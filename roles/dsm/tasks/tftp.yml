@@ -1,0 +1,79 @@
+---
+- set_fact:
+    root_password: "{{ lookup('file', '{{ item }}') }}"
+  with_first_found:
+    - files:
+        - ~/.config/harem/root_password
+      skip: true
+
+- name: generate random root password if not defined
+  set_fact:
+    root_password: "{{ lookup('password', '~/.config/harem/root_password chars=ascii_letters') }}"
+  when: root_password is not defined
+
+- become: true
+  block:
+    - name: boot tftp server speed
+      # https://forum.synology.com/enu/viewtopic.php?t=107882
+      ini_file:
+        path: /etc/opentftp.ini
+        section: TFTP-OPTIONS
+        option: blksize
+        value: 4096
+        # value: 1456
+        no_extra_spaces: true
+      register: result
+
+    - name: restart tftp
+      command: /usr/syno/sbin/synoservicectl --restart opentftp
+      when: result is changed
+
+    - name: configure pxe boot menu
+      template:
+        src: pxelinux.cfg/default.j2
+        dest: "{{ pxe_root }}/pxelinux.cfg/default"
+
+    - name: deploy kickstart config files (ks)
+      template:
+        src: "{{ ks_file }}"
+        dest: "{{ ks_root }}/{{ (ks_file | basename | splitext)[0] }}"
+      with_fileglob: templates/ks/*
+      loop_control:
+        loop_var: ks_file
+
+    - name: deploy static files used during provisioning
+      # synchronize:  # diabled due to https://community.synology.com/forum/9/post/121078
+      copy:
+        src: files/
+        dest: "{{ ks_root }}"
+
+    - name: create directories for boot files
+      file:
+        path: "{{ pxe_root }}/{{ file | dirname }}"
+        state: directory
+      with_items:
+        - fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/vmlinuz
+        - fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/initrd.img
+      loop_control:
+        loop_var: file
+
+    - name: get ipxe
+      get_url:
+        url: http://boot.ipxe.org/{{ file }}
+        dest: "{{ pxe_root }}/{{ file }}"
+      with_items:
+        - ipxe.pxe
+        - undionly.kpxe
+      loop_control:
+        loop_var: file
+
+    - name: get boot files
+      get_url:
+        url: "{{ distros_mirror }}/{{ file }}"
+        dest: "{{ pxe_root }}/{{ file }}"
+
+      with_items:
+        - fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/vmlinuz
+        - fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/initrd.img
+      loop_control:
+        loop_var: file

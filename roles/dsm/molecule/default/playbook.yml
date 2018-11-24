@@ -1,0 +1,5 @@
+---
+- name: Converge
+  hosts: instance
+  roles:
+    - role: dsm

@@ -1,0 +1,159 @@
+install
+lang en_US.UTF-8
+keyboard us
+services --enabled=network,{% if snmp is defined and snmp %}snmpd,{% endif %}sshd,ntpd
+eula --agreed
+
+network --device=eth0 --onboot=yes --hostname=fedora28 --bootproto=dhcp{% if not ipv6 %} --noipv6{% endif%}
+
+{% if rootpw is defined and rootpw %}
+rootpw {{ rootpw }}
+{# auth --useshadow {{ auth_encryption | default() }} #}
+{% endif %}
+{% if default_username is defined %}
+user --name={{ default_username }}{% if default_password is defined and default_password %} --password={{ default_password }}{% endif %}
+{% endif %}
+
+firewall --disabled
+selinux --disabled
+timezone UTC
+firstboot --disable
+skipx
+text
+
+ignoredisk --only-use=sda
+bootloader --location=mbr --timeout=0 --append="{% if not ipv6 %}ipv6.disable=1 {% endif %}net.ifnames=0 biosdevname=0"
+zerombr
+clearpart --drives=sda --all
+part swap --asprimary --fstype=swap --ondisk=sda --size=1024
+part /    --asprimary --fstype=xfs  --ondisk=sda --size=1024 --grow
+
+reboot
+
+%packages
+@core
+{% if snmp is defined and snmp %}net-snmp
+{% endif %}
+net-tools
+ntp
+deltarpm
+curl
+%end
+
+%post --log=/root/ks-post.log
+
+hostnamectl set-hostname fedora28
+
+set -x
+sed -i -e 's|^# %wheel\tALL=(ALL)\tNOPASSWD: ALL|%wheel\tALL=(ALL)\tNOPASSWD: ALL|; s|^Defaults    requiretty|#&|' /etc/sudoers
+
+if command -v dnf >/dev/null; then
+  PKG_CMD=dnf
+  PKG_CONFIG=/etc/dnf/dnf.conf
+  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-28-primary
+  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-28-x86_64
+else
+  PKG_CMD=yum
+  PKG_CONFIG=/etc/yum.conf
+  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+  rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+fi
+
+{% if http_proxy is defined %}
+{# https://unix.stackexchange.com/questions/212894/whats-the-right-format-for-the-http-proxy-environment-variable-caps-or-no-ca #}
+### HTTP PROXY
+echo "proxy=http://{{ http_proxy }}" >> $PKG_CONFIG
+cat <<EOF > /etc/profile.d/proxy.sh
+HTTP_PROXY={{ http_proxy }}
+HTTPS_PROXY={{ http_proxy }}
+http_proxy={{ http_proxy }}
+https_proxy={{ http_proxy }}
+ftp_proxy={{ http_proxy }}
+export http_proxy https_proxy ftp_proxy HTTP_PROXY HTTPS_PROXY
+EOF
+cat <<EOF > /etc/wgetrc
+http_proxy = {{ http_proxy }}
+https_proxy = {{ http_proxy }}
+ftp_proxy = {{ http_proxy }}
+EOF
+{% endif %}
+
+$PKG_CMD install -y augeas dmidecode {{ extra_packages | join(" ") }}
+
+{% if nameserver is defined %}
+### DNS settings
+cat << EOF > /etc/resolv.conf
+domain {{ domain }}
+search {{ search_domains }}
+nameserver {{ nameserver }}
+EOF
+{% endif %}
+
+{### disable /etc/resolv.conf rewritting if NM is installed #}
+[ -f /etc/NetworkManager/NetworkManager.conf ] && sed -i '/\[main\]/a dns=none' /etc/NetworkManager/NetworkManager.conf
+
+{### creating new /etc/hosts #}
+cat << EOF > /etc/hosts
+# Do not remove the following line, or various programs
+# that require network functionality will fail
+127.0.0.1 localhost.localdomain localhost
+::1       localhost6.localdomain6 localhost6
+EOF
+
+{% if snmp is defined and snmp %}
+{### create snmp config #}
+cat << EOF >/etc/snmp/snmpd.conf
+com2sec         notConfigUser  default       public
+group           notConfigGroup v1            notConfigUser
+group           notConfigGroup v2c           notConfigUser
+access          notConfigGroup ""            any  noauth exact systemview none none
+view            systemview     included      .1
+master  agentx
+agentxperms 770 770 daemon daemon
+dontLogTCPWrappersConnects 1
+interface lo 24 1000000000
+EOF
+{% endif %}
+
+install --mode=700 -d /root/.ssh
+{# install --mode=700 /dev/null /root/.ssh/authorized_keys #}
+
+{# ---- Install our SSH key ---- #}
+install -m 0600 /dev/stdin /root/.ssh/authorized_keys <<EOF
+{{ authorized_keys }}
+EOF
+
+{# fix up selinux context #}
+restorecon -R /root/.ssh/
+
+{% if default_username is defined %}
+install --mode=700 -o {{ default_username }} -g {{ default_username }} -d ~{{ default_username }}/.ssh
+install -o {{ default_username }} -g {{ default_username }} /root/.ssh/authorized_keys ~{{ default_username }}/.ssh/authorized_keys ~{{ default_username }}/.ssh/authorized_keys
+{% endif %}
+
+{% for f in lookup('fileglob', 'files/etc/ssh/*.key', wantlist=True) %}
+curl -s {{ ks_url }}/etc/ssh/{{ f | basename }} | \
+    install -m 0640 -o root -g ssh_keys /dev/stdin /etc/ssh/{{ f | basename }}
+{% endfor %}
+{% for f in lookup('fileglob', 'files/etc/ssh/*.pub', wantlist=True) %}
+curl -s {{ ks_url }}/etc/ssh/{{ f | basename }} | \
+    install -m 0644 -o root -g root /dev/stdin /etc/ssh/{{ f | basename }}
+{% endfor %}
+
+augtool -s <<EOF
+{# root login needs to be enabled during initial setup so the project specific scripts can be executed #}
+set /files/etc/ssh/sshd_config/PermitRootLogin yes
+
+{# This saves time during vm startup #}
+set /files/etc/grub.conf/timeout 0
+
+{# Removed because otherwise user install scripts can't use sudo #}
+rm /files/etc/sudoers/Defaults[requiretty]
+EOF
+
+{# install virtualbox guest tools, if appropiate #}
+dmidecode -t system|grep 'Product Name: VirtualBox' >/dev/null && {
+    $PKG_CMD install -y virtualbox-guest-additions
+}
+
+%end

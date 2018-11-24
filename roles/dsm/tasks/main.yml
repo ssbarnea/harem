@@ -1,0 +1,10 @@
+---
+# tasks file for dsm
+- include_tasks:
+    file: "{{ dsm_subtask }}"
+  with_items:
+    - tasks/tftp.yml
+    # - ssl.yml
+    # - docker.yml
+  loop_control:
+    loop_var: dsm_subtask

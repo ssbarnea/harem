@@ -1,0 +1,9 @@
+#!/usr/bin/env ansible-playbook
+- hosts: syno
+  gather_facts: no
+  vars:
+    cert_name: sbarnea.com
+  tasks:
+    - include_role:
+        name: dsm
+
