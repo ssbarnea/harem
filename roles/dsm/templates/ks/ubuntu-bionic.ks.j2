@@ -1,4 +1,4 @@
-d-i debian-installer/locale select en_US.UTF-8 
+d-i debian-installer/locale select en_US.UTF-8
 d-i debian-installer/add-kernel-opts ipv6.disable=1 vga=791 net.ifnames=0 biosdevname=0
 #d-i console-tools/archs select at
 d-i console-keymaps-at/keymap select us
@@ -88,7 +88,7 @@ d-i passwd/user-password-crypted password '!!'
 
 # Grub config
 #grub-pc grub-pc/install_devices multiselect     /dev/sda
-#grub-pc grub-pc/install_devices_disks_changed multiselect 
+#grub-pc grub-pc/install_devices_disks_changed multiselect
 
 grub-installer  grub-installer/grub_not_mature_on_this_platform boolean false
 grub-installer  grub-installer/with_other_os  boolean true

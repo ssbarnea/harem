@@ -51,7 +51,7 @@ extra_packages:
 # -- not implemented yet --
 
 dhcp_boot_default_bios_filename: pxelinux.0
-# undionly.kpxe  # ipxe file (causes recursive loop without special config on dhcp server)
+# undionly.kpxe  # ipxe file (causes recursive loop w/o config on dhcp server)
 dhcp_boot_uefi_32bit_filename: centos/efi/grubia32.efi
 dhcp_boot_uefi_64bit_filename: centos/efi/grubx64.efi
 dhcp_boot_next_server: 192.168.33.40

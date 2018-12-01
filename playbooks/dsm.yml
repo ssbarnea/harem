@@ -1,4 +1,4 @@
-#!/usr/bin/env ansible-playbook
+---
 - hosts: syno
   gather_facts: no
   vars:
@@ -6,4 +6,3 @@
   tasks:
     - include_role:
         name: dsm
-

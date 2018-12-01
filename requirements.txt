@@ -1,3 +1,4 @@
-pykickstart
 passlib
+pyghmi
+pykickstart
 python-vagrant

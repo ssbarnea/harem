@@ -1,4 +1,4 @@
-d-i debian-installer/locale select en_US.UTF-8 
+d-i debian-installer/locale select en_US.UTF-8
 #d-i console-tools/archs select at
 d-i console-keymaps-at/keymap select us
 
@@ -47,12 +47,12 @@ d-i partman-auto/choose_recipe select atomic
 d-i mirror/codename string stretch
 d-i mirror/protocol string http
 d-i mirror/country string enter information manually
-d-i mirror/http/countries string enter information manually 
+d-i mirror/http/countries string enter information manually
 d-i mirror/http/directory string /debian
 d-i mirror/http/hostname string mirror.yandex.ru
 d-i mirror/http/proxy string
 # Suite to install
-d-i clock-setup/utc boolean false 
+d-i clock-setup/utc boolean false
 d-i time/zone string Central
 # Repo set-up, squelch pesky security updates until later...
 d-i apt-setup/use_mirror boolean true
@@ -83,7 +83,7 @@ d-i passwd/user-uid string 1000
 #
 # Grub config
 #grub-pc grub-pc/install_devices multiselect     /dev/sda
-#grub-pc grub-pc/install_devices_disks_changed multiselect 
+#grub-pc grub-pc/install_devices_disks_changed multiselect
 
 grub-installer  grub-installer/grub_not_mature_on_this_platform boolean false
 grub-installer  grub-installer/with_other_os  boolean true

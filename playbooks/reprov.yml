@@ -1,4 +1,4 @@
-#!/usr/bin/env ansible-playbook
+---
 - hosts: baremetals
   gather_facts: false
   strategy: free

@@ -8,7 +8,9 @@
 
 - name: generate random root password if not defined
   set_fact:
-    root_password: "{{ lookup('password', '~/.config/harem/root_password chars=ascii_letters') }}"
+    root_password: |
+      "{{ lookup('password',
+      '~/.config/harem/root_password chars=ascii_letters') }}"
   when: root_password is not defined
 
 - become: true
