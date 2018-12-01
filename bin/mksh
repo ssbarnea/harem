@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Shortcut for creating templated new shell scripts
+set -euxo pipefail
+
+touch $1
+chmod +x $1
+cat <<EOF >$1
+#!/usr/bin/env bash
+set -euxo pipefail
+
+EOF
+
+$EDITOR $1 &
+

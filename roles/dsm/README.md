@@ -7,6 +7,11 @@ Configures Synology DSM to act as:
 - installing SSL certificates
 - allow DSM docker to be accessible using TCP
 
+References:
+
+- https://www.syslinux.org/wiki/index.php?title=PXELINUX
+
+
 Requirements
 ------------
 
@@ -17,6 +22,7 @@ Role Variables
 
 http_proxy
 cert_name
+
 
 Dependencies
 ------------

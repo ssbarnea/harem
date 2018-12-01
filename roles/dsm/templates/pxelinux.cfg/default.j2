@@ -4,6 +4,7 @@ PXERetry 5
 PROMPT 0
 {# unit: 0.1s #}
 TIMEOUT 100
+DEFAULT {{ os_flavour | default('bootlocal') }}
 
 LABEL bootlocal
   MENU LABEL Local Boot

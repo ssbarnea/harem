@@ -1,0 +1,18 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: all
+  connection: local
+  gather_facts: true
+  strategy: linear
+  vars:
+    state: on
+  tasks:
+    - ipmi_power:
+        name: "{{ ipmi_address }}"
+        user: "{{ ipmi_user }}"
+        password: "{{ ipmi_password }}"
+        state: "{{ state }}"
+        timeout: 10
+      register: result
+    - debug:
+        msg: "{{ result }}"

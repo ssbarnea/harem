@@ -6,6 +6,7 @@ http_proxy: 192.168.33.1:3128
 ks_url: http://192.168.33.40/~ssbarnea/ks
 ks_root: /volume1/homes/ssbarnea/www/ks
 pxe_root: /volume2/PXE
+serial_console: ttyS1,115200
 
 # Use `openssl passwd -1 "password"` to generate a new password
 # rootpw: "--iscrypted $6$...."
@@ -16,12 +17,14 @@ default_username: cloud-user
 default_password: "{{ root_password }}"
 
 authorized_keys: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
-ipv6: false
+ipv6: true
 snmp: false
 
+custom_networking: false  # if false we will fully trust DHCP
 nameserver: ~  # define it if you want to configure a default nameserver
 domain: lan
-search_domains: "{{ domain}}"
+search_domains: "{{ domain }}"
+# ^ above options are used only when custom_networking is true
 
 kernel_options: >
   nomodeset
@@ -30,19 +33,21 @@ kernel_options: >
   logo.nologo
   inst.cmdline
   inst.proxy=http://{{ http_proxy }}
-  console=tty0
   modprobe.blacklist=floppy
-# console=ttyS0,115200
-# console=ttyS0
+  console=tty0
+  console={{ serial_console }}
 
-#   quiet  # not desired as it will replace the boot mesages is a progress bar
-
-# ksdevice=bootif - does nothing
-
+# quiet  # not desired as it will replace the boot mesages is a progress bar
+# ksdevice=bootif  # does nothing
 # inst.cmdline
 # see https://serverfault.com/questions/708447/probing-edd-boot-message-stays-for-ten-minutes-on-centos-6-6
 
 
+extra_packages:
+  - htop
+  - iotop
+  - mc
+  - ncdu
 # -- not implemented yet --
 
 dhcp_boot_default_bios_filename: pxelinux.0
@@ -50,9 +55,3 @@ dhcp_boot_default_bios_filename: pxelinux.0
 dhcp_boot_uefi_32bit_filename: centos/efi/grubia32.efi
 dhcp_boot_uefi_64bit_filename: centos/efi/grubx64.efi
 dhcp_boot_next_server: 192.168.33.40
-
-extra_packages:
-  - htop
-  - iotop
-  - mc
-  - ncdu

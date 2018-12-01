@@ -1,0 +1,35 @@
+#!/usr/bin/env ansible-playbook
+- hosts: baremetals
+  gather_facts: false
+  strategy: free
+  tasks:
+
+    # - pip:
+    #     name: pyghmi
+    #     state: present
+    #     executable: "{% if ansible_python is defined %}{{ ansible_python.executable | default('python') }}{% else %}python{% endif%} -m pip"
+    #     extra_args: --user
+
+    - ipmi_boot:
+        bootdev: network
+        # setup
+        # network
+        name: "{{ ipmi_address }}"
+        uefiboot: no
+        user: "{{ ipmi_user }}"
+        password: "{{ ipmi_password }}"
+      delegate_to: localhost
+      register: result
+    - debug:
+        msg: "{{ result }}"
+
+    - ipmi_power:
+        name: "{{ ipmi_address }}"
+        user: "{{ ipmi_user }}"
+        password: "{{ ipmi_password }}"
+        state: reset
+        timeout: 1
+      register: result
+      delegate_to: localhost
+    - debug:
+        msg: "{{ result }}"
