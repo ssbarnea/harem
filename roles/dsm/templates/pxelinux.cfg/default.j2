@@ -1,5 +1,5 @@
 UI menu.c32
-MENU TITLE Host Menu
+MENU TITLE Host Menu {{ inventory_hostname }}
 PXERetry 5
 PROMPT 0
 {# unit: 0.1s #}
@@ -13,6 +13,16 @@ LABEL bootlocal
   to boot from local media (hard disk, DVD, etc)
   ENDTEXT
   localboot 0
+
+LABEL memtest
+  MENU LABEL memtest
+  kernel memtest
+  append -
+
+LABEL nemo
+MENU LABEL nemo
+ kernel memdisk
+ append initrd=nemo.img floppy raw
 
 LABEL centos7
 MENU LABEL centos7

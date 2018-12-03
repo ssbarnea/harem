@@ -28,7 +28,7 @@
         user: "{{ ipmi_user }}"
         password: "{{ ipmi_password }}"
         state: reset
-        timeout: 1
+        timeout: 3
       register: result
       delegate_to: localhost
     - debug:

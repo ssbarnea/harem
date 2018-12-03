@@ -9,8 +9,8 @@
 - name: generate random root password if not defined
   set_fact:
     root_password: |
-      "{{ lookup('password',
-      '~/.config/harem/root_password chars=ascii_letters') }}"
+      {{ lookup('password',
+      '~/.config/harem/root_password chars=ascii_letters') }}
   when: root_password is not defined
 
 - become: true
@@ -31,6 +31,8 @@
       when: result is changed
 
     - name: configure default pxe boot menu
+      vars:
+        inventory_hostname: ~
       template:
         src: pxelinux.cfg/default.j2
         dest: "{{ pxe_root }}/pxelinux.cfg/default"
@@ -38,12 +40,14 @@
     - name: configure specific pxe boot menus
       template:
         src: pxelinux.cfg/default.j2
-        dest: "{{ pxe_root }}/pxelinux.cfg/{{ hostvars[item].pxe_mac_address }}"
+        dest: >-
+          {{ pxe_root }}/pxelinux.cfg/{{
+          hostvars[item].boot_mac[0] | regex_replace(':', '-') | lower }}
       vars:
         os_flavour: "{{ hostvars[item].os_flavour }}"
-      when: hostvars[item].pxe_mac_address is defined
+        inventory_hostname: "{{ item }}"
+      when: hostvars[item].boot_mac is defined
       with_items: "{{ groups['baremetals'] }}"
-      no_log: true
 
     - name: deploy kickstart templated files (ks)
       template:
@@ -74,11 +78,14 @@
 
     - name: get ipxe
       get_url:
-        url: http://boot.ipxe.org/{{ file }}
-        dest: "{{ pxe_root }}/{{ file }}"
-      with_items:
-        - ipxe.pxe
-        - undionly.kpxe
+        url: "{{ file.value }}"
+        dest: "{{ pxe_root }}/{{ file.key }}"
+      with_dict:
+        ipxe.pxe: http://boot.ipxe.org/ipxe.pxe
+        undionly.kpxe: http://boot.ipxe.org/undionly.kpxe
+        nemo.img: http://www.lsc-group.phys.uwm.edu/beowulf/nemo/construction/BIOS/Nemo-node-config.img
+        memtest: http://boot.ipxe.org/memtest
+        memtest.0: http://boot.ipxe.org/memtest.0
       loop_control:
         loop_var: file
 

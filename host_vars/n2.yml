@@ -1,4 +1,5 @@
 ---
-pxe_mac_address: 00-30-48-F2-30-4B
+bmc_mac_address: 00:30:48:F2:30:4B
 os_flavour: fedora28
-ipmi_address: n2i.sbarnea.com
+mac_address:
+  - 00:30:48:F2:30:4B

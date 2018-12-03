@@ -13,7 +13,7 @@
 #     use: pkg
 #   delegate_to: pfsense
 #   become: yes
-- name: conmfigure docked
+- name: configure docked
   template:
     src: dockerd.json.j2
     dest: /var/packages/Docker/etc/dockerd.json

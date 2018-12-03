@@ -6,12 +6,27 @@
   vars:
     state: "on"
   tasks:
+
+    - name: configure boot device
+      ipmi_boot:
+        bootdev: "{{ state }}"
+        # network
+        # setup
+        # network
+        name: "{{ ipmi_address }}"
+        uefiboot: no
+        user: "{{ ipmi_user }}"
+        password: "{{ ipmi_password }}"
+      delegate_to: localhost
+      when: state != "on"
+      register: ipmi_boot
+
     - ipmi_power:
         name: "{{ ipmi_address }}"
         user: "{{ ipmi_user }}"
         password: "{{ ipmi_password }}"
-        state: "{{ state }}"
+        state: "{% if state == 'setup' %}boot{% elif state %}on{% else %}off{% endif %}"
         timeout: 10
-      register: result
+      register: ipmi_power
     - debug:
-        msg: "{{ result }}"
+        msg: "{{ ipmi_boot }} {{ ipmi_power }}"

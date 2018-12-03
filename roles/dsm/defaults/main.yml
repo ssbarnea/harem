@@ -9,9 +9,7 @@ pxe_root: /volume2/PXE
 serial_console: ttyS1,115200
 
 # Use `openssl passwd -1 "password"` to generate a new password
-# rootpw: "--iscrypted $6$...."
-# auth_encryption: --passalgo=sha512
-rootpw: "--plaintext {{ root_password }}"
+auth_encryption: sha512
 
 default_username: cloud-user
 default_password: "{{ root_password }}"
@@ -36,6 +34,10 @@ kernel_options: >
   modprobe.blacklist=floppy
   console=tty0
   console={{ serial_console }}
+
+#  bond=bond0:em1,em2,p1p1,p1p2:mode=802.3ad,lacp_rate=fast,miimon=100,xmit_hash_policy=layer2+3
+
+#vlan=bond0.123:bond0
 
 # quiet  # not desired as it will replace the boot mesages is a progress bar
 # ksdevice=bootif  # does nothing
