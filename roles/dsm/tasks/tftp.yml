@@ -68,13 +68,13 @@
 
     - name: create directories for boot files
       file:
-        path: "{{ pxe_root }}/{{ file | dirname }}"
+        path: "{{ pxe_root }}/{{ dir}}"
         state: directory
       with_items:
-        - fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/vmlinuz
-        - fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/initrd.img
+        - fedora28
+        - centos7
       loop_control:
-        loop_var: file
+        loop_var: dir
 
     - name: get ipxe
       get_url:
@@ -86,16 +86,9 @@
         nemo.img: http://www.lsc-group.phys.uwm.edu/beowulf/nemo/construction/BIOS/Nemo-node-config.img
         memtest: http://boot.ipxe.org/memtest
         memtest.0: http://boot.ipxe.org/memtest.0
-      loop_control:
-        loop_var: file
-
-    - name: get boot files
-      get_url:
-        url: "{{ distros_mirror }}/{{ file }}"
-        dest: "{{ pxe_root }}/{{ file }}"
-
-      with_items:
-        - fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/vmlinuz
-        - fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/initrd.img
+        'fedora28/vmlinuz': "{{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/vmlinuz"
+        'fedora28/initrd.img': "{{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/initrd.img"
+        'centos7/initrd.img': "{{ distros_mirror }}/centos/7/os/x86_64/images/pxeboot/initrd.img"
+        'centos7/vmlinuz': "{{ distros_mirror }}/centos/7/os/x86_64/images/pxeboot/vmlinuz"
       loop_control:
         loop_var: file

@@ -27,14 +27,14 @@ MENU LABEL nemo
 LABEL centos7
 MENU LABEL centos7
   ipappend 2
-  kernel centos/7/os/x86_64/images/pxeboot/vmlinuz
-  append initrd=centos/7/os/x86_64/images/pxeboot/initrd.img repo={{ distros_mirror }}/centos/7/os/x86_64/ ks={{ ks_url }}/centos7.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+  kernel centos7/vmlinuz
+  append initrd=centos7/initrd.img repo={{ distros_mirror }}/centos/7/os/x86_64/ ks={{ ks_url }}/centos7.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
 
 LABEL fedora28
 MENU LABEL fedora28
   ipappend 2
-  kernel fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/vmlinuz
-  append initrd=fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/initrd.img repo={{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/ ks={{ ks_url }}/fedora28.ks inst.proxy=http://{{ http_proxy }} ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+  kernel fedora28/vmlinuz
+  append initrd=fedora28/initrd.img repo={{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/ ks={{ ks_url }}/fedora28.ks inst.proxy=http://{{ http_proxy }} ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
 
 LABEL debian-stretch
 MENU LABEL debian-stretch
