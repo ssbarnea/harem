@@ -41,12 +41,12 @@
       template:
         src: pxelinux.cfg/default.j2
         dest: >-
-          {{ pxe_root }}/pxelinux.cfg/{{
-          hostvars[item].boot_mac[0] | regex_replace(':', '-') | lower }}
+          {{ pxe_root }}/pxelinux.cfg/01-{{
+          hostvars[item].mac_addresses[0] | regex_replace(':', '-') | lower }}
       vars:
         os_flavour: "{{ hostvars[item].os_flavour }}"
         inventory_hostname: "{{ item }}"
-      when: hostvars[item].boot_mac is defined
+      when: hostvars[item].mac_addresses is defined
       with_items: "{{ groups['baremetals'] }}"
 
     - name: deploy kickstart templated files (ks)
