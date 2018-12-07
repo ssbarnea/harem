@@ -10,20 +10,31 @@
     #     executable: "{% if ansible_python is defined %}{{ ansible_python.executable | default('python') }}{% else %}python{% endif%} -m pip"
     #     extra_args: --user
 
-    - ipmi_boot:
+    - name: set default boot to disk
+      ipmi_boot:
+        bootdev: hd
+        name: "{{ ipmi_address }}"
+        uefiboot: no
+        user: "{{ ipmi_user }}"
+        password: "{{ ipmi_password }}"
+        persistent: yes
+      delegate_to: localhost
+
+    - name: set next boot to network (pxe)
+      ipmi_boot:
         bootdev: network
-        # setup
-        # network
         name: "{{ ipmi_address }}"
         uefiboot: no
         user: "{{ ipmi_user }}"
         password: "{{ ipmi_password }}"
       delegate_to: localhost
       register: result
+
     - debug:
         msg: "{{ result }}"
 
-    - ipmi_power:
+    - name: perform ipmi reboot
+      ipmi_power:
         name: "{{ ipmi_address }}"
         user: "{{ ipmi_user }}"
         password: "{{ ipmi_password }}"
@@ -31,5 +42,6 @@
         timeout: 3
       register: result
       delegate_to: localhost
+
     - debug:
         msg: "{{ result }}"

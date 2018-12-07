@@ -38,15 +38,7 @@
         dest: "{{ pxe_root }}/pxelinux.cfg/default"
 
     - name: configure specific pxe boot menus
-      template:
-        src: pxelinux.cfg/default.j2
-        dest: >-
-          {{ pxe_root }}/pxelinux.cfg/01-{{
-          hostvars[item].mac_addresses[0] | regex_replace(':', '-') | lower }}
-      vars:
-        os_flavour: "{{ hostvars[item].os_flavour }}"
-        inventory_hostname: "{{ item }}"
-      when: hostvars[item].mac_addresses is defined
+      include_tasks: custom-menus.yml
       with_items: "{{ groups['baremetals'] }}"
 
     - name: deploy kickstart templated files (ks)
@@ -54,7 +46,7 @@
         src: "{{ ks_file }}"
         dest: "{{ ks_root }}/{{ (ks_file | basename | splitext)[0] }}"
         decrypt: true
-      with_fileglob: templates/ks/*
+      with_fileglob: templates/ks/*.ks.j2
       loop_control:
         loop_var: ks_file
 

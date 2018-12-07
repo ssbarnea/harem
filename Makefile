@@ -8,5 +8,11 @@ list:
 dsm:
 	ansible-playbook playbooks/dsm.yml
 
+nodes:
+	ansible-playbook playbooks/nodes.yml
+
 n2:
 	./bin/reprov n2
+
+n0:
+	./bin/reprov n0

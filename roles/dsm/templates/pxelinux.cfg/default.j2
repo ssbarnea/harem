@@ -1,10 +1,10 @@
 UI menu.c32
-MENU TITLE Host Menu {{ inventory_hostname }}
+MENU TITLE Host Menu {{ ks_hostname | default('generic') }}
 PXERetry 5
 PROMPT 0
 {# unit: 0.1s #}
 TIMEOUT 100
-DEFAULT {{ os_flavour | default('bootlocal') }}
+DEFAULT {{ 'custom-' + ks_os_flavour | default('bootlocal') }}
 
 LABEL bootlocal
   MENU LABEL Local Boot
@@ -23,6 +23,14 @@ LABEL nemo
 MENU LABEL nemo
  kernel memdisk
  append initrd=nemo.img floppy raw
+
+{% if ks_hostname is defined %}
+LABEL custom-{{ ks_os_flavour }}
+MENU LABEL custom-{{ ks_os_flavour }}
+  ipappend 2
+  kernel {{ ks_os_flavour }}/vmlinuz
+  append initrd={{ ks_os_flavour }}/initrd.img repo={{ ks_os_repo }} ks={{ ks_url }}/{{ ks_host_id }}.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+{% else %}
 
 LABEL centos7
 MENU LABEL centos7
@@ -59,3 +67,4 @@ MENU LABEL ubuntu-xenial
   ipappend 2
   kernel {{ distros_mirror }}/ubuntu/dists/xenial/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux
   append initrd={{ distros_mirror }}/ubuntu/dists/xenial/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 keymap=us netcfg/get_hostname=ubuntu-xenial netcfg/get_domain=lan auto url={{ ks_url }}/ubuntu-xenial.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 interface=eth0 {{ kernel_options }}
+{% endif %}

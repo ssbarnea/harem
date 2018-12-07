@@ -1,18 +1,20 @@
 install
 lang en_US.UTF-8
-keyboard us
-services --enabled=network,sshd,snmpd,ntpd
+keyboard --vckeymap=us --xlayouts=''
+services --enabled={{ ks_services | join(',') }}
 eula --agreed
 
-network --device=eth0 --onboot=yes --hostname=centos7 --bootproto=dhcp{% if not ipv6 %} --noipv6{% endif %}
+network {{ network_options | replace('\n', '') }} --onboot=yes --hostname={{ ks_hostname }} --bootproto=dhcp{% if not ipv6 %} --noipv6{% endif %} --activate
 
-{% if rootpw is defined and rootpw %}
-rootpw {{ rootpw }}
-auth --useshadow {{ auth_encryption | default() }}
+{% if root_password is defined and root_password %}
+rootpw --iscrypted {{ root_password | password_hash(auth_encryption) }}
+auth --useshadow --passalgo={{ auth_encryption }}
 {% endif %}
 {% if default_username is defined %}
-user --name={{ default_username }}{% if default_password is defined and default_password %} --password={{ default_password }}{% endif %}
+user --name={{ default_username }}{% if default_password is defined and default_password %} --iscrypted --password={{ default_password | password_hash(auth_encryption)  }}{% endif %}
 {% endif %}
+
+{{ ks_repo_updates }}
 
 firewall --disabled
 selinux --disabled
@@ -31,23 +33,26 @@ part /    --asprimary --fstype=xfs  --ondisk=sda --size=1024 --grow
 reboot
 
 %packages
-@base
 @core
-@hardware-monitoring
-@system-admin-tools
-net-tools
-net-snmp
-ntp
-screen
-vim-enhanced
-deltarpm
-curl
+{{ ks_packages | join('\n') }}
 %end
 
-%post --log=/root/ks-post.log
+%post
+{# tee post execution based on https://wiki.centos.org/TipsAndTricks/KickStart #}
+exec < /dev/tty3 > /dev/tty3
+chvt 3
+(
 
 set -exuo pipefail
 sed -i -e 's|^# %wheel\tALL=(ALL)\tNOPASSWD: ALL|%wheel\tALL=(ALL)\tNOPASSWD: ALL|; s|^Defaults    requiretty|#&|' /etc/sudoers
+
+{# to avoid rpm install from url failing due to untrusted CA of the proxy #}
+{% if custom_ca is defined %}
+cat << EOF > /etc/pki/ca-trust/source/anchors/custom-ca.crt
+{{ custom_ca }}
+EOF
+update-ca-trust
+{% endif %}
 
 if command -v dnf >/dev/null; then
   PKG_CMD=dnf
@@ -58,6 +63,8 @@ else
   PKG_CMD=yum
   PKG_CONFIG=/etc/yum.conf
   rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+  rpm --import https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+  rpm --import https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7Server
   rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 fi
 
@@ -80,7 +87,7 @@ ftp_proxy = {{ http_proxy }}
 EOF
 {% endif %}
 
-$PKG_CMD install -y augeas dmidecode {{ extra_packages | join(" ") }}
+$PKG_CMD install -q -y augeas dmidecode {{ extra_packages | join(" ") }}
 
 {% if custom_networking %}
 {% if nameserver is defined and nameserver %}
@@ -132,15 +139,15 @@ restorecon -R /root/.ssh/
 
 {% if default_username is defined %}
 install --mode=700 -o {{ default_username }} -g {{ default_username }} -d ~{{ default_username }}/.ssh
-install -o {{ default_username }} -g {{ default_username }} /root/.ssh/authorized_keys ~{{ default_username }}/.ssh/authorized_keys ~{{ default_username }}/.ssh/authorized_keys
+install -o {{ default_username }} -g {{ default_username }} /root/.ssh/authorized_keys ~{{ default_username }}/.ssh/authorized_keys
 {% endif %}
 
 {% for f in lookup('fileglob', 'files/etc/ssh/*.key', wantlist=True) %}
-curl -s {{ ks_url }}/etc/ssh/{{ f | basename }} | \
+curl -ks {{ ks_url }}/etc/ssh/{{ f | basename }} | \
     install -m 0640 -o root -g ssh_keys /dev/stdin /etc/ssh/{{ f | basename }}
 {% endfor %}
 {% for f in lookup('fileglob', 'files/etc/ssh/*.pub', wantlist=True) %}
-curl -s {{ ks_url }}/etc/ssh/{{ f | basename }} | \
+curl -ks {{ ks_url }}/etc/ssh/{{ f | basename }} | \
     install -m 0644 -o root -g root /dev/stdin /etc/ssh/{{ f | basename }}
 {% endfor %}
 
@@ -159,5 +166,8 @@ EOF
 dmidecode -t system|grep 'Product Name: VirtualBox' >/dev/null && {
     $PKG_CMD install -y virtualbox-guest-additions
 }
+
+) 2>&1 | /usr/bin/tee /root/ks-post.log
+chvt 1
 
 %end

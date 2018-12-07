@@ -1,6 +1,6 @@
 ---
-- hosts: syno
+- hosts: baremetals
   gather_facts: no
   tasks:
     - include_role:
-        name: dsm
+        name: virsh

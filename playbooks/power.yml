@@ -7,7 +7,7 @@
     state: "on"
   tasks:
 
-    - name: configure boot device
+    - name: configure next boot device
       ipmi_boot:
         bootdev: "{{ state }}"
         # network
@@ -21,12 +21,14 @@
       when: state != "on"
       register: ipmi_boot
 
-    - ipmi_power:
+    - name: reboot
+      ipmi_power:
         name: "{{ ipmi_address }}"
         user: "{{ ipmi_user }}"
         password: "{{ ipmi_password }}"
         state: "{% if state == 'setup' %}boot{% elif state %}on{% else %}off{% endif %}"
         timeout: 10
       register: ipmi_power
+
     - debug:
         msg: "{{ ipmi_boot }} {{ ipmi_power }}"

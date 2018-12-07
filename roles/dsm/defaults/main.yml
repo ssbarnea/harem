@@ -24,6 +24,16 @@ domain: lan
 search_domains: "{{ domain }}"
 # ^ above options are used only when custom_networking is true
 
+bond_slaves: eth0,eth1
+bond_options: mode=802.3ad,lacp_rate=fast,miimon=100,xmit_hash_policy=layer2+3
+
+
+# TODO(ssbarnea): enable bonding based on number of interfaces on host
+network_options: >
+  --device=bond0 --bondslaves={{ bond_slaves }} --bondopts={{ bond_options }}
+
+# https://access.redhat.com/solutions/666853 - about bonding options
+
 kernel_options: >
   nomodeset
   i915.modeset=0
@@ -31,18 +41,22 @@ kernel_options: >
   logo.nologo
   inst.cmdline
   inst.proxy=http://{{ http_proxy }}
+  proxy=http://{{ http_proxy }}
   modprobe.blacklist=floppy
   console=tty0
   console={{ serial_console }}
+  inst.ks.sendmac
+  bond=bond0:{{ bond_slaves }}:{{ bond_options}}
+  {%- if syslog_server is defined -%}inst.syslog={{ syslog_server }}{%- endif -%}
 
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/sect-parameter-configuration-files-other-s390
+# https://media.readthedocs.org/pdf/anaconda-installer/latest/anaconda-installer.pdf
 #  bond=bond0:em1,em2,p1p1,p1p2:mode=802.3ad,lacp_rate=fast,miimon=100,xmit_hash_policy=layer2+3
+# vlan=bond0.123:bond0
 
-#vlan=bond0.123:bond0
-
-# quiet  # not desired as it will replace the boot mesages is a progress bar
-# ksdevice=bootif  # does nothing
-# inst.cmdline
 # see https://serverfault.com/questions/708447/probing-edd-boot-message-stays-for-ten-minutes-on-centos-6-6
+
+
 
 
 extra_packages:
@@ -57,3 +71,13 @@ dhcp_boot_default_bios_filename: pxelinux.0
 dhcp_boot_uefi_32bit_filename: centos/efi/grubia32.efi
 dhcp_boot_uefi_64bit_filename: centos/efi/grubx64.efi
 dhcp_boot_next_server: 192.168.33.40
+
+boot_options:
+  centos7:
+    name: centos
+    version: 7
+    template: redhat
+  fedora28:
+    name: fedora
+    version: 28
+    template: redhat

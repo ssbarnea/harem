@@ -1,0 +1,62 @@
+---
+
+- set_fact:
+    ks_os_flavour: "{{ hostvars[item].os_flavour }}"
+
+- set_fact:
+    ks_host_id: "{{ hostvars[item].mac_addresses[0] | regex_replace(':', '-') | lower }}"
+    ks_os_name: "{{ boot_options[hostvars[item].os_flavour].name }}"
+    ks_os_version: "{{ boot_options[hostvars[item].os_flavour].version }}"
+    ks_template: "{{ boot_options[hostvars[item].os_flavour].template }}"
+    ks_hostname: "{{ item }}"
+    ks_services:
+        - sshd
+        - ntpd
+    ks_packages:
+        - ca-certificates
+        - curl
+        - deltarpm
+        - net-tools
+        - ntp
+        - vim-enhanced
+    ks_repo_updates: ''
+
+- when: snmp is defined and snmp
+  set_fact:
+    ks_services: "{{ ks_services }} + [ 'snmpd' ]"
+    ks_packages:  "{{ ks_packages }} + [ 'net-snmp' ]"
+
+- when: ks_os_name != 'fedora'
+  set_fact:
+    ks_services: "{{ ks_services }} + [ 'network' ]"
+    ks_packages:  "{{ ks_packages }} + [ 'screen' ]"
+
+- name: set centos specific facts
+  when: ks_os_name == 'centos'
+  set_fact:
+    ks_packages:  "{{ ks_packages }} + [ '@base', '@hardware-monitoring', '@system-admin-tools' ]"
+    ks_repo_updates: |
+        repo --name=updates --baseurl={{ distros_mirror }}/{{ ks_os_name }}/{{ ks_os_version }}/updates/x86_64
+
+- set_fact:
+    ks_os_repo: "{{ distros_mirror }}/{{ ks_os_name }}/{{ ks_os_version }}/os/x86_64/"
+  when: ks_os_name != "fedora"
+
+- name: set fedora specific facts
+  set_fact:
+    ks_os_repo: "{{ distros_mirror }}/{{ ks_os_name }}/linux/releases/{{ ks_os_version }}/Server/x86_64/os/"
+    ks_repo_updates: |
+        repo --name=updates --baseurl={{ distros_mirror }}/fedora/linux/updates/{{ ks_os_version }}/Everything/x86_64/
+  when: ks_os_name == "fedora"
+
+- name: generate pxeboot menu for {{ item }}
+  template:
+    src: pxelinux.cfg/default.j2
+    dest: >-
+      {{ pxe_root }}/pxelinux.cfg/01-{{ ks_host_id }}
+  when: hostvars[item].mac_addresses is defined
+
+- name: generare ks file for {{ item }}
+  template:
+    src: "ks/{{ ks_template }}.ks.j2"
+    dest: "{{ ks_root }}/{{ ks_host_id }}.ks"
