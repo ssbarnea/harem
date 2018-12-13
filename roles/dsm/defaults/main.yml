@@ -1,7 +1,6 @@
 ---
 # vars file for dsm
 distros_mirror: http://mirror.bytemark.co.uk
-http_proxy: 192.168.33.1:3128
 # ks_url is where the kickstart files are served from
 ks_url: http://192.168.33.40/~ssbarnea/ks
 ks_root: /volume1/homes/ssbarnea/www/ks

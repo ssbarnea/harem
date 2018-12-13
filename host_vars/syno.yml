@@ -6,3 +6,6 @@ pxe_root: /volume2/PXE
 # workaround for Synology DSM issue:
 # [WARNING]: sftp transfer mechanism failed on [...]. Use ANSIBLE_DEBUG=1 to see detailed information
 ansible_ssh_transfer_method: scp
+
+
+docker_volumes_root: /volume1/docker/

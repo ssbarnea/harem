@@ -1,0 +1,26 @@
+- name: check if pip is present
+  shell: command -v pip
+  failed_when: false
+  register: command_pip
+
+- name: install pip
+  when: command_pip.rc != 0
+  become: true
+  block:
+
+    - name: download get-pip.py
+      get_url:
+        url: https://bootstrap.pypa.io/get-pip.py
+        dest: /root/get-pip.py
+
+    - name: install pip
+      shell: python /root/get-pip.py
+
+- name: install pip packages
+  become: true
+  pip:
+    name:
+      - docker
+      - docker-compose
+    state: present
+    # extra_args: --user

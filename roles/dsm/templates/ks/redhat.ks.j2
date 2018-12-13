@@ -54,6 +54,12 @@ EOF
 update-ca-trust
 {% endif %}
 
+{# assure pip will uses system CA certificates and avoid failing due to proxy #}
+cat << EOF >/etc/pip.conf
+[global]
+cert = /etc/ssl/certs/ca-bundle.crt
+EOF
+
 if command -v dnf >/dev/null; then
   PKG_CMD=dnf
   PKG_CONFIG=/etc/dnf/dnf.conf

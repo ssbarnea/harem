@@ -8,6 +8,9 @@ list:
 dsm:
 	ansible-playbook playbooks/dsm.yml
 
+leno:
+	ansible-playbook playbooks/leno.yml
+
 nodes:
 	ansible-playbook playbooks/nodes.yml
 
