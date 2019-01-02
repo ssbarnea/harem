@@ -146,6 +146,7 @@ restorecon -R /root/.ssh/
 {% if default_username is defined %}
 install --mode=700 -o {{ default_username }} -g {{ default_username }} -d ~{{ default_username }}/.ssh
 install -o {{ default_username }} -g {{ default_username }} /root/.ssh/authorized_keys ~{{ default_username }}/.ssh/authorized_keys
+echo "{{ default_username }} ALL=(ALL)    NOPASSWD: ALL" >> /etc/sudoers
 {% endif %}
 
 {% for f in lookup('fileglob', 'files/etc/ssh/*.key', wantlist=True) %}
