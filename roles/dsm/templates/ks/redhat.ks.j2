@@ -44,6 +44,9 @@ chvt 3
 (
 
 set -exuo pipefail
+
+{# configure static MAC address for the bond0 interface to avoid randon assignment at boot#}
+crudini --set /etc/sysconfig/network-scripts/ifcfg-bond0 MACADDR {{ ks_bond_mac }}
 sed -i -e 's|^# %wheel\tALL=(ALL)\tNOPASSWD: ALL|%wheel\tALL=(ALL)\tNOPASSWD: ALL|; s|^Defaults    requiretty|#&|' /etc/sudoers
 
 {# to avoid rpm install from url failing due to untrusted CA of the proxy #}
