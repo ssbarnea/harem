@@ -14,6 +14,9 @@ leno:
 nodes:
 	ansible-playbook playbooks/nodes.yml
 
+q:
+	ansible-playbook playbooks/q.yml
+
 n2:
 	./bin/reprov n2
 
