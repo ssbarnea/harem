@@ -11,6 +11,9 @@ domain: !vault |
 syslog_server: syslog.lan
 
 http_proxy: 192.168.33.1:3128
+https_proxy: 192.168.33.1:3129
+
+matrix_fqdn: "m.{{ domain }}"
 
 root_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256
