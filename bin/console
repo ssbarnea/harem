@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -eou pipefail
-ipmitool -I lanplus -H $1 -U $IPMI_USER -E sol deactivate
+ipmitool -I lanplus -H $1 -U $IPMI_USER -E sol deactivate || true
 ipmitool -I lanplus -H $1 -U $IPMI_USER -E sol activate
