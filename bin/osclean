@@ -1,0 +1,120 @@
+#!/bin/bash
+#
+# Use can use different clouds by tunning OS_CLOUD or the older OS_* variables.
+#
+set -euo pipefail
+die () {
+    echo >&2 "$@"
+    exit 1
+}
+
+POSITIONAL=()
+YES=false
+
+while [[ $# -gt 0 ]]; do
+key="$1"
+
+case $key in
+    -y|--yes)
+    YES=true
+    shift # past argument
+    ;;
+    --default)
+    DEFAULT=YES
+    shift # past argument
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+esac
+done
+set -- "${POSITIONAL[@]:-}" # restore positional parameters
+
+EXCLUDES=${EXCLUDES:-'^(external|management|rhos-jenkins|default)$'}
+if [ "$#" -ne 1 ]; then
+    echo "WARN:	No resource name pattern specificed, this could wipe almost everything except ${EXCLUDES} "
+    PATTERN="cat"
+else
+    PATTERN="egrep ${1:-.\*}"
+fi
+PATTERN="$PATTERN | egrep -v '$EXCLUDES' | sort"
+
+if [ -z ${OS_CLOUD+x} ]; then
+    CLOUD="{OS_USERNAME:-?}@${OS_PROJECT_NAME:-?} at ${OS_AUTH_URL:-?}"
+else
+    CLOUD="\033[32m${OS_CLOUD}\033[39m cloud"
+fi
+echo -e "INFO:	Getting resources from ${OS_PROJECT_NAME:-default} project on ${CLOUD} cloud, excluding $EXCLUDES ..."
+
+# $(bash -c "...") is a to allow use of $PATTERN partial *command*.
+SERVERS=$(bash -c "openstack server list --format=value -c Name | $PATTERN")
+ROUTERS=$(bash -c "openstack router list --format=value -c Name | $PATTERN")
+NETWORKS=$(bash -c "openstack network list --internal --format=value -c Name | $PATTERN")
+KEYPAIRS=$(bash -c "openstack keypair list --format=value -c Name | $PATTERN")
+SECURITY_GROUPS=$(bash -c "openstack security group list --format=value -c Name | $PATTERN")
+
+# shellcheck disable=SC2046
+
+echo -e "INFO:	$(echo -n "$SERVERS" | wc -l | cut -f1 -d' ') servers:         ${SERVERS:-none}"
+echo -e "INFO:	$(echo -n "$ROUTERS" | wc -l | cut -f1 -d' ') routers:         ${ROUTERS:-none}"
+echo -e "INFO:	$(echo -n "$NETWORKS" | wc -l | cut -f1 -d' ') networks:        ${NETWORKS:-none}"
+echo -e "INFO:	$(echo -n "$KEYPAIRS" | wc -l | cut -f1 -d' ') keypairs:        ${KEYPAIRS:-none}"
+echo -e "INFO:	$(echo -n "$SECURITY_GROUPS" | wc -l | cut -f1 -d' ') security_groups: ${SECURITY_GROUPS:-none}"
+
+if [ "$YES" != true ]; then
+    yn=n
+    >&2 echo "Are you sure you want to delete all these resources? "
+    read -n 1 yn
+    case $yn in
+        [Yy]* )
+            echo -e "\nINFO: be patient, it may take some time ..."
+            ;;
+        * )
+            exit
+            ;;
+    esac
+fi
+
+for SERVER in $SERVERS; do
+    openstack server delete $SERVER &
+done
+# shellcheck disable=SC2046
+wait $(jobs -p)
+
+for ROUTER in $ROUTERS; do
+    echo -n '.'
+    openstack router unset --external-gateway $ROUTER || FAILED=1
+    for PORT in $(openstack port list --router $ROUTER --format=value -c ID); do
+        echo -n '.'
+        openstack router remove port $ROUTER $PORT || FAILED=1
+    done
+    echo -n '.'
+    openstack router delete $ROUTER || FAILED=1
+done
+
+for NETWORK in $NETWORKS; do
+    for PORT in $(openstack port list --network $NETWORK --format=value -c ID); do
+        echo -n '.'
+        openstack port delete $PORT &
+    done
+    # shellcheck disable=SC2046
+    wait $(jobs -p)
+    echo -n '.'
+    openstack network delete $NETWORK
+done
+
+for ITEM in $KEYPAIRS; do
+    echo -n '.'
+    openstack keypair delete $ITEM &
+done
+
+for ITEM in $SECURITY_GROUPS; do
+    echo -n '.'
+    openstack security group delete $ITEM &
+done
+
+# shellcheck disable=SC2046
+wait $(jobs -p)
+
+echo "INFO:	done running $0"
