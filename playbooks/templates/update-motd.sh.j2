@@ -1,0 +1,34 @@
+#! /usr/bin/env bash
+source /etc/os-release
+
+COLOR_DEFAULT="\033[0m"
+COLOR_INFO="\033[0;37m"
+COLOR_DARK="\033[0;90m"
+COLOR_VALUE="\033[${ANSI_COLOR:-0;35}m"
+
+# Basic info
+HOSTNAME=`uname -n`
+ROOT=`df -h | awk '{if($(NF) == "/") {print $(NF-1); exit;}}'`
+if [[ -f /etc/redhat-release ]]; then
+    OS_INFO=`cat /etc/redhat-release`
+else
+    OS_INFO="${NAME} ${VERSION}"
+fi
+
+# System load
+MEMORY1=`free -t -m | grep Total | awk '{print $3" MB";}'`
+MEMORY2=`free -t -m | grep "Mem" | awk '{print $2" MB";}'`
+LOAD1=`cat /proc/loadavg | awk {'print $1'}`
+LOAD5=`cat /proc/loadavg | awk {'print $2'}`
+LOAD15=`cat /proc/loadavg | awk {'print $3'}`
+
+echo -e "${COLOR_DARK}======================================================
+${COLOR_INFO}Hostname${COLOR_DARK}........: ${COLOR_VALUE}$HOSTNAME${COLOR_DARK}.$(hostname -d)
+${COLOR_INFO}Operating System${COLOR_DARK}: ${COLOR_VALUE}$OS_INFO
+${COLOR_INFO}Disk Space${COLOR_DARK}......: ${COLOR_VALUE}$ROOT${COLOR_DARK} in use
+${COLOR_DARK}======================================================
+${COLOR_INFO}CPU usage${COLOR_DARK}.......: ${COLOR_VALUE}$LOAD1, $LOAD5, $LOAD15${COLOR_DARK} (1, 5, 15 min)
+${COLOR_INFO}Memory used${COLOR_DARK}.....: ${COLOR_VALUE}$MEMORY1 / $MEMORY2
+${COLOR_INFO}Swap in use${COLOR_DARK}.....: ${COLOR_VALUE}`free -m | tail -n 1 | awk '{print $3}'` MB
+${COLOR_DARK}======================================================${COLOR_DEFAULT}
+"

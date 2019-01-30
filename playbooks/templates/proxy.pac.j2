@@ -1,0 +1,13 @@
+function FindProxyForURL(url,host)
+{
+    if(isPlainHostName(host))
+    {
+        return "DIRECT";
+    }
+
+    if(isInNet(host,"127.0.0.1","255.255.255.0"))
+    {
+        return "DIRECT";
+    }
+    return "PROXY {{ http_proxy }}";
+}

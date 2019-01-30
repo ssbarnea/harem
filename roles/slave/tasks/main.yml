@@ -1,0 +1,35 @@
+- name: remove outdated OS packages
+  # https://github.com/ansible/ansible/issues/50843
+  # package:
+  #   name:
+  #     - /usr/bin/tox
+  #   state: absent
+  shell: |
+    sudo {{ ansible_pkg_mgr }} remove -y  /usr/bin/tox
+  args:
+    warn: no
+  register: result
+  failed_when: result.rc != 0 and 'No packages marked for removal' not in result.stderr
+  changed_when: |
+    'No packages marked for removal' not in result.stderr
+
+- debug: var=result
+
+- name: install seashells for easy sharing console
+  pip:
+    name:
+      - seashells
+      - tox
+
+- name: create sea utility function
+  copy:
+    content: |
+      sea () {
+        $* 2>&1 | seashells
+      }
+    dest: /etc/profile.d/seashells.sh
+
+- package:
+    name:
+      - the_silver_searcher
+      - rsync

@@ -1,0 +1,90 @@
+---
+# https://unix.stackexchange.com/questions/212894/whats-the-right-format-for-the-http-proxy-environment-variable-caps-or-no-ca
+- hosts: mac
+  gather_facts: true
+  strategy: free
+  become: false
+  vars:
+    ca_cert: /Users/ssbarnea/cacert.pem
+  tasks:
+  # - include_role:
+  #     name: ensure
+  # - include_role:
+  #     name: monitoring
+
+    # - name: configure system proxy variables
+    #   copy:
+    #     dest: /etc/profile.d/proxy.sh
+    #     content: |
+    #       HTTP_PROXY={{ http_proxy }}
+    #       HTTPS_PROXY={{ http_proxy }}
+    #       http_proxy={{ http_proxy }}
+    #       https_proxy={{ http_proxy }}
+    #       ftp_proxy={{ http_proxy }}
+    #       export http_proxy https_proxy ftp_proxy HTTP_PROXY HTTPS_PROXY
+
+    # - name: configure wget proxy
+    #   copy:
+    #     dest: /etc/wgetrc
+    #     content: |
+    #       http_proxy = {{ http_proxy }}
+    #       https_proxy = {{ http_proxy }}
+    #       ftp_proxy = {{ http_proxy }}
+
+    # - name: configure packager proxy
+    #   ini_file:
+    #     path: "{{ pkg_mgr_map[ansible_pkg_mgr] }}"
+    #     section: main
+    #     option: proxy
+    #     value: "{{ http_proxy }}"
+
+    # - name: install custom CA
+    #   copy:
+    #     dest: /etc/pki/ca-trust/source/anchors/custom-ca.crt
+    #     content: "{{ custom_ca }}"
+    #   register: result
+
+    # - name: activate custom CA
+    #   when: result is changed
+    #   shell: update-ca-trust
+    - set_fact:
+        env_dict:
+            http_proxy: "{{ http_proxy }}"
+            https_proxy: "{{ http_proxy }}"
+            HTTP_PROXY: "{{ http_proxy }}"
+            HTTPS_PROXY: "{{ http_proxy }}"
+            ftp_proxy: "{{ http_proxy }}"
+            SSL_CERT_FILE: "{{ ca_cert }}"
+            REQUESTS_CA_BUNDLE: "{{ ca_cert }}"
+
+    - name: add environment variables
+      lineinfile:
+        path: ~/.profile
+        regexp: '^#?\s?export {{ item.key }}\s?='
+        line: 'export {{ set_line }}  # managed by ansible'
+        validate: 'bash -c "source %s && set || grep \"{{ set_line }}\""'
+      vars:
+        set_line: "{{ item.key }}={{ item.value }}"
+      with_dict: "{{ env_dict }}"
+
+    - name: dump MacOS system certificates into bundle format (PEM)
+      shell: |
+        security find-certificate -a -p /Library/Keychains/System.keychain > {{ ca_cert }}
+        security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> {{ ca_cert }}
+
+    - name: configure pip to use system ca certificates
+      ini_file:
+        path: "~/.conf/pip/pip.conf"
+        section: global
+        option: cert
+        value: "{{ ca_cert }}"
+
+    - name: validate pip
+      shell: pip search pip
+
+# TODOs:
+
+# sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain <certificate>
+# https://apple.stackexchange.com/questions/80623/import-certificates-into-the-system-keychain-via-the-command-line
+
+# validate curl

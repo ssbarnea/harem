@@ -1,0 +1,36 @@
+#! /usr/bin/env bash
+
+# avoid doing anything if that is not an interactive TTY so we avoid breaking
+# (or slowing down) stuff like sftp or scp due to extra banner.
+if [[ $- == *i* ]]; then
+  source /etc/os-release
+
+  COLOR_DEFAULT="\033[0m"
+  COLOR_INFO="\033[0;37m"
+  COLOR_VALUE="\033[${ANSI_COLOR:-0;35}m"
+  COLOR_DARK="\033[0;90m"
+
+  # If id command returns zero, you've root access.
+  if [ $(id -u) -eq 0 ];
+  then # you are root, set red colour prompt
+    PS1="\\[$COLOR_DEFAULT\\]\\u\\[$COLOR_DEFAULT\\]@\\[$COLOR_VALUE\\]\\h\\[$COLOR_DARK\\]:\\w # \\[$COLOR_DEFAULT\\]"
+  else # normal
+    PS1="\\u@\\[$COLOR_VALUE\\h\\[$COLOR_DARK\\]:\\w $ \\[$COLOR_DEFAULT\\]"
+  fi
+
+  export PS1
+fi
+
+# adds ~/.local/bin to the *top* of PATH to allow overriding system utils
+if [[ ! ":$PATH:" == *":~/.local/bin:"* ]]; then
+    export PATH=~/.local/bin:$PATH
+fi
+
+alias ls='ls --color=auto'
+
+export ANSIBLE_CALLBACK_WHITELIST=timer,profile_roles
+export ANSIBLE_FORCE_COLOR=1
+export ANSIBLE_STDOUT_CALLBACK=debug
+export ANSIBLE_VERBOSITY=1
+export PY_COLORS=1
+export LIBVIRT=1

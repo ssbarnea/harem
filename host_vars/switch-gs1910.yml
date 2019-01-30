@@ -1,0 +1,10 @@
+ip: 172.172.172.172
+mac: B0:B2:DC:68:F7:2C
+mgt_url: http://172.172.172.172
+mgt_user: admin
+mgt_password: 1234
+model: GS1910-24HP
+name: esw
+
+vendor_url: ftp://ftp.zyxel.com/GS1910-24HP/
+max_frame: 10240

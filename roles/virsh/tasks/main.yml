@@ -1,0 +1,27 @@
+---
+- name: update system
+  package:
+    name: '*'
+    state: latest
+
+- name: install virsh packages
+  package:
+    name:
+      - bridge-utils
+      - libguestfs-tools
+      - libvirt
+      - libvirt-client
+      - qemu-kvm
+      - virt-install
+      - virt-top
+    state: present
+
+- name: enable libvirtd
+  service:
+    name: libvirtd
+    state: started
+
+- name: validate virsh
+  shell:
+    virsh list
+  changed_when: false
