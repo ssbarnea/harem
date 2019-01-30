@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+red=`tput setaf 1`
+green=`tput setaf 2`
+blue=`tput setaf 4`
+bold=`tput bold; tput setaf 7`
+dark=`tput bold; tput setaf 0`
+reset=`tput sgr0`
+
+# wget needs CURL_CA_BUNDLE
+
+for VAR in SSL_CERT_FILE SSL_CERT_DIR REQUESTS_CA_BUNDLE CURL_CA_BUNDLE http_proxy https_proxy; do
+    echo "${dark}INFO: $VAR=${green}$(printenv $VAR)${reset}"
+done
+
+function report() {
+    RESULT=0
+    eval $2 >/dev/null || RESULT=$?
+    if [[ $RESULT -eq 0 ]]; then
+        echo "${blue}$1${reset} test finished with ${green}SUCCESS${reset}"
+    else
+        echo "${blue}$1${reset} test finished with ${red}FAILURE${reset}"
+    fi
+}
+#openssl version -d
+
+# openssl x509 -in $SSL_CERT_FILE -text > certs.text
+
+#keytool -printcert -v -file sbarnea-ca.crt | grep 'Owner:' > sbarnea-ca.text
+#keytool -printcert -v -file  $SSL_CERT_FILE | grep 'Owner:' > certs.text
+
+#openssl s_client -showcerts -connect pypi.org:443 -proxy 192.168.33.1:3128 -CAfile $SSL_CERT_FILE
+
+# verify error:num=19:self signed certificate in certificate chain
+
+
+URL=https://files.pythonhosted.org/packages/60/db/645aa9af249f059cc3a368b118de33889219e0362141e75d4eaf6f80f163/pycrypto-2.6.1.tar.gz#sha256=f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c
+
+report curl "curl -s $URL"
+report wget "wget -q -o wget.log -O /dev/null $URL"
+report requests "python -c 'import requests,sys; x = requests.Session().get(\"$URL\").status_code;sys.exit(x==\"200\")'"
+
+proxy_with_no_schema=$(echo $http_proxy | sed 's/https\?:\/\///')
+report pip-no-proxy "pip search --isolated pip"
+set -x
+report pip-with-proxy "pip search --isolated --proxy sss${proxy_with_no_schema}xxx search pip"
+
+# for i in $(seq 10); do
+# wget -nv --report-speed=bits http://ipv4.download.thinkbroadband.com/50MB.zip -O /dev/null
+# done
+

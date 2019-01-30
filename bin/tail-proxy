@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+if which ccze >/dev/null; then
+    ssh q tail -F /var/squid/logs/access.log | ccze
+else
+    ssh q tail -F /var/squid/logs/access.log | ccze
+fi

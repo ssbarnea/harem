@@ -1,0 +1,19 @@
+#!/bin/bash
+set -ex
+set | grep -E "(proxy|REQUESTS|.*pem)"
+
+# python3 -c "import requests; requests.get('https://pypi.org', verify='/Users/ssbarnea/cacert.pem')"
+
+
+# unset https_proxy
+# ^ uncomment line above to make it work
+
+for PY in python2.7 python3.6 python3.7; do
+
+    $PY -m pip install -q --user requests
+    $PY -c """import logging, requests; logging.basicConfig(level=logging.DEBUG); logging.getLogger('requests.packages.urllib3').setLevel(logging.DEBUG); requests.get('https://pypi.org')"""
+
+    $PY -c "import requests,sys; x = requests.get('https://pypi.org'); sys.exit(x.status_code == '200')"
+
+
+done

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Shortcut for creating templated new shell scripts
+set -euxo pipefail
+
+tmpdir=${TMPDIR:-${TMPPATH:-/tmp}}
+echo $tmpdir`md5sum -q $BASH_SOURCE | head -c6`
+
+
