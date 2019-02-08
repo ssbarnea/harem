@@ -47,6 +47,10 @@ set -exuo pipefail
 
 {# configure static MAC address for the bond0 interface to avoid randon assignment at boot#}
 crudini --set /etc/sysconfig/network-scripts/ifcfg-bond0 MACADDR {{ ks_bond_mac }}
+
+{# we want to be able to know what happens with our switch #}
+chkconfig lldpd enable
+
 sed -i -e 's|^# %wheel\tALL=(ALL)\tNOPASSWD: ALL|%wheel\tALL=(ALL)\tNOPASSWD: ALL|; s|^Defaults    requiretty|#&|' /etc/sudoers
 
 {# to avoid rpm install from url failing due to untrusted CA of the proxy #}
@@ -80,7 +84,7 @@ fi
 {% if http_proxy is defined %}
 {# https://unix.stackexchange.com/questions/212894/whats-the-right-format-for-the-http-proxy-environment-variable-caps-or-no-ca #}
 ### HTTP PROXY
-echo "proxy=http://{{ http_proxy }}" >> $PKG_CONFIG
+echo "proxy={{ http_proxy }}" >> $PKG_CONFIG
 cat <<EOF > /etc/profile.d/proxy.sh
 HTTP_PROXY={{ http_proxy }}
 HTTPS_PROXY={{ http_proxy }}
@@ -90,9 +94,9 @@ ftp_proxy={{ http_proxy }}
 export http_proxy https_proxy ftp_proxy HTTP_PROXY HTTPS_PROXY
 EOF
 cat <<EOF > /etc/wgetrc
-http_proxy = {{ http_proxy }}
-https_proxy = {{ http_proxy }}
-ftp_proxy = {{ http_proxy }}
+http_proxy = {{ http_proxy_no_schema }}
+https_proxy = {{ https_proxy_no_schema }}
+ftp_proxy = {{ http_proxy_no_schema }}
 EOF
 {% endif %}
 

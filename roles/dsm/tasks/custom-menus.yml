@@ -9,6 +9,7 @@
     ks_os_version: "{{ boot_options[hostvars[item].os_flavour].version }}"
     ks_template: "{{ boot_options[hostvars[item].os_flavour].template }}"
     ks_hostname: "{{ item }}"
+    ks_bond_mac: "{{ hostvars[item].mac_addresses[0] | regex_replace('-', ':') | upper }}"
     ks_services:
         - sshd
         - ntpd

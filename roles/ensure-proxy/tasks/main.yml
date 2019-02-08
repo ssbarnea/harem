@@ -3,7 +3,11 @@
     filter: "*"
   when: ansible_pkg_mgr is not defined
 
+- set_fact:
+    use_proxy: "{{ http_proxy is defined or https_proxy is defined }}"
+
 - name: configure system proxy variables
+  when: use_proxy
   copy:
     dest: /etc/profile.d/proxy.sh
     content: |
@@ -14,22 +18,31 @@
       ftp_proxy={{ http_proxy }}
       export http_proxy https_proxy ftp_proxy HTTP_PROXY HTTPS_PROXY
 
+- when: not use_proxy
+  file:
+    path: /etc/profile.d/proxy.sh
+    state: absent
+
 - name: configure wget proxy
   copy:
     dest: /etc/wgetrc
     content: |
-      http_proxy = {{ http_proxy }}
-      https_proxy = {{ http_proxy }}
-      ftp_proxy = {{ http_proxy }}
+      {% if http_proxy is defined or https_proxy is defined %}
+      http_proxy = {{ http_proxy_no_schema }}
+      https_proxy = {{ http_proxy_no_schema }}
+      ftp_proxy = {{ http_proxy_no_schema }}
+      {% endif %}
 
-- name: configure packager proxy
+- name: "configure packager proxy: {{ pkg_mgr_map[ansible_pkg_mgr] }}"
   ini_file:
     path: "{{ pkg_mgr_map[ansible_pkg_mgr] }}"
     section: main
     option: proxy
-    value: "http://{{ http_proxy }}"
+    value: "{{ http_proxy | default(omit) }}"
+    state: "{% if http_proxy is defined or https_proxy is defined %}present{% else %}absent{% endif %}"
 
 - name: install custom CA
+  when: custom_ca is defined
   copy:
     dest: /etc/pki/ca-trust/source/anchors/custom-ca.crt
     content: "{{ custom_ca }}"
@@ -40,6 +53,7 @@
   shell: update-ca-trust
 
 - name: configure pip to use system ca certificates
+  when: custom_ca is defined
   ini_file:
     path: "/etc/pip.conf"
     section: global

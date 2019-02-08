@@ -39,8 +39,8 @@ kernel_options: >
   nouveau.modeset=0
   logo.nologo
   inst.cmdline
-  inst.proxy=http://{{ http_proxy }}
-  proxy=http://{{ http_proxy }}
+  inst.proxy={{ http_proxy }}
+  proxy={{ http_proxy }}
   modprobe.blacklist=floppy
   console=tty0
   console={{ serial_console }}
@@ -59,10 +59,14 @@ kernel_options: >
 
 
 extra_packages:
+  - crudini
   - htop
   - iotop
   - mc
   - ncdu
+  - lldpd
+  - python2-pip
+  - iperf3
 # -- not implemented yet --
 
 dhcp_boot_default_bios_filename: pxelinux.0

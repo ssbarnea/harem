@@ -8,3 +8,19 @@
     # - docker.yml
   loop_control:
     loop_var: dsm_subtask
+
+# kudos to: https://nguvu.org/pfsense/pfSense-WPAD-PAC-proxy-configuration-guide/
+- name: configure proxy wpad file
+  template:
+    src: proxy.pac.j2
+    dest: "{{ ks_root }}/proxy.pac"
+
+- name: proxy wpad symlinks
+  file:
+    dest: "{{ ks_root }}/{{ item }}"
+    src: "{{ ks_root }}/proxy.pac"
+    state: link
+    # force: true
+  with_items:
+    - wpad.dat
+    - wpad.da

@@ -42,7 +42,7 @@ LABEL fedora28
 MENU LABEL fedora28
   ipappend 2
   kernel fedora28/vmlinuz
-  append initrd=fedora28/initrd.img repo={{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/ ks={{ ks_url }}/fedora28.ks inst.proxy=http://{{ http_proxy }} ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+  append initrd=fedora28/initrd.img repo={{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/ ks={{ ks_url }}/fedora28.ks inst.proxy={{ http_proxy }} ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
 
 LABEL debian-stretch
 MENU LABEL debian-stretch

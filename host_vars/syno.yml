@@ -1,4 +1,6 @@
 ---
+ansible_network_os: dsm
+
 python_cmd: python
 cert_name: sbarnea.com
 pxe_root: /volume2/PXE
@@ -9,3 +11,13 @@ ansible_ssh_transfer_method: scp
 
 
 docker_volumes_root: /volume1/docker/
+
+# first one is used for wol wake
+mac_addresses:
+  - 00:11:32:45:ca:9d
+
+wol:
+  mac: 00:11:32:45:ca:9d
+  port: 9
+  #5000
+  address: 255.255.255.255
