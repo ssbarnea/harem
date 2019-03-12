@@ -10,3 +10,7 @@
         regexp: '^alias mc '
         line: alias mc 'mc -u'
         # ^ use of single quotes is a MUST for alias to work
+
+    - name: router role
+      import_role:
+        name: router

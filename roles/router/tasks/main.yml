@@ -1,0 +1,53 @@
+---
+- setup:
+    filter: "*"
+  when: ansible_pkg_mgr is not defined
+
+- name: configure freebash repository
+  copy:
+    dest: /usr/local/etc/pkg/repos/FreeBSD.conf
+    content: |
+      FreeBSD: {
+        url: "pkg+https://pkg.freebsd.org/freebsd:11:x86:64/latest",
+        mirror_type: "srv",
+        # signature_type: "fingerprints",
+        # fingerprints: "/usr/local/share/pfSense/keys/pkg",
+        enabled: yes
+      }
+
+- name: install freebash packages
+  pkgng:
+    name:
+      - oath-toolkit
+      - atop
+      - ntopng
+      - iftop
+    pkgsite: FreeBSD
+  register: result
+
+- name: rehash
+  when: result is changed
+  command: rehash
+
+- debug: var=result
+
+- name: deploy ovpn-pipe
+  copy:
+    dest: /usr/local/etc/rc.d/ovpn-pipe.sh
+    mode: u+x
+    content: |
+      #!/usr/local/bin/bash
+      set -euo pipefail
+      pkill -f ovpn_pipe || true
+      rm -rf ~/.cache/ovpn-pipe
+      mkfifo -m 0600 ~/.cache/ovpn-pipe || true
+      ovpn_pipe() {
+      while true; do
+        printf "{{ vpn_username }}\n{{ vpn_otp_pin }}$(oathtool --totp -b {{ vpn_otp_seed }})" > ~/.cache/ovpn-pipe
+      done
+      }
+      export -f ovpn_pipe
+      nohup bash -c ovpn_pipe >>/var/log/ovpn-pipe.log 2>&1 </dev/null &
+
+- name: start ovpn-pipe
+  shell: /usr/local/etc/rc.d/ovpn-pipe.sh
