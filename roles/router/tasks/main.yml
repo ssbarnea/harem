@@ -3,7 +3,7 @@
     filter: "*"
   when: ansible_pkg_mgr is not defined
 
-- name: configure freebash repository
+- name: configure freebsd repository
   copy:
     dest: /usr/local/etc/pkg/repos/FreeBSD.conf
     content: |
@@ -15,7 +15,7 @@
         enabled: yes
       }
 
-- name: install freebash packages
+- name: install freebsd packages
   pkgng:
     name:
       - oath-toolkit
@@ -27,27 +27,36 @@
 
 - name: rehash
   when: result is changed
-  command: rehash
+  # rehash is shell build-in on opnsense
+  shell: rehash
+  args:
+    warn: false
 
 - debug: var=result
+
+
+- name: deploy ovpn-get-auth
+  copy:
+    dest: /root/ovpn-get-auth
+    mode: u+x
+    content: |
+      #!/usr/bin/env sh
+      while true; do
+        printf "{{ vpn_username }}\n{{ vpn_otp_pin }}`oathtool --totp -b {{ vpn_otp_seed }}`" > ~/.cache/ovpn-pipe
+      done
 
 - name: deploy ovpn-pipe
   copy:
     dest: /usr/local/etc/rc.d/ovpn-pipe.sh
     mode: u+x
     content: |
-      #!/usr/local/bin/bash
-      set -euo pipefail
-      pkill -f ovpn_pipe || true
+      #!/usr/bin/env sh
+      set -eu
+      pkill -f ovpn-get-auth || true
+      mkdir -p ~/.cache
       rm -rf ~/.cache/ovpn-pipe
       mkfifo -m 0600 ~/.cache/ovpn-pipe || true
-      ovpn_pipe() {
-      while true; do
-        printf "{{ vpn_username }}\n{{ vpn_otp_pin }}$(oathtool --totp -b {{ vpn_otp_seed }})" > ~/.cache/ovpn-pipe
-      done
-      }
-      export -f ovpn_pipe
-      nohup bash -c ovpn_pipe >>/var/log/ovpn-pipe.log 2>&1 </dev/null &
+      nohup sh /root/ovpn-get-auth >>/var/log/ovpn-pipe.log 2>&1 </dev/null &
 
 - name: start ovpn-pipe
-  shell: /usr/local/etc/rc.d/ovpn-pipe.sh
+  shell: sh /usr/local/etc/rc.d/ovpn-pipe.sh
