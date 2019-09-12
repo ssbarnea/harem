@@ -2,6 +2,10 @@
 ## Please note that overlay2 is only supported on newer kernels
 #docker_storage_options: -s overlay2
 
+# really needed for avoiding kubespray to downgrade it, as it managed to
+# downgrade docker 18.09 to 18.06 when this was not defined.
+docker_version: latest
+
 ## Enable docker_container_storage_setup, it will configure devicemapper driver on Centos7 or RedHat7.
 docker_container_storage_setup: false
 
@@ -66,8 +70,8 @@ docker_options: >-
   --add-runtime docker-runc=/usr/libexec/docker/docker-runc-current
   --default-runtime=docker-runc --exec-opt native.cgroupdriver=systemd
   --userland-proxy-path=/usr/libexec/docker/docker-proxy-current --signature-verification=false
-  {%- endif %}
-   -H unix:///var/run/docker.sock --tlscacert=/etc/ssl/etcd/ssl/ca.pem --tlscert=/etc/ssl/etcd/ssl/member-n0.pem --tlskey=/etc/ssl/etcd/ssl/member-n0-key.pem -H tcp://0.0.0.0:2376
+  {%- endif -%}
+##   -H unix:///var/run/docker.sock --tlsverify --tlscacert=/etc/ssl/etcd/ssl/ca.pem --tlscert=/etc/ssl/etcd/ssl/member-n0.pem --tlskey=/etc/ssl/etcd/ssl/member-n0-key.pem -H tcp://0.0.0.0:2376
 
 # --tlsverify
 #ETCD_TRUSTED_CA_FILE=/etc/ssl/etcd/ssl/ca.pem

@@ -2,4 +2,4 @@
 # see https://docs.ansible.com/ansible/latest/reference_appendices/galaxy.html#installing-multiple-roles-from-a-file
 
 # from galaxy
-- src: avinetworks.docker
+# - src: avinetworks.docker

@@ -2,7 +2,6 @@
 ansible_network_os: dsm
 
 python_cmd: python
-cert_name: sbarnea.com
 pxe_root: /volume2/PXE
 
 # workaround for Synology DSM issue:

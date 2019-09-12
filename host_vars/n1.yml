@@ -1,2 +1,6 @@
 ---
 bmc_mac_address: 00:30:48:F1:3A:18
+os_flavour: rhel8
+mac_addresses:
+  - 00:30:48:f1:ad:b2
+  - 00:30:48:f1:ad:b3

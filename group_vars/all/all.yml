@@ -8,6 +8,10 @@ domain: !vault |
   3439663737653638620a623634613831663735336538323863623034393962356261636531313939
   6662
 
+cert_name: sbarnea.com
+
+sysadmin_email: sorin.sbarnea@gmail.com
+
 syslog_server: syslog.lan
 
 http_proxy_no_schema: 192.168.33.1:3128
@@ -17,6 +21,13 @@ https_proxy: "http://{{ https_proxy_no_schema }}"
 no_proxy: "localhost,zuul.openstack.org,192.168.0.0/16,10.0.0.0/8,172.30.0.0/16"
 
 matrix_fqdn: "m.{{ domain }}"
+
+
+distros_mirror: http://mirror.bytemark.co.uk
+
+rhel8_pxeboot_url:
+  http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os/isolinux
+# http://download-node-02.eng.bos.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8/work/x86_64/buildinstall/BaseOS/images/pxeboot
 
 vpn_username: !vault |
   $ANSIBLE_VAULT;1.1;AES256
