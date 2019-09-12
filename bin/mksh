@@ -11,4 +11,3 @@ set -euxo pipefail
 EOF
 
 $EDITOR $1 &
-

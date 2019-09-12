@@ -5,6 +5,11 @@ function FindProxyForURL(url,host)
         return "DIRECT";
     }
 
+    if (shExpMatch(host, "zuul.openstack.org"))
+    {
+        return "DIRECT";
+    }
+
     if(isInNet(host,"127.0.0.1","255.255.255.0"))
     {
         return "DIRECT";

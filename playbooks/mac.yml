@@ -7,10 +7,10 @@
   vars:
     ca_cert: /Users/ssbarnea/cacert.pem
   tasks:
-  # - include_role:
-  #     name: ensure
-  # - include_role:
-  #     name: monitoring
+    # - include_role:
+    #     name: ensure
+    # - include_role:
+    #     name: monitoring
 
     # - name: configure system proxy variables
     #   copy:
@@ -49,13 +49,13 @@
     #   shell: update-ca-trust
     - set_fact:
         env_dict:
-            http_proxy: "{{ http_proxy }}"
-            https_proxy: "{{ http_proxy }}"
-            HTTP_PROXY: "{{ http_proxy }}"
-            HTTPS_PROXY: "{{ http_proxy }}"
-            ftp_proxy: "{{ http_proxy }}"
-            SSL_CERT_FILE: "{{ ca_cert }}"
-            REQUESTS_CA_BUNDLE: "{{ ca_cert }}"
+          http_proxy: "{{ http_proxy }}"
+          https_proxy: "{{ http_proxy }}"
+          HTTP_PROXY: "{{ http_proxy }}"
+          HTTPS_PROXY: "{{ http_proxy }}"
+          ftp_proxy: "{{ http_proxy }}"
+          SSL_CERT_FILE: "{{ ca_cert }}"
+          REQUESTS_CA_BUNDLE: "{{ ca_cert }}"
 
     - name: add environment variables
       lineinfile:

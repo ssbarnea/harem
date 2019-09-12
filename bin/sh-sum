@@ -4,5 +4,3 @@ set -euxo pipefail
 
 tmpdir=${TMPDIR:-${TMPPATH:-/tmp}}
 echo $tmpdir`md5sum -q $BASH_SOURCE | head -c6`
-
-

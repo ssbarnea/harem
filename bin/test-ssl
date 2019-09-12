@@ -15,5 +15,4 @@ for PY in python2.7 python3.6 python3.7; do
 
     $PY -c "import requests,sys; x = requests.get('https://pypi.org'); sys.exit(x.status_code == '200')"
 
-
 done

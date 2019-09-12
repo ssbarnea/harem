@@ -1,87 +1,97 @@
+#!/usr/bin/env ansible-playbook
 ---
 - hosts: baremetals
   gather_facts: no
   tasks:
 
     - include_role:
-        name: ensure-proxy
+        name: ensure-mail
 
-    - include_role:
-        name: virsh
+#     - include_role:
+#         name: ensure-proxy
 
-    - include_role:
-        name: slave
+#     - include_role:
+#         name: virsh
 
-    - shell: |
-        npm config set proxy ${http_proxy}
-        npm config set https-proxy ${http_proxy}
-# NFS multipath https://vspherecentral.vmware.com/t/esxi-host-and-virtual-machine/storage-and-networking/nfs-4-1-multipathing-configuration-and-best-practices/
-# iSCSI multipath https://opentodo.net/2015/06/high-available-nfs-server-setup-iscsi-multipath/
+#     - include_role:
+#         name: slave
 
-    - package:
-        name:
-        - docker
-        - docker-common
-        state: absent
-    - include_role:
-        name: ensure-docker
+#     - shell: |
+#         npm config set proxy ${http_proxy}
+#         npm config set https-proxy ${http_proxy}
+# # NFS multipath https://vspherecentral.vmware.com/t/esxi-host-and-virtual-machine/storage-and-networking/nfs-4-1-multipathing-configuration-and-best-practices/
+# # iSCSI multipath https://opentodo.net/2015/06/high-available-nfs-server-setup-iscsi-multipath/
 
-    - package:
-        name:
-          - wget
-          - git
-          - python-virtualenv
-          - ansible
-          - gcc
-          - python-lxml
-          - iftop
-          - nodejs
+#     - package:
+#         name:
+#         - docker
+#         - docker-common
+#         state: absent
+#     - include_role:
+#         name: ensure-docker
 
-    - package:
-        name: lldpd
-    # lldpctl
+#     - package:
+#         name:
+#           - wget
+#           - git
+#           - python-virtualenv
+#           - ansible
+#           - gcc
+#           - python-lxml
+#           - iftop
+#           - nodejs
 
-    - service:
-        name: lldpd
-        state: started
+#     - package:
+#         name: lldpd
+#     # lldpctl
 
-    - template:
-        src: update-motd.sh.j2
-        dest: /etc/profile.d/update-moth.sh
-    # cat /proc/net/bonding/bond0
+#     - service:
+#         name: lldpd
+#         state: started
 
-    - template:
-        src: ps1.sh.j2
-        dest: /etc/profile.d/ps1.sh
+#     - name: enabled ssd TRIM
+#       service:
+#         name: fstrim.timer
+#         state: started
+#         enabled: true
 
-    - package:
-        name: yum-cron
-    - ini_file:
-        path: /etc/yum/yum-cron.conf
-        section: "{{ item.key | basename }}"
-        option: "{{ item.key | splitext }}"
-        value: "{{ item.value }}"
-      with_dict:
-        commands.apply_updates: "yes"
-        commands.download_updates: "yes"
-        emitters.emit_via: email
-        email.email_from: root@localhost
-        email.email_to: root
-      register: result
-    - service:
-        name: yum-cron
-        state: "{% if result.changed %}re{% endif %}started"
+#     - template:
+#         src: update-motd.sh.j2
+#         dest: /etc/profile.d/update-moth.sh
+#     # cat /proc/net/bonding/bond0
 
-    - name: upgrade pip
-      pip:
-        name:
-          - pip
-          - setuptools
-        extra_args: --user --upgrade --upgrade-strategy only-if-needed
-    - name: install openstack cli
-      pip:
-        name:
-          - python-openstackclient
-          - python-heatclient
-          - git-review
-        extra_args: --user --upgrade --upgrade-strategy only-if-needed
+#     - template:
+#         src: ps1.sh.j2
+#         dest: /etc/profile.d/ps1.sh
+
+#     - package:
+#         name: yum-cron
+#     - ini_file:
+#         path: /etc/yum/yum-cron.conf
+#         section: "{{ item.key | basename }}"
+#         option: "{{ item.key | splitext }}"
+#         value: "{{ item.value }}"
+#       with_dict:
+#         commands.apply_updates: "yes"
+#         commands.download_updates: "yes"
+#         emitters.emit_via: email
+#         email.email_from: root@localhost
+#         email.email_to: root
+#       register: result
+#     - service:
+#         name: yum-cron
+#         state: "{% if result.changed %}re{% endif %}started"
+
+#     - name: upgrade pip
+#       pip:
+#         name:
+#           - pip
+#           - setuptools
+#         extra_args: --user --upgrade --upgrade-strategy only-if-needed
+#     - name: install openstack cli
+#       pip:
+#         name:
+#           - python-openstackclient
+#           - python-heatclient
+#           - git-review
+#         extra_args: --user --upgrade --upgrade-strategy only-if-needed

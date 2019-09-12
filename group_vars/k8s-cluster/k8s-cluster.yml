@@ -1,3 +1,4 @@
+---
 # Kubernetes configuration dirs and system namespace.
 # Those are where all the additional config stuff goes
 # the kubernetes normally puts in /srv/kubernetes.
@@ -51,9 +52,9 @@ kube_users:
       - system:masters
 
 ## It is possible to activate / deactivate selected authentication methods (basic auth, static token auth)
-#kube_oidc_auth: false
-#kube_basic_auth: false
-#kube_token_auth: false
+# kube_oidc_auth: false
+# kube_basic_auth: false
+# kube_token_auth: false
 
 
 ## Variables for OpenID Connect Configuration https://kubernetes.io/docs/admin/authentication/
@@ -90,11 +91,11 @@ kube_pods_subnet: 10.233.64.0/18
 kube_network_node_prefix: 24
 
 # The port the API Server will be listening on.
-kube_apiserver_ip: "{{ kube_service_addresses|ipaddr('net')|ipaddr(1)|ipaddr('address') }}"
-kube_apiserver_port: 6443 # (https)
-#kube_apiserver_insecure_port: 8080 # (http)
+kube_apiserver_ip: "{{ kube_service_addresses | ipaddr('net') | ipaddr(1) | ipaddr('address') }}"
+kube_apiserver_port: 6443  # (https)
+# kube_apiserver_insecure_port: 8080 # (http)
 # Set to 0 to disable insecure port - Requires RBAC in authorization_modes and kube_api_anonymous_auth: true
-kube_apiserver_insecure_port: 0 # (disabled)
+kube_apiserver_insecure_port: 0  # (disabled)
 
 # Kube-proxy proxyMode configuration.
 # Can be ipvs, iptables
@@ -112,7 +113,7 @@ kube_proxy_nodeport_addresses: >-
   {%- endif -%}
 
 # If non-empty, will use this string as identification instead of the actual hostname
-#kube_override_hostname: >-
+# kube_override_hostname: >-
 #  {%- if cloud_provider is defined and cloud_provider in [ 'aws' ] -%}
 #  {%- else -%}
 #  {{ inventory_hostname }}
@@ -129,9 +130,9 @@ ndots: 2
 # Can be dnsmasq_kubedns, kubedns, coredns, coredns_dual, manual or none
 dns_mode: coredns
 # Set manual server if using a custom cluster DNS server
-#manual_dns_server: 10.x.x.x
+# manual_dns_server: 10.x.x.x
 # Enable nodelocal dns cache
-enable_nodelocaldns: False
+enable_nodelocaldns: false
 nodelocaldns_ip: 169.254.25.10
 
 # Can be docker_dns, host_resolvconf or none
@@ -163,7 +164,7 @@ kubernetes_audit: false
 dynamic_kubelet_configuration: false
 
 # define kubelet config dir for dynamic kubelet
-#kubelet_config_dir:
+# kubelet_config_dir:
 default_kubelet_config_dir: "{{ kube_config_dir }}/dynamic_kubelet_dir"
 dynamic_kubelet_configuration_dir: "{{ kubelet_config_dir | default(default_kubelet_config_dir) }}"
 

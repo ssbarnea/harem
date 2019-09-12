@@ -18,5 +18,5 @@ mac_addresses:
 wol:
   mac: 00:11:32:45:ca:9d
   port: 9
-  #5000
+  # 5000
   address: 255.255.255.255

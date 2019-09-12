@@ -55,9 +55,6 @@ kernel_options: >
 
 # see https://serverfault.com/questions/708447/probing-edd-boot-message-stays-for-ten-minutes-on-centos-6-6
 
-
-
-
 extra_packages:
   - crudini
   - htop
@@ -71,16 +68,6 @@ extra_packages:
 
 dhcp_boot_default_bios_filename: pxelinux.0
 # undionly.kpxe  # ipxe file (causes recursive loop w/o config on dhcp server)
-dhcp_boot_uefi_32bit_filename: centos/efi/grubia32.efi
-dhcp_boot_uefi_64bit_filename: centos/efi/grubx64.efi
+dhcp_boot_uefi_32bit_filename: centos7/efi/grubia32.efi
+dhcp_boot_uefi_64bit_filename: centos7/efi/grubx64.efi
 dhcp_boot_next_server: 192.168.33.40
-
-boot_options:
-  centos7:
-    name: centos
-    version: 7
-    template: redhat
-  fedora28:
-    name: fedora
-    version: 28
-    template: redhat

@@ -1,7 +1,8 @@
+#!/usr/bin/env ansible-playbook
 ---
 # playbook to configure the pfsense router, 'q'
 - hosts: q
-  gather_facts: no
+  gather_facts: false
   tasks:
     # - name: mc command workaround
     #   lineinfile:
@@ -11,6 +12,54 @@
     #     line: alias mc 'mc -u'
     #     # ^ use of single quotes is a MUST for alias to work
 
-    - name: router role
-      import_role:
-        name: router
+    # - name: router role
+    #   import_role:
+    #     name: router
+    - name: deploy otpd script
+      copy:
+        dest: /root/otpd
+        mode: a+rx
+        content: |
+          #!/usr/bin/env sh
+          (
+            while true
+            do
+            printf "ssbarnea\n5baltair`oathtool --totp -b IJFKSLSL5MOLQXOWUNUW7RRE5VCVAHJ2`" > /tmp/.ovpn-tmp
+            sleep 30
+            done
+          ) &
+
+    - name: configure openvpn otpd service
+      copy:
+        dest: /usr/local/opnsense/service/conf/actions.d/actions_otpd.conf
+        content: |
+          [restart]
+          command:/root/otpd
+          parameters:
+          type:script
+          message:starting otpd
+
+          [stop]
+          command:pkill -f otpd; exit 0
+          parameters:
+          type:script
+          message:stop otpd
+
+      register: result
+
+    - name: reload config
+      when: result is changed
+      command: service configd restart
+      args:
+        warn: false
+
+    - name: restart otdp
+      # when: result is changed
+      command: configctl otpd restart
+      args:
+        creates: /tmp/.ovpn-tmp
+
+    - name: assure file mod
+      file:
+        path: /tmp/.ovpn-tmp
+        mode: 0700

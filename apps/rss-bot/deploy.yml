@@ -1,6 +1,7 @@
 #!/usr/bin/env ansible-playbook
+---
 - hosts: n0
-  become: yes
+  become: true
   vars:
     gid: 99
     uid: 99
@@ -47,11 +48,11 @@
 
     - name: compose up
       docker_compose:
-        build: yes
-        debug: yes
-        pull: yes
+        build: true
+        debug: true
+        pull: true
         recreate: always
-        restarted: yes
+        restarted: true
         project_name: rss-bot
         definition:
           version: '3.7'

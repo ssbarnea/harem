@@ -14,17 +14,17 @@
       ipmi_boot:
         bootdev: hd
         name: "{{ ipmi_address }}"
-        uefiboot: no
+        uefiboot: "no"
         user: "{{ ipmi_user }}"
         password: "{{ ipmi_password }}"
-        persistent: yes
+        persistent: true
       delegate_to: localhost
 
     - name: set next boot to network (pxe)
       ipmi_boot:
         bootdev: network
         name: "{{ ipmi_address }}"
-        uefiboot: no
+        uefiboot: "no"
         user: "{{ ipmi_user }}"
         password: "{{ ipmi_password }}"
       delegate_to: localhost

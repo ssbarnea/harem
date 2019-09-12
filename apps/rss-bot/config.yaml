@@ -1,3 +1,4 @@
+---
 host: chat.freenode.net
 ssl_port: 6697
 nick: recheck

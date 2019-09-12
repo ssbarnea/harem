@@ -13,7 +13,7 @@ for VAR in SSL_CERT_FILE SSL_CERT_DIR REQUESTS_CA_BUNDLE CURL_CA_BUNDLE http_pro
     echo "${dark}INFO: $VAR=${green}$(printenv $VAR)${reset}"
 done
 
-function report() {
+function report {
     RESULT=0
     eval $2 >/dev/null || RESULT=$?
     if [[ $RESULT -eq 0 ]]; then
@@ -48,4 +48,3 @@ report pip-with-proxy "pip search --isolated --proxy sss${proxy_with_no_schema}x
 # for i in $(seq 10); do
 # wget -nv --report-speed=bits http://ipv4.download.thinkbroadband.com/50MB.zip -O /dev/null
 # done
-

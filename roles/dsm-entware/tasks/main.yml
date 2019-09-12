@@ -1,0 +1,40 @@
+---
+# based on a true story fund at:
+# https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
+
+
+- name: check if opkg exists
+  stat:
+    path: /opt/bin/opkg
+  register: st
+
+- when: not st.stat.exists
+  become: true
+  block:
+
+    - name: create folder
+      file:
+        path: /volume1/@entware-ng/opt
+        state: directory
+        mode: 0755
+
+    - name: get installer
+      get_url:
+        url: http://pkg.entware.net/binaries/x86-64/installer/entware_install.sh
+        dest: /volume1/@entware-ng/opt/entware_install.sh
+        mode: +x
+
+    - name: install
+      shell: /bin/sh /volume1/@entware-ng/opt/entware_install.sh
+
+- name: check PATH status
+  shell: which opkg
+  failed_when: false
+  register: result
+
+- when: result.rc != 0
+  lineinfile:
+    dest: /etc/profile
+    state: present
+    line: 'PATH=$PATH:/opt/bin'
+  become: true

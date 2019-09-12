@@ -1,34 +1,92 @@
 ---
 - hosts: all
   connection: local
-  gather_facts: true
+  gather_facts: false
   strategy: linear
   vars:
     state: "on"
   tasks:
 
-    - name: configure next boot device
-      ipmi_boot:
-        bootdev: "{{ state }}"
-        # network
-        # setup
-        # network
-        name: "{{ ipmi_address }}"
-        uefiboot: no
-        user: "{{ ipmi_user }}"
-        password: "{{ ipmi_password }}"
-      delegate_to: localhost
-      when: state != "on"
-      register: ipmi_boot
+    - name: if host has ipmi_address
+      when: ipmi_address is defined
+      block:
 
-    - name: reboot
-      ipmi_power:
-        name: "{{ ipmi_address }}"
-        user: "{{ ipmi_user }}"
-        password: "{{ ipmi_password }}"
-        state: "{% if state == 'setup' %}boot{% elif state %}on{% else %}off{% endif %}"
-        timeout: 10
-      register: ipmi_power
+        - pip:
+            name: pyghmi
+          delegate_to: localhost
+          connection: local
+          ignore_errors: true
 
-    - debug:
-        msg: "{{ ipmi_boot }} {{ ipmi_power }}"
+        - name: configure next boot device
+          ipmi_boot:
+            bootdev: "{% if state == 'on' %}hd0{% else %}{{ state }}{% endif %}"
+            # network
+            # setup
+            # network
+            name: "{{ ipmi_address }}"
+            uefiboot: "no"
+            user: "{{ ipmi_user }}"
+            password: "{{ ipmi_password }}"
+          delegate_to: localhost
+          when: state in ['network', 'hd', 'floppy', 'safe', 'optical', 'setup', 'default']
+          register: ipmi_boot
+
+        - name: trigger reboot if host is already up
+          shell: "ssh {{ inventory_hostname }} reboot &"
+          connection: local
+          delegate_to: localhost
+          ignore_errors: true
+          async: 10
+          poll: 0
+
+        - name: reboot
+          ipmi_power:
+            name: "{{ ipmi_address }}"
+            user: "{{ ipmi_user }}"
+            password: "{{ ipmi_password }}"
+            state: "{% if state == 'setup' %}boot{% else %}{{ state }}{% endif %}"
+            timeout: 10
+          register: ipmi_power
+          delegate_to: localhost
+
+        - debug:
+            msg: |
+              ipmi_boot: {{ ipmi_boot }}
+              ipmi_power: {{ ipmi_power }}
+
+    - name: if non ipmi host try wol waking
+      when:
+        - wol is defined
+        - wol.mac
+        - state != 'off'
+      block:
+
+        - name: send wol magic packet
+          wakeonlan:
+            mac: "{{ wol.mac }}"
+            broadcast: "{{ wol.address }}"
+            port: "{{ wol.port | default('7') }}"
+          delegate_to: localhost
+          with_sequence: count=3
+
+        - wait_for:
+            host: "{{ ansible_host }}"
+            port: 22
+            timeout: 10
+            state: present
+          delegate_to: localhost
+          register: result
+          retries: 5
+          until: result is success
+          # retries: 5
+
+        # - name: Wait for host to be available
+        #   wait_for_connection:
+        #     timeout: 10
+        #   register: result
+        #   retries: 5
+        #   delay: 10
+        #   until: result is success
+
+        - name: test setup
+          setup:
