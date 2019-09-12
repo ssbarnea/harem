@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+unset http_proxy
+docker pull linuxserver/unifi-controller
+docker stop unifi || true
+docker rm unifi || true
+docker create \
+  --name=unifi \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -p 3478:3478/udp \
+  -p 10001:10001/udp \
+  -p 28080:8080 \
+  -p 8081:8081 \
+  -p 28443:8443 \
+  -p 8843:8843 \
+  -p 8880:8880 \
+  -p 6789:6789 \
+  -v /opt/data/unifi:/config \
+  --restart unless-stopped \
+  linuxserver/unifi-controller:latest
+
+#   --network bridge \
+#   --ip 192.168.33.50 \
+docker start unifi

@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  flexget:
+    build: .
+    ports:
+     - "5555:5050"
+    networks:
+      hostnet: {}
+networks:
+  hostnet:
+    driver: host
+    # external: true
+    name: host

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+docker stop flexget || true
+docker rm flexget || true
+docker create \
+    --name=flexget \
+    -e WEB_PASSWD=*** \
+    -e TORRENT_PLUGIN=transmission \
+    -e TZ=Europe/London \
+    -e FLEXGET_LOG_LEVEL=debug \
+    -p 5555:5050 \
+    -v /opt/data/flexget/config:/config \
+    -v /opt/data/flexget/downloads:/downloads \
+    cpoppema/docker-flexget
+
+docker start flexget
+
+# -e PGID=<gid> -e PUID=<uid> \
+
+# docker run -it flexget
