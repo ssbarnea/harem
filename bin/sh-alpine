@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+unset http_proxy
+unset ALL_PROXY
+docker pull alpine:${1:-latest}
+docker run --network host -it alpine:${1:-latest} /bin/sh
+#bash

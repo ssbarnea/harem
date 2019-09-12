@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+docker run -it trunk.registry.rdoproject.org/rhel/rhel8-rhui:8.0-126 /bin/bash

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+unset http_proxy
+unset ALL_PROXY
+docker pull oraclelinux:${1:-latest}
+docker run --network host -it oraclelinux:${1:-latest} /bin/sh
+#bash

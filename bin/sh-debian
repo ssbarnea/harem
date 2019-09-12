@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+unset http_proxy
+unset ALL_PROXY
+docker pull debian:${1:-latest}
+docker run --network host -it debian:${1:-latest} /bin/bash

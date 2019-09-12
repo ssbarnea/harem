@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+docker pull fedora:${1:-latest}
+docker run --network host -it \
+  -v "$(pwd)":/tmp/$(basename "${PWD}"):ro \
+  -w /tmp/$(basename "${PWD}") \
+  quay.io/ansible/molecule:2.22rc6 /bin/bash
+
+
+docker run --rm -it \
+>     -v "$(pwd)":/tmp/$(basename "${PWD}"):ro \
+>     -v /var/run/docker.sock:/var/run/docker.sock \
+>     -w /tmp/$(basename "${PWD}") \
+>     quay.io/ansible/molecule:2.22rc6 \
+>     molecule create

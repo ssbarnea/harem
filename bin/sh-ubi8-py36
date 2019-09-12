@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+docker run -u root -it registry.redhat.io/ubi8/python-36 /bin/bash

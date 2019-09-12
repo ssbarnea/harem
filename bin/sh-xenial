@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+unset http_proxy
+unset ALL_PROXY
+docker run -it ubuntu:xenial /bin/bash

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+unset http_proxy
+unset ALL_PROXY
+docker pull ubuntu:16.04
+docker run -it ubuntu:16.04 /bin/bash
