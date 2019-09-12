@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+# docker-compose build
+# docker-compose run
+
+docker pull emby/embyserver:latest
+docker container stop emby || true
+docker run -d \
+    --name emby \
+    --volume /media/wd10/.config/emby:/config \
+    --volume /media/wd10/.cache/emby:/cache \
+    --volume /media/wd10/media:/media \
+    --volume /media/download:/download \
+    --publish 8096:8096 \
+    --publish 8920:8920 \
+    --env UID=1000 \
+    --env GID=100 \
+    --env GIDLIST=100 \
+    emby/embyserver:latest
+ # --device /dev/dri/renderD128 \ # To mount a render node for VAAPI 
+# --volume-driver=nfs -v syno/volume2/download:/download \
