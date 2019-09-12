@@ -1,0 +1,102 @@
+host: chat.freenode.net
+ssl_port: 6697
+nick: recheck
+alerts_channel: '##recheck-alerts'
+mode:
+feeds:
+  "#ansible-molecule":
+    so-molecule:
+      url: https://stackoverflow.com/feeds/tag/molecule
+      period: 0.5
+      shorten: false
+      new: none
+  "#oooq":
+    taiga-blog:
+      url: https://blog.taiga.io/feeds/all.atom.xml
+      period: 0.5
+      shorten: false
+      new: none
+    rdo-blog:
+      url: https://blogs.rdoproject.org/feed/
+      period: 0.5
+      shorten: false
+      new: none
+  "#zuul":
+    so-zuul:
+      url: https://stackoverflow.com/feeds/tag/openstack-zuul
+      period: 0.5
+      shorten: false
+      new: none
+  "#openstack":
+    so-openstack:
+      url: https://stackoverflow.com/feeds/tag/openstack
+      period: 0.5
+      shorten: false
+      new: none
+    ask-openstack:
+      url: https://ask.openstack.org/en/feeds/rss/
+      period: 0.5
+      shorten: false
+      new: none
+  "#tripeo":
+    ask-tripleo:
+      url: https://ask.openstack.org/en/feeds/rss/?q=tripleo&tags=tripleo
+      period: 0.5
+      shorten: false
+      new: none
+    so-tripleo:
+      url: https://stackoverflow.com/feeds/tag/tripleo
+      period: 0.5
+      shorten: false
+      new: none
+    sf-tripleo:
+      url: https://serverfault.com/feeds/tag/tripleo
+      period: 0.5
+      shorten: false
+      new: none
+  "#openstack-jjb":
+    so-jjb:
+      url: https://stackoverflow.com/feeds/tag/jenkins-job-builder
+      period: 0.5
+      shorten: false
+      new: none
+  "#pytest":
+    so-pytest:
+      url: https://stackoverflow.com/feeds/tag/pytest
+      period: 0.5
+      shorten: false
+      new: none
+  "#opendev":
+    so-python-pbr:
+      url: https://stackoverflow.com/feeds/tag/python-pbr
+      period: 0.5
+      shorten: false
+      new: none
+    so-git-review:
+      url: https://stackoverflow.com/feeds/tag/git-review
+      period: 0.5
+      shorten: false
+      new: none
+  "#opnsense":
+    so-opnsense:
+      url: https://stackoverflow.com/feeds/tag/opnsense
+      period: 0.5
+      shorten: false
+      new: none
+  "#quay":
+    so-quay-io:
+      url: https://stackoverflow.com/feeds/tag/quay.io
+      period: 0.5
+      shorten: false
+      new: none
+  "#podman":
+    so-buildah:
+      url: https://stackoverflow.com/feeds/tag/buildah
+      period: 0.5
+      shorten: false
+      new: none
+    so-podman:
+      url: https://stackoverflow.com/feeds/tag/podman
+      period: 0.5
+      shorten: false
+      new: none
