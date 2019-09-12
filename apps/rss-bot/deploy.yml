@@ -30,7 +30,7 @@
         owner: "{{ owner }}"
         group: "{{ group }}"
         state: directory
-        mode: 1700
+        mode: "0700"
 
     - name: deploy config
       copy:
@@ -46,23 +46,41 @@
         dest: /opt/data/rss-bot/secrets.env
       register: secrets
 
-    - name: compose up
-      docker_compose:
-        build: true
-        debug: true
-        pull: true
-        recreate: always
-        restarted: true
-        project_name: rss-bot
-        definition:
-          version: '3.7'
-          services:
-            rss-bot:
-              # nobody:nobody on centos7, does not support names
-              user: "{{ uid }}:{{ gid }}"
-              container_name: rss-bot
-              image: ascensive/irc-rss-feed-bot:latest
-              volumes:
-                - /opt/data/rss-bot:/config
-              env_file:
-                - /opt/data/rss-bot/secrets.env
+    - block:
+        - name: compose up
+          docker_compose:
+            build: true
+            debug: true
+            pull: true
+            recreate: always
+            restarted: true
+            project_name: rss-bot
+            definition:
+              version: '3.7'
+              services:
+                rss-bot:
+                  # nobody:nobody on centos7, does not support names
+                  user: "{{ uid }}:{{ gid }}"
+                  container_name: rss-bot
+                  image: ascensive/irc-rss-feed-bot:latest
+                  volumes:
+                    - /opt/data/rss-bot:/config
+                  env_file:
+                    - /opt/data/rss-bot/secrets.env
+          register: result
+
+        - docker_container_info:
+            name: rss-bot
+          register: result
+          failed_when: not result.container.State.Running
+          retries: 3
+          delay: 5
+
+      rescue:
+        - debug: var=result
+        - shell: docker logs rss-bot
+          register: result
+        - fail: msg="{{ result }}"
+
+
+    # - debug: var=result

@@ -8,6 +8,7 @@
 
 - name: configure system proxy variables
   when: use_proxy
+  become: true
   copy:
     dest: /etc/profile.d/proxy.sh
     content: |
@@ -19,11 +20,13 @@
       export http_proxy https_proxy ftp_proxy HTTP_PROXY HTTPS_PROXY
 
 - when: not use_proxy
+  become: true
   file:
     path: /etc/profile.d/proxy.sh
     state: absent
 
 - name: configure wget proxy
+  become: true
   copy:
     dest: /etc/wgetrc
     content: |
@@ -34,6 +37,7 @@
       {% endif %}
 
 - name: "configure packager proxy: {{ pkg_mgr_map[ansible_pkg_mgr] }}"
+  become: true
   ini_file:
     path: "{{ pkg_mgr_map[ansible_pkg_mgr] }}"
     section: main
@@ -43,6 +47,7 @@
 
 - name: install custom CA
   when: custom_ca is defined
+  become: true
   copy:
     dest: /etc/pki/ca-trust/source/anchors/custom-ca.crt
     content: "{{ custom_ca }}"
@@ -50,10 +55,12 @@
 
 - name: activate custom CA
   when: result is changed
+  become: true
   shell: update-ca-trust
 
 - name: configure pip to use system ca certificates
   when: custom_ca is defined
+  become: true
   ini_file:
     path: "/etc/pip.conf"
     section: global

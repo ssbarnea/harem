@@ -18,17 +18,21 @@
 - name: install freebsd packages
   pkgng:
     name:
-      - oath-toolkit
       - atop
-      - ntopng
+      - htop
       - iftop
+      - mc
+      - ncdu
+      - nmap
+      - ntopng
+      - oath-toolkit
     pkgsite: FreeBSD
   register: result
 
 - name: rehash
   when: result is changed
   # rehash is shell build-in on opnsense
-  shell: rehash
+  shell: rehash || true
   args:
     warn: false
 

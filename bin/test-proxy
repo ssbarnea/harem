@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+
+export http_proxy=http://192.168.33.1:3128/
+export https_proxy=http://192.168.33.1:3128/
+
+curl -v6LI https://ipv6test.google.com -o /dev/null  -w '%{http_code}\n' -s
+curl -v4LI https://ipv6test.google.com -o /dev/null  -w '%{http_code}\n' -s
+
+
+pip -vvv --proxy="$https_proxy" search selinux
+
+echo "[PASSED]"

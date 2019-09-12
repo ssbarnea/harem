@@ -6,7 +6,7 @@ list:
 	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | xargs
 
 env:
-	ansible-galaxy install -r requirements.yml
+	bash -c "ansible-galaxy install -r requirements.yml || true"
 
 dsm:
 	ansible-playbook playbooks/dsm.yml
@@ -39,3 +39,6 @@ kube: env
 	# ansible-playbook --become --become-user=root contribs/kubespray/remove-node.yml -l n2
 	ansible-playbook --become --become-user=root contribs/kubespray/cluster.yml
 
+kube-reset: env
+	ansible-playbook contribs/kubespray/reset.yml
+#--become --become-user=root

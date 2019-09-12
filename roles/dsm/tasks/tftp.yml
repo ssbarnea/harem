@@ -4,7 +4,7 @@
   with_first_found:
     - files:
         - ~/.config/harem/root_password
-      skip: true
+      errors: ignore
 
 - name: generate random root password if not defined
   set_fact:
@@ -12,6 +12,7 @@
       {{ lookup('password',
       '~/.config/harem/root_password chars=ascii_letters') }}
   when: root_password is not defined
+  no_log: true
 
 - become: true
   block:
@@ -21,7 +22,7 @@
         path: /etc/opentftp.ini
         section: TFTP-OPTIONS
         option: blksize
-        value: 4096
+        value: "4096"
         # value: 1456
         no_extra_spaces: true
       register: result
@@ -37,9 +38,10 @@
         src: pxelinux.cfg/default.j2
         dest: "{{ pxe_root }}/pxelinux.cfg/default"
 
-    - name: configure specific pxe boot menus
-      include_tasks: custom-menus.yml
-      with_items: "{{ groups['baremetals'] }}"
+    - name: generate pxeboot menu
+      syncronize:
+        src: secrets/pxe
+        dest: "{{ pxe_root }}/pxelinux.cfg/01-{{ ks_host_id }}"
 
     - name: deploy kickstart templated files (ks)
       template:
@@ -65,6 +67,7 @@
       with_items:
         - fedora28
         - centos7
+        - rhel8
       loop_control:
         loop_var: dir
 
@@ -82,5 +85,11 @@
         'fedora28/initrd.img': "{{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/initrd.img"
         'centos7/initrd.img': "{{ distros_mirror }}/centos/7/os/x86_64/images/pxeboot/initrd.img"
         'centos7/vmlinuz': "{{ distros_mirror }}/centos/7/os/x86_64/images/pxeboot/vmlinuz"
+        'rhel8/vmlinuz': "{{ rhel8_pxeboot_url }}/vmlinuz"
+        'rhel8/initrd.img': "{{ rhel8_pxeboot_url }}/initrd.img"
+        'rhel80/vmlinuz': "http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8.0/compose/BaseOS/x86_64/os/images/pxeboot/vmlinuz"
+        'rhel80/initrd.img': "http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8.0/compose/BaseOS/x86_64/os/images/pxeboot/initrd.img"
+
+
       loop_control:
         loop_var: file

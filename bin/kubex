@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# This script implements a missing feature of kubectl of applying config files
+#from stdin, one that would allow you to just execute the yaml config files.
+#
+# Add this shebang and make the yaml file executable:
+#!/usr/bin/env kubex
+set -euo pipefail
+[ $# -ge 1 -a -f "$1" ] && input="$1" || input="-"
+cat $input | kubectl apply -f - $*

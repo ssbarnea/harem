@@ -1,0 +1,45 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: n0
+  gather_facts: no
+  become: yes
+  vars:
+    accounts:
+        - arxcruz
+        - chkumar246
+        - gabrielecerami
+        - marios
+        - rafaelfolco
+        - rlandy
+        - sshnaidm
+        - weshayutin
+        - cloudnull  # not real ci but trusted
+        - ekultails # luke short
+  tasks:
+
+    - user:
+        name: "{{ item }}"
+        state: present
+        groups:
+            - docker
+      with_items: "{{ accounts }}"
+
+    - name: Set authorized key taken from file
+      authorized_key:
+        user: "{{ item }}"
+        state: present
+        key: "https://github.com/{{ item }}.keys"
+      with_items: "{{ accounts }}"
+
+    - name: disable password login on ssh
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^PasswordAuthentication .+"
+        line: "PasswordAuthentication no"
+      register: result
+
+    - name: restart sshd
+      when: result is changed
+      service:
+        name: sshd
+        state: restarted

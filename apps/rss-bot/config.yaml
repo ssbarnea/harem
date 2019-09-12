@@ -101,3 +101,28 @@ feeds:
       period: 0.5
       shorten: false
       new: none
+  "#pylib":
+    so-tox:
+      url: https://stackoverflow.com/feeds/tag/tox
+      period: 0.5
+      shorten: false
+      new: none
+  "#pypa":
+    so-virtualenv:
+      url: https://stackoverflow.com/feeds/tag/virtualenv
+      period: 0.5
+      shorten: false
+      new: none
+    so-setuptools:
+      url: https://stackoverflow.com/feeds/tag/setuptools
+      period: 0.5
+      shorten: false
+      new: none
+    so-pip:
+      url: https://stackoverflow.com/feeds/tag/pip
+      period: 0.5
+      shorten: false
+      new: none
+  "#ara":
+    so-ara:
+      url: https://stackoverflow.com/feeds/tag/ara

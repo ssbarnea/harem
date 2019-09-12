@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export MOLECULE_PLATFORM=rhel8
+export MOLECULE_IMAGE=rhel/rhel8-rhui-testing:latest
+export MOLECULE_CONTAINER_REGISTRY_URL=trunk.registry.rdoproject.org
+
+molecule $*
+#--destroy=never

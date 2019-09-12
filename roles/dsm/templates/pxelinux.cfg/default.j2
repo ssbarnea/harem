@@ -4,7 +4,7 @@ PXERetry 5
 PROMPT 0
 {# unit: 0.1s #}
 TIMEOUT 100
-DEFAULT {{ 'custom-' + ks_os_flavour | default('bootlocal') }}
+DEFAULT {{ 'custom-' + os_flavour | default('bootlocal') }}
 
 LABEL bootlocal
   MENU LABEL Local Boot
@@ -25,11 +25,11 @@ MENU LABEL nemo
  append initrd=nemo.img floppy raw
 
 {% if ks_hostname is defined %}
-LABEL custom-{{ ks_os_flavour }}
-MENU LABEL custom-{{ ks_os_flavour }}
+LABEL custom-{{ os_flavour }}
+MENU LABEL custom-{{ os_flavour }}
   ipappend 2
-  kernel {{ ks_os_flavour }}/vmlinuz
-  append initrd={{ ks_os_flavour }}/initrd.img repo={{ ks_os_repo }} ks={{ ks_url }}/{{ ks_host_id }}.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+  kernel {{ os_flavour }}/vmlinuz
+  append initrd={{ os_flavour }}/initrd.img repo={{ ks_os_repo }} ks={{ ks_url }}/{{ ks_host_id }}.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
 {% else %}
 
 LABEL centos7
@@ -38,6 +38,13 @@ MENU LABEL centos7
   kernel centos7/vmlinuz
   append initrd=centos7/initrd.img repo={{ distros_mirror }}/centos/7/os/x86_64/ ks={{ ks_url }}/centos7.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
 
+LABEL rhel8
+MENU LABEL rhel8
+  ipappend 2
+  kernel rhel8/vmlinuz
+  append initrd=rhel8/initrd.img repo=http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os
+{# ks={{ ks_url }}/rhel8.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+#}
 LABEL fedora28
 MENU LABEL fedora28
   ipappend 2

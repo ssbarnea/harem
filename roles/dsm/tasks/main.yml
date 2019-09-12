@@ -1,13 +1,14 @@
 ---
-# tasks file for dsm
-- include_tasks:
-    file: "{{ dsm_subtask }}"
-  with_items:
-    - tasks/tftp.yml
-    # - ssl.yml
-    # - docker.yml
-  loop_control:
-    loop_var: dsm_subtask
+# TODO:
+# PermitRootLogin=yes into /etc/ssh/sshd_config
+# Restart sshd: sudo synoservicectl --restart sshd
+# needed to be able to rsync ssl certs from router
+
+- include_tasks: tftp.yml
+
+- include_tasks: ssl.yml
+
+# - include_tasks: docker.yml
 
 # kudos to: https://nguvu.org/pfsense/pfSense-WPAD-PAC-proxy-configuration-guide/
 - name: configure proxy wpad file

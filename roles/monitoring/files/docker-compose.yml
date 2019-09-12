@@ -1,0 +1,15 @@
+version: '2'
+services:
+  metrics:
+    image: samuelebistoletti/docker-statsd-influxdb-grafana
+    ports:
+      - '3003:3003' # grafana
+      - '8083:8083' # influxdb-admin
+      - '8086:8086' # influxdb
+      - '8088:8088' # backup
+      - '8089:8089/udp'
+      - '8125:8125/udp' # statsd
+    volumes:
+      - ./grafana:/var/lib/grafana
+    environment:
+      - "GF_DATABASE_TYPE=sqlite3"

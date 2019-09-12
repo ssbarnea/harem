@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+for BRANCH in `git branch -a|grep review/`; do
+
+echo $BRANCH
+git rev-parse --abbrev-ref --symbolic-full-name "$BRANCH"@{upstream}
+done
+
+
+# for DIR in ~/rdo/*; do
+# (
+#     cd $DIR
+#     git branch --merged | egrep -v "(^\*|master|dev)" | xargs git branch -d
+# ) || true
+# done
