@@ -1,0 +1,34 @@
+---
+# tasks file for ensure-docker
+- setup:
+    gather_subset: min
+    # min includes ansible_python_version
+# cert.pem\nchain.pem\nfullchain.pem\nprivkey.pem
+# - shell: |
+#     ls /usr/syno/etc/certificate/system/default
+#   register: result
+
+- debug: var=ansible_distribution
+# - docker_swarm:
+#     state: present
+# - import_role:
+#     name: avinetworks.docker
+- package:
+    name:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+
+# - package:
+#     name: rsync
+#     use: pkg
+#   delegate_to: pfsense
+#   become: yes
+# - name: configure docked
+#   template:
+#     src: dockerd.json.j2
+#     dest: /var/packages/Docker/etc/dockerd.json
+#   register: result
+#   become: true
+
+- debug: var=result
