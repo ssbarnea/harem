@@ -11,6 +11,34 @@ feeds:
       period: 0.5
       shorten: false
       new: none
+    gh-ansible:
+      url: https://github.com/ansible/ansible/releases.atom
+      shorten: false
+      new: none
+    gh-molecule:
+      url: https://github.com/ansible/molecule/releases.atom
+      shorten: false
+      new: none
+    gh-pytest-molecule:
+      url: https://github.com/pycontribs/pytest-molecule/releases.atom
+      shorten: false
+      new: none
+    gh-selinux:
+      url: https://github.com/pycontribs/selinux/releases.atom
+      shorten: false
+      new: none
+    gh-molecule-goss:
+      url: https://github.com/pycontribs/molecule-goss/releases.atom
+      shorten: false
+      new: none
+    gh-molecule-azure:
+      url: https://github.com/pycontribs/molecule-azure/releases.atom
+      shorten: false
+      new: none
+    gh-cookiecutter:
+      url: https://github.com/cookiecutter/cookiecutter/releases.atom
+      shorten: false
+      new: none
   "#oooq":
     taiga-blog:
       url: https://blog.taiga.io/feeds/all.atom.xml
@@ -22,6 +50,18 @@ feeds:
       period: 0.5
       shorten: false
       new: none
+    gh-ansible:
+      url: https://github.com/ansible/ansible/releases.atom
+      shorten: false
+    gh-molecule:
+      url: https://github.com/ansible/molecule/releases.atom
+      shorten: false
+    gh-pytest-molecule:
+      url: https://github.com/pycontribs/pytest-molecule/releases.atom
+      shorten: false
+    gh-selinux:
+      url: https://github.com/pycontribs/selinux/releases.atom
+      shorten: false
   "#zuul":
     so-zuul:
       url: https://stackoverflow.com/feeds/tag/openstack-zuul
@@ -31,11 +71,6 @@ feeds:
   "#openstack":
     so-openstack:
       url: https://stackoverflow.com/feeds/tag/openstack
-      period: 0.5
-      shorten: false
-      new: none
-    ask-openstack:
-      url: https://ask.openstack.org/en/feeds/rss/
       period: 0.5
       shorten: false
       new: none
@@ -61,12 +96,6 @@ feeds:
       period: 0.5
       shorten: false
       new: none
-  "#pytest":
-    so-pytest:
-      url: https://stackoverflow.com/feeds/tag/pytest
-      period: 0.5
-      shorten: false
-      new: none
   "#opendev":
     so-python-pbr:
       url: https://stackoverflow.com/feeds/tag/python-pbr
@@ -78,7 +107,7 @@ feeds:
       period: 0.5
       shorten: false
       new: none
-  "#opnsense":
+  "#OPNsense":
     so-opnsense:
       url: https://stackoverflow.com/feeds/tag/opnsense
       period: 0.5
@@ -107,22 +136,40 @@ feeds:
       period: 0.5
       shorten: false
       new: none
+    so-pytest:
+      url: https://stackoverflow.com/feeds/tag/pytest
+      period: 3
+      shorten: false
+      new: none
+    pre-commit:
+      url: https://stackoverflow.com/feeds/tag/pre-commit.com
+      period: 0.5
+      shorten: false
+    gh-testinfra:
+      url: https://github.com/philpep/testinfra/releases.atom
+      shorten: false
+      new: none
   "#pypa":
     so-virtualenv:
       url: https://stackoverflow.com/feeds/tag/virtualenv
-      period: 0.5
+      period: 3
       shorten: false
       new: none
     so-setuptools:
       url: https://stackoverflow.com/feeds/tag/setuptools
-      period: 0.5
+      period: 3
       shorten: false
       new: none
-    so-pip:
-      url: https://stackoverflow.com/feeds/tag/pip
-      period: 0.5
-      shorten: false
-      new: none
+      # so-pip:
+      #   url: https://stackoverflow.com/feeds/tag/pip
+      #   period: 12
+      #   shorten: false
+      #   new: none
   "#ara":
     so-ara:
       url: https://stackoverflow.com/feeds/tag/ara
+  "#cookiecutter":
+    gh-cookiecutter:
+      url: https://github.com/cookiecutter/cookiecutter/releases.atom
+      shorten: false
+      new: none

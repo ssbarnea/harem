@@ -59,6 +59,7 @@
               version: '3.7'
               services:
                 rss-bot:
+                  tty: true
                   # nobody:nobody on centos7, does not support names
                   user: "{{ uid }}:{{ gid }}"
                   container_name: rss-bot
@@ -67,9 +68,20 @@
                     - /opt/data/rss-bot:/config
                   env_file:
                     - /opt/data/rss-bot/secrets.env
+                  restart: always
+                  logging:
+                    options:
+                      max-size: 10m
+                      max-file: "3"
+                  deploy:
+                    restart_policy:
+                      condition: on-failure
+                      delay: 10s
+                      max_attempts: 3
           register: result
 
-        - docker_container_info:
+        - name: gather container info
+          docker_container_info:
             name: rss-bot
           register: result
           failed_when: not result.container.State.Running
@@ -81,6 +93,3 @@
         - shell: docker logs rss-bot
           register: result
         - fail: msg="{{ result }}"
-
-
-    # - debug: var=result
