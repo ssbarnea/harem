@@ -1,0 +1,85 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: n0
+  become: true
+  vars:
+    app:
+      name: prom
+  tasks:
+
+    - name: create app user
+      user:
+        name: "{{ app.name }}"
+        home: "/opt/data/{{ app.name }}/"
+      register: user
+
+    - name: service folder
+      file:
+        path: /opt/data/{{ app.name }}/
+        owner: "{{ app.name }}"
+        group: "{{ app.name }}"
+        state: directory
+        mode: "0700"
+
+    - name: deploy config
+      copy:
+        src: prometheus.yml
+        dest: /opt/data/{{ app.name }}/prometheus.yml
+        group: "{{ app.name }}"
+        owner: "{{ app.name }}"
+      register: cfg
+
+    - block:
+        - name: compose up
+          docker_compose:
+            build: true
+            debug: true
+            pull: true
+            # recreate: always
+            restarted: true
+            project_name: "{{ app.name }}"
+            definition:
+              version: '3.7'
+              services:
+                rss-bot:
+                  tty: true
+                  # nobody:nobody on centos7, does not support names
+                  user: "{{ user.uid }}:{{ user.group }}"
+                  container_name: "{{ app.name }}"
+                  image: prom/prometheus:latest
+                  ports:
+                    - "9090:9090"
+                  volumes:
+                    - /opt/data/{{ app.name }}:/prometheus-data
+                  # env_file:
+                  #   - /opt/data/{{ app.name }}/secrets.env
+                  restart: always
+                  logging:
+                    options:
+                      max-size: 10m
+                      max-file: "3"
+                  deploy:
+                    restart_policy:
+                      condition: on-failure
+                      delay: 10s
+                      max_attempts: 3
+          register: result
+
+        - docker_container_info:
+            name: "{{ app.name }}"
+          register: result2
+          failed_when: not result.container.State.Running
+          retries: 3
+          delay: 5
+
+      rescue:
+        - debug: var=result
+        - shell: |
+            docker logs {{ app.name }}
+          register: result
+        - fail:
+            msg: |
+              "{{ result.stderr_lines | join('\\n') }}"
+              "{{ result.stdout_lines | join('\\n') }}"
+
+    # - debug: var=result

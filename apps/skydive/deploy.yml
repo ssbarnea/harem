@@ -1,0 +1,140 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: n0
+  become: true
+  vars:
+    gid: 99
+    uid: 99
+    owner: nobody
+    group: nobody
+  tasks:
+
+    - name: service folder
+      file:
+        path: /opt/data/rss-bot/
+        owner: "{{ owner }}"
+        group: "{{ group }}"
+        state: directory
+        mode: "0700"
+
+    - name: deploy config
+      copy:
+        src: config.yaml
+        dest: /opt/data/rss-bot/config.yaml
+      register: cfg
+
+    - name: deploy secrets
+      copy:
+        content: |
+          IRC_PASSWORD={{ IRC_PASSWORD }}
+          BITLY_TOKENS={{ BITLY_TOKENS }}
+        dest: /opt/data/rss-bot/secrets.env
+      register: secrets
+
+    - block:
+        - name: compose up
+          docker_compose:
+            build: true
+            debug: true
+            pull: true
+            recreate: always
+            restarted: true
+            project_name: rss-bot
+            definition:
+
+
+
+
+
+version: '2'
+services:
+  elasticsearch:
+    image: elasticsearch:5
+    ports:
+      - "19200:9200"
+      - "19300:9300"
+    environment:
+      - "discovery.type=single-node"
+    networks:
+      - skynet
+
+  skydive-analyzer:
+    image: skydive/skydive
+    ports:
+      - "8082:8082"
+      - "8082:8082/udp"
+    links:
+      - elasticsearch
+    command: analyzer --listen=0.0.0.0:8082
+    environment:
+      - SKYDIVE_STORAGE_ELASTICSEARCH_HOST=elasticsearch:9200
+      - SKYDIVE_ANALYZER_STORAGE_BACKEND=elasticsearch
+      - SKYDIVE_GRAPH_BACKEND=elasticsearch
+      - SKYDIVE_ETCD_LISTEN=0.0.0.0:12379
+    networks:
+      - skynet
+
+  skydive-agent:
+    image: skydive/skydive
+    depends_on:
+      - skydive-analyzer
+    ports:
+      - "8081:8081"
+    network_mode: "host"
+    pid: "host"
+    command: agent --listen=0.0.0.0:8081
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/netns:/host/run
+      - /var/run/openvswitch/db.sock:/var/run/openvswitch/db.sock
+    environment:
+      - SKYDIVE_AGENT_TOPOLOGY_NETNS_RUN_PATH=/host/run
+      - SKYDIVE_ANALYZERS=127.0.0.1:8082
+
+networks:
+  skynet:
+  
+  
+
+
+              version: '3.7'
+              services:
+                rss-bot:
+                  tty: true
+                  # nobody:nobody on centos7, does not support names
+                  user: "{{ uid }}:{{ gid }}"
+                  container_name: rss-bot
+                  image: ascensive/irc-rss-feed-bot:latest
+                  volumes:
+                    - /opt/data/rss-bot:/config
+                  env_file:
+                    - /opt/data/rss-bot/secrets.env
+                  restart: always
+                  logging:
+                    options:
+                      max-size: 10m
+                      max-file: "3"
+                  deploy:
+                    restart_policy:
+                      condition: on-failure
+                      delay: 10s
+                      max_attempts: 3
+          register: result
+
+        - name: gather container info
+          docker_container_info:
+            name: rss-bot
+          register: result
+          failed_when: not result.container.State.Running
+          retries: 3
+          delay: 5
+
+      rescue:
+        - debug: var=result
+        - shell: docker logs rss-bot
+          register: result
+        - fail: msg="{{ result }}"
+
+
+    # - debug: var=result
