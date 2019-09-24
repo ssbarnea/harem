@@ -1,7 +1,8 @@
+---
 # Based on a true story from
 # https://blog.bobbyallen.me/2013/02/03/how-to-redirect-local-root-mail-to-an-external-email-address-on-linux/
 - name: forward root email
-  become: yes
+  become: true
   lineinfile:
     dest: /etc/aliases
     regexp: "^(.*)root:(.*)"
@@ -18,23 +19,23 @@
 
     - name: install mail related packages
       package:
-        name: 
+        name:
           - postfix
           - mailx
         state: installed
 
     - name: call newaliases
-      become: yes
+      become: true
       command: /usr/bin/newaliases
-  
+
     - name: restart postfix
-      become: yes
+      become: true
       service:
         name: postfix
         state: restarted
-        enabled: yes
+        enabled: true
 
     - name: sent test email
-      become: yes
+      become: true
       shell: |
         echo 'ansible configured email on {{ ansible_hostname }}' | mail -s '{{ ansible_hostname }}: ansible test' root

@@ -1,3 +1,4 @@
+---
 # This compose file is compatible with Compose itself, it might need some
 # adjustments to run properly with stack.
 
@@ -7,8 +8,8 @@ services:
 
   synapse:
     build:
-        context: .
-        dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile
     image: docker.io/matrixdotorg/synapse:latest
     # Since synapse does not retry to connect to the database, restart upon
     # failure

@@ -17,5 +17,5 @@ docker run -d \
     --env GID=100 \
     --env GIDLIST=100 \
     emby/embyserver:latest
- # --device /dev/dri/renderD128 \ # To mount a render node for VAAPI 
+ # --device /dev/dri/renderD128 \ # To mount a render node for VAAPI
 # --volume-driver=nfs -v syno/volume2/download:/download \

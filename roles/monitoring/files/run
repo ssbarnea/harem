@@ -1,3 +1,4 @@
+#!/bin/bash
 docker run -d \
   --name docker-statsd-influxdb-grafana \
   -p 3003:3003 \

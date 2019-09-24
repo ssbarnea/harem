@@ -1,13 +1,13 @@
 ---
 version: "3"
 services:
-    emby:
-      image: emby/embyserver:latest
-      network_mode: "host"
-      volumes:
-        - /media/wd10/.config/emby:/config
-        - /media/wd10/.cache/emby:/cache
-        - /media/wd10/media:/media
-      environment:
-        PUID: 1000
-        PGID: 100
+  emby:
+    image: emby/embyserver:latest
+    network_mode: "host"
+    volumes:
+      - /media/wd10/.config/emby:/config
+      - /media/wd10/.cache/emby:/cache
+      - /media/wd10/media:/media
+    environment:
+      PUID: 1000
+      PGID: 100

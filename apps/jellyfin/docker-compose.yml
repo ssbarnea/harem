@@ -1,10 +1,10 @@
 ---
 version: "3"
 services:
-    jellyfin:
-      image: jellyfin/jellyfin
-      network_mode: "host"
-      volumes:
-        - /media/wd10/.config/jellyfin:/config
-        - /media/wd10/.cache/jellyfin:/cache
-        - /media/wd10/media:/media
+  jellyfin:
+    image: jellyfin/jellyfin
+    network_mode: "host"
+    volumes:
+      - /media/wd10/.config/jellyfin:/config
+      - /media/wd10/.cache/jellyfin:/cache
+      - /media/wd10/media:/media

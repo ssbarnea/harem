@@ -7,4 +7,3 @@
       name: ensure
   - include_role:
       name: monitoring
-

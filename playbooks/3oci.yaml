@@ -1,27 +1,27 @@
 #!/usr/bin/env ansible-playbook
 ---
 - hosts: n0
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   vars:
     accounts:
-        - arxcruz
-        - chkumar246
-        - gabrielecerami
-        - marios
-        - rafaelfolco
-        - rlandy
-        - sshnaidm
-        - weshayutin
-        - cloudnull  # not real ci but trusted
-        - ekultails # luke short
+      - arxcruz
+      - chkumar246
+      - gabrielecerami
+      - marios
+      - rafaelfolco
+      - rlandy
+      - sshnaidm
+      - weshayutin
+      - cloudnull  # not real ci but trusted
+      - ekultails  # luke short
   tasks:
 
     - user:
         name: "{{ item }}"
         state: present
         groups:
-            - docker
+          - docker
       with_items: "{{ accounts }}"
 
     - name: Set authorized key taken from file

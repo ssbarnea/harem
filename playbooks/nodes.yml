@@ -1,7 +1,7 @@
 #!/usr/bin/env ansible-playbook
 ---
 - hosts: baremetals
-  gather_facts: no
+  gather_facts: false
   tasks:
 
     - include_role:
