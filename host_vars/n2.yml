@@ -1,6 +1,6 @@
 ---
 bmc_mac_address: 00:30:48:F1:46:6D
-os_flavour: fedora28
+os_flavour: centos8
 mac_addresses:
   - 00:30:48:F2:30:4A
   - 00:30:48:F2:30:4B

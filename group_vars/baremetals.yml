@@ -17,3 +17,4 @@ ipmi_vnc_password: "{{ ipmi_user }}:{{ ipmi_password }}"
 # https://basraayman.com/2016/12/03/using-a-novnc-branch-to-connect-to-your-supermicro-ikvm/
 
 ipmi_address: "{{ inventory_hostname }}i.{{ domain }}"
+ks_url: http://192.168.33.40/~ssbarnea/ks

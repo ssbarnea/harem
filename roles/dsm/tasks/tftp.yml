@@ -38,12 +38,12 @@
         src: pxelinux.cfg/default.j2
         dest: "{{ pxe_root }}/pxelinux.cfg/default"
 
-    - name: generate pxeboot menu
-      syncronize:
-        src: secrets/pxe
-        dest: "{{ pxe_root }}/pxelinux.cfg/01-{{ ks_host_id }}"
+    # - name: generate pxeboot menu
+    #   syncronize:
+    #     src: secrets/pxe
+    #     dest: "{{ pxe_root }}/pxelinux.cfg/01-{{ ks_host_id }}"
 
-    - name: deploy kickstart templated files (ks)
+    - name: deploy generic kickstart templated files (ks)
       template:
         src: "{{ ks_file }}"
         dest: "{{ ks_root }}/{{ (ks_file | basename | splitext)[0] }}"
@@ -67,6 +67,7 @@
       with_items:
         - fedora28
         - centos7
+        - centos8
         - rhel8
       loop_control:
         loop_var: dir
@@ -85,11 +86,11 @@
         'fedora28/initrd.img': "{{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/initrd.img"
         'centos7/initrd.img': "{{ distros_mirror }}/centos/7/os/x86_64/images/pxeboot/initrd.img"
         'centos7/vmlinuz': "{{ distros_mirror }}/centos/7/os/x86_64/images/pxeboot/vmlinuz"
+        'centos8/initrd.img': "{{ distros_mirror }}/centos/8/BaseOS/x86_64/kickstart/images/pxeboot/initrd.img"
+        'centos8/vmlinuz': "{{ distros_mirror }}/centos/8/BaseOS/x86_64/kickstart/images/pxeboot/vmlinuz"
         'rhel8/vmlinuz': "{{ rhel8_pxeboot_url }}/vmlinuz"
         'rhel8/initrd.img': "{{ rhel8_pxeboot_url }}/initrd.img"
         'rhel80/vmlinuz': "http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8.0/compose/BaseOS/x86_64/os/images/pxeboot/vmlinuz"
         'rhel80/initrd.img': "http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8.0/compose/BaseOS/x86_64/os/images/pxeboot/initrd.img"
-
-
       loop_control:
         loop_var: file

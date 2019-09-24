@@ -11,7 +11,7 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd )"
 
 (
     cd $DIR/..
-    if [ -z ${2+x} ]; then
+    if [ -n "${2+x}" ]; then
         PARAMS="-e os_flavour=${2:-}"
     fi
     ansible-playbook -l $1 playbooks/reprov.yml ${PARAMS:-}

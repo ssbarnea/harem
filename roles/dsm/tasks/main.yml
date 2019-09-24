@@ -3,10 +3,31 @@
 # PermitRootLogin=yes into /etc/ssh/sshd_config
 # Restart sshd: sudo synoservicectl --restart sshd
 # needed to be able to rsync ssl certs from router
+- name: generate pxeboot menu
+  template:
+    src: "{{ playbook_dir }}/../roles/dsm/templates/pxelinux.cfg/default.j2"
+    dest: >-
+      /volume2/PXE/pxelinux.cfg/01-{{ hostvars[item]['ks_host_id'] }}
+  loop: "{{ groups.baremetals }}"
+  when: mac_addresses is defined
 
-- include_tasks: tftp.yml
+- name: generare ks file
+  vars:
+    ks_services: "{{ hostvars[item]['ks_services'] }}"
+    ks_hostname: "{{ hostvars[item]['ks_hostname'] }}"
+    ks_repo_updates: "{{ hostvars[item]['ks_repo_updates'] }}"
+    ks_packages: "{{ hostvars[item]['ks_packages'] }}"
+    ks_bond_mac: "{{ hostvars[item]['ks_bond_mac'] }}"
+  template:
+    src: "ks/{{ hostvars[item]['ks_template'] }}.ks.j2"
+    dest: "{{ hostvars[item]['ks_root'] | default(ks_root) }}/{{ hostvars[item]['ks_host_id'] }}.ks"
+  loop: "{{ groups['baremetals'] }}"
 
-- include_tasks: ssl.yml
+- name: tftp tasks
+  include_tasks: tftp.yml
+
+- name: ssl tasks
+  include_tasks: ssl.yml
 
 # - include_tasks: docker.yml
 

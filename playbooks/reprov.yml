@@ -38,10 +38,12 @@
         name: "{{ ipmi_address }}"
         user: "{{ ipmi_user }}"
         password: "{{ ipmi_password }}"
-        state: reset
-        timeout: 3
+        state: boot
+        timeout: 10
       register: result
       delegate_to: localhost
+      retries: 5
+      delay: 5
 
     - debug:
         msg: "{{ result }}"

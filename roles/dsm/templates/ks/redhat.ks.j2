@@ -1,25 +1,28 @@
-install
 lang en_US.UTF-8
 keyboard --vckeymap=us --xlayouts=''
-services --enabled={{ ks_services | join(',') }}
+{% if ks_services is defined and ks_services %}
+services --enabled={{ ks_services | default([]) | join(',') }}
+{% endif %}
 eula --agreed
 
-network {{ network_options | replace('\n', '') }} --onboot=yes --hostname={{ ks_hostname }} --bootproto=dhcp{% if not ipv6 %} --noipv6{% endif %} --activate
+network {{ network_options | replace('\n', '') }} --onboot=yes {% if ks_hostname is defined %}--hostname={{ ks_hostname }}{% endif %} --bootproto=dhcp{% if not ipv6 %} --noipv6{% endif %} --activate
 
 {% if root_password is defined and root_password %}
-rootpw --iscrypted {{ root_password | password_hash(auth_encryption) }}
+rootpw --iscrypted {{ root_password | string | password_hash(auth_encryption) }}
 auth --useshadow --passalgo={{ auth_encryption }}
 {% endif %}
 {% if default_username is defined %}
-user --name={{ default_username }}{% if default_password is defined and default_password %} --iscrypted --password={{ default_password | password_hash(auth_encryption)  }}{% endif %}
+user --name={{ default_username }}{% if default_password is defined and default_password %} --iscrypted --password={{ default_password | string | password_hash(auth_encryption)  }}{% endif %}
 {% endif %}
 
+{% if ks_repo_updates is defined %}
 {{ ks_repo_updates }}
+{% endif %}
 
 firewall --disabled
 selinux --disabled
 timezone UTC
-firstboot --disable
+firstboot --disabled
 skipx
 text
 
@@ -34,7 +37,9 @@ reboot
 
 %packages
 @core
+{% if ks_packages is defined %}
 {{ ks_packages | join('\n') }}
+{% endif %}
 %end
 
 %post
@@ -46,10 +51,12 @@ chvt 3
 set -exuo pipefail
 
 {# configure static MAC address for the bond0 interface to avoid randon assignment at boot#}
+{% if ks_bond_mac is defined %}
 crudini --set /etc/sysconfig/network-scripts/ifcfg-bond0 MACADDR {{ ks_bond_mac }}
+{% endif %}
 
 {# we want to be able to know what happens with our switch #}
-chkconfig lldpd enable
+which lldpd && chkconfig lldpd on || true
 
 sed -i -e 's|^# %wheel\tALL=(ALL)\tNOPASSWD: ALL|%wheel\tALL=(ALL)\tNOPASSWD: ALL|; s|^Defaults    requiretty|#&|' /etc/sudoers
 
@@ -67,18 +74,21 @@ cat << EOF >/etc/pip.conf
 cert = /etc/ssl/certs/ca-bundle.crt
 EOF
 
-if command -v dnf >/dev/null; then
+
+source /etc/os-release
+if $ID == 'fedora'; then
   PKG_CMD=dnf
   PKG_CONFIG=/etc/dnf/dnf.conf
-  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-28-primary
-  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-28-x86_64
+  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-${VERSION_ID}-primary
+  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-${VERSION_ID}-x86_64
 else
   PKG_CMD=yum
   PKG_CONFIG=/etc/yum.conf
-  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
-  rpm --import https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
-  rpm --import https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7Server
-  rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-${VERSION_ID} || true
+  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial || true
+  rpm --import https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-${VERSION_ID} || true
+  rpm --import https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-${VERSION_ID}Server || true
+  rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-${VERSION_ID}.noarch.rpm || true
 fi
 
 {% if http_proxy is defined %}
@@ -180,6 +190,9 @@ EOF
 dmidecode -t system|grep 'Product Name: VirtualBox' >/dev/null && {
     $PKG_CMD install -y virtualbox-guest-additions
 }
+
+
+yum makecache
 
 ) 2>&1 | /usr/bin/tee /root/ks-post.log
 chvt 1

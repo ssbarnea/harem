@@ -10,32 +10,44 @@
 
 - name: configure specific pxe boot menus
   hosts: baremetals
+  # at least some are offline
+  gather_facts: false
   vars:
     boot_options:
       centos7:
         name: centos
         version: 7
         template: redhat
+        ks_os_repo: "{{ distros_mirror }}/centos/7/os/x86_64/"
+      centos8:
+        name: centos
+        version: 8
+        template: redhat
+        ks_os_repo: "{{ distros_mirror }}/centos/8/BaseOS/x86_64/os/"
       fedora28:
         name: fedora
         version: 28
         template: redhat
+        ks_os_repo: "{{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/"
       rhel8:
         name: rhel
         version: 8
         template: redhat
+        ks_os_repo: "{{ distros_mirror }}/rhel/8/os/x86_64/"
   tasks:
 
     - set_fact:
         ks_host_id: "{{ mac_addresses[0] | regex_replace(':', '-') | lower }}"
         ks_os_name: "{{ boot_options[os_flavour].name }}"
         ks_os_version: "{{ boot_options[os_flavour].version }}"
+        ks_os_repo: "{{ boot_options[os_flavour].ks_os_repo }}"
         ks_template: "{{ boot_options[os_flavour].template }}"
         ks_hostname: "{{ inventory_hostname }}"
         ks_bond_mac: "{{ mac_addresses[0] | regex_replace('-', ':') | upper }}"
         ks_services:
-          - sshd
+          - lldpd
           - ntpd
+          - sshd
         ks_packages:
           - ca-certificates
           - curl
@@ -62,28 +74,11 @@
         ks_repo_updates: |
             repo --name=updates --baseurl={{ distros_mirror }}/{{ ks_os_name }}/{{ ks_os_version }}/updates/x86_64
 
-    - set_fact:
-        ks_os_repo: "{{ distros_mirror }}/{{ ks_os_name }}/{{ ks_os_version }}/os/x86_64/"
-      when: ks_os_name != "fedora"
-
     - name: set fedora specific facts
       set_fact:
-        ks_os_repo: "{{ distros_mirror }}/{{ ks_os_name }}/linux/releases/{{ ks_os_version }}/Server/x86_64/os/"
         ks_repo_updates: |
             repo --name=updates --baseurl={{ distros_mirror }}/fedora/linux/updates/{{ ks_os_version }}/Everything/x86_64/
       when: ks_os_name == "fedora"
-
-    - name: generate pxeboot menu
-      template:
-        src: pxelinux.cfg/default.j2
-        dest: >-
-          secrets/pxe/pxelinux.cfg/01-{{ ks_host_id }}
-      when: mac_addresses is defined
-
-    - name: generare ks file
-      template:
-        src: "ks/{{ ks_template }}.ks.j2"
-        dest: "{{ ks_root }}/{{ ks_host_id }}.ks"
 
 - hosts: syno
   gather_facts: false

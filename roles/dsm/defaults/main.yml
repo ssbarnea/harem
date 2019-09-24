@@ -46,7 +46,9 @@ kernel_options: >
   console={{ serial_console }}
   inst.ks.sendmac
   bond=bond0:{{ bond_slaves }}:{{ bond_options}}
-  {%- if syslog_server is defined -%}inst.syslog={{ syslog_server }}{%- endif -%}
+  {# save wasted minutes waiting for: "random: crng init done" #}
+  random.trust_cpu=on
+  {% if syslog_server is defined -%}inst.syslog={{ syslog_server }}{%- endif -%}
 
 # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/sect-parameter-configuration-files-other-s390
 # https://media.readthedocs.org/pdf/anaconda-installer/latest/anaconda-installer.pdf

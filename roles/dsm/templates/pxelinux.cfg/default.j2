@@ -36,20 +36,26 @@ LABEL centos7
 MENU LABEL centos7
   ipappend 2
   kernel centos7/vmlinuz
-  append initrd=centos7/initrd.img repo={{ distros_mirror }}/centos/7/os/x86_64/ ks={{ ks_url }}/centos7.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+  append initrd=centos7/initrd.img repo={{ distros_mirror }}/centos/7/os/x86_64/ ks={{ ks_url }}/redhat.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+
+LABEL centos8
+MENU LABEL centos8
+  ipappend 2
+  kernel centos8/vmlinuz
+  append initrd=centos8/initrd.img repo={{ distros_mirror }}/centos/8/BaseOS/x86_64/os/ ks={{ ks_url }}/redhat.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
 
 LABEL rhel8
 MENU LABEL rhel8
   ipappend 2
   kernel rhel8/vmlinuz
   append initrd=rhel8/initrd.img repo=http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os
-{# ks={{ ks_url }}/rhel8.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+{# ks={{ ks_url }}/redhat.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
 #}
 LABEL fedora28
 MENU LABEL fedora28
   ipappend 2
   kernel fedora28/vmlinuz
-  append initrd=fedora28/initrd.img repo={{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/ ks={{ ks_url }}/fedora28.ks inst.proxy={{ http_proxy }} ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+  append initrd=fedora28/initrd.img repo={{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/ ks={{ ks_url }}/redhat.ks inst.proxy={{ http_proxy }} ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
 
 LABEL debian-stretch
 MENU LABEL debian-stretch

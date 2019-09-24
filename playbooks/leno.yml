@@ -7,7 +7,3 @@
   tasks:
     - include_role:
         name: ensure-proxy
-      # - include_role:
-      #     name: ensure
-      # - include_role:
-      #     name: monitoring
