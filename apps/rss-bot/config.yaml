@@ -5,6 +5,12 @@ nick: recheck
 alerts_channel: '##recheck-alerts'
 mode:
 feeds:
+  "#ansible-galaxy":
+    so:
+      url: https://stackoverflow.com/feeds/tag/ansible-galaxy
+      period: 3
+      shorten: false
+      new: none
   "#ansible-molecule":
     so-molecule:
       url: https://stackoverflow.com/feeds/tag/molecule
