@@ -149,22 +149,6 @@ feeds:
       url: https://github.com/philpep/testinfra/releases.atom
       shorten: false
       new: none
-  "#pypa":
-    so-virtualenv:
-      url: https://stackoverflow.com/feeds/tag/virtualenv
-      period: 3
-      shorten: false
-      new: none
-    so-setuptools:
-      url: https://stackoverflow.com/feeds/tag/setuptools
-      period: 3
-      shorten: false
-      new: none
-      # so-pip:
-      #   url: https://stackoverflow.com/feeds/tag/pip
-      #   period: 12
-      #   shorten: false
-      #   new: none
   "#ara":
     so-ara:
       url: https://stackoverflow.com/feeds/tag/ara
