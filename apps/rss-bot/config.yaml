@@ -41,6 +41,8 @@ feeds:
       url: https://github.com/pycontribs/molecule-azure/releases.atom
       shorten: false
       new: none
+      alerts:
+        empty: false
     gh-cookiecutter:
       url: https://github.com/cookiecutter/cookiecutter/releases.atom
       shorten: false
@@ -136,41 +138,26 @@ feeds:
       period: 0.5
       shorten: false
       new: none
-  "#pylib":
-    so-tox:
-      url: https://stackoverflow.com/feeds/tag/tox
-      period: 0.5
-      shorten: false
-      new: none
-    so-pytest:
-      url: https://stackoverflow.com/feeds/tag/pytest
-      period: 3
-      shorten: false
-      new: none
-    pre-commit:
-      url: https://stackoverflow.com/feeds/tag/pre-commit.com
-      period: 0.5
-      shorten: false
-    gh-testinfra:
-      url: https://github.com/philpep/testinfra/releases.atom
-      shorten: false
-      new: none
-  "#pypa":
-    so-virtualenv:
-      url: https://stackoverflow.com/feeds/tag/virtualenv
-      period: 3
-      shorten: false
-      new: none
-    so-setuptools:
-      url: https://stackoverflow.com/feeds/tag/setuptools
-      period: 3
-      shorten: false
-      new: none
-      # so-pip:
-      #   url: https://stackoverflow.com/feeds/tag/pip
-      #   period: 12
-      #   shorten: false
-      #   new: none
+  # "#pylib":
+  #   so-tox:
+  #     url: https://stackoverflow.com/feeds/tag/tox
+  #     period: 0.5
+  #     shorten: false
+  #     new: none
+  #   so-pytest:
+  #     url: https://stackoverflow.com/feeds/tag/pytest
+  #     period: 3
+  #     shorten: false
+  #     new: none
+  #   pre-commit:
+  #     url: https://stackoverflow.com/feeds/tag/pre-commit.com
+  #     period: 0.5
+  #     shorten: false
+  #   gh-testinfra:
+  #     url: https://github.com/philpep/testinfra/releases.atom
+  #     shorten: false
+  #     new: none
+  # edit #     #   new: none
   "#ara":
     so-ara:
       url: https://stackoverflow.com/feeds/tag/ara
