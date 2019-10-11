@@ -48,11 +48,11 @@ feeds:
       shorten: false
       new: none
   "#oooq":
-    taiga-blog:
-      url: https://blog.taiga.io/feeds/all.atom.xml
-      period: 0.5
-      shorten: false
-      new: none
+    # taiga-blog:
+    #   url: https://blog.taiga.io/feeds/all.atom.xml
+    #   period: 0.5
+    #   shorten: false
+    #   new: none
     rdo-blog:
       url: https://blogs.rdoproject.org/feed/
       period: 0.5
