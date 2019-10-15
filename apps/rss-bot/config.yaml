@@ -70,18 +70,18 @@ feeds:
     gh-selinux:
       url: https://github.com/pycontribs/selinux/releases.atom
       shorten: false
-  "#zuul":
-    so-zuul:
-      url: https://stackoverflow.com/feeds/tag/openstack-zuul
-      period: 0.5
-      shorten: false
-      new: none
-  "#openstack":
-    so-openstack:
-      url: https://stackoverflow.com/feeds/tag/openstack
-      period: 0.5
-      shorten: false
-      new: none
+  # "#zuul":
+  #   so-zuul:
+  #     url: https://stackoverflow.com/feeds/tag/openstack-zuul
+  #     period: 0.5
+  #     shorten: false
+  #     new: none
+  # "#openstack":
+  #   so-openstack:
+  #     url: https://stackoverflow.com/feeds/tag/openstack
+  #     period: 0.5
+  #     shorten: false
+  #     new: none
   "#tripeo":
     ask-tripleo:
       url: https://ask.openstack.org/en/feeds/rss/?q=tripleo&tags=tripleo
@@ -166,3 +166,6 @@ feeds:
       url: https://github.com/cookiecutter/cookiecutter/releases.atom
       shorten: false
       new: none
+  "#pycontribs":
+      psf:
+        url: http://feeds.feedburner.com/PythonInsider
