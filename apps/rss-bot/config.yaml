@@ -104,17 +104,17 @@ feeds:
       period: 0.5
       shorten: false
       new: none
-  "#opendev":
-    so-python-pbr:
-      url: https://stackoverflow.com/feeds/tag/python-pbr
-      period: 0.5
-      shorten: false
-      new: none
-    so-git-review:
-      url: https://stackoverflow.com/feeds/tag/git-review
-      period: 0.5
-      shorten: false
-      new: none
+  # "#opendev":
+  #   so-python-pbr:
+  #     url: https://stackoverflow.com/feeds/tag/python-pbr
+  #     period: 0.5
+  #     shorten: false
+  #     new: none
+  #   so-git-review:
+  #     url: https://stackoverflow.com/feeds/tag/git-review
+  #     period: 0.5
+  #     shorten: false
+  #     new: none
   "#OPNsense":
     so-opnsense:
       url: https://stackoverflow.com/feeds/tag/opnsense
