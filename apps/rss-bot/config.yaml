@@ -167,5 +167,5 @@ feeds:
       shorten: false
       new: none
   "#pycontribs":
-      psf:
-        url: http://feeds.feedburner.com/PythonInsider
+    psf:
+      url: http://feeds.feedburner.com/PythonInsider
