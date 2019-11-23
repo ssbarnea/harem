@@ -1,16 +1,21 @@
 ---
 - become: true
   block:
-  - file:
+  - name: create directories
+    file:
       path: "{{ docker_volumes_root }}/{{ item }}"
       state: directory
     with_items:
       - monitoring
       - monitoring/grafana
-  - copy:
+
+  - name: deploy compose file
+    copy:
       src: docker-compose.yml
       dest: /{{ docker_volumes_root }}/monitoring/docker-compose.yml
-  - copy:
+
+  - name: deploy grafana config
+    copy:
       src: grafana.ini
       dest: /{{ docker_volumes_root }}/monitoring/grafana/grafana.ini
       force: false

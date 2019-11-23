@@ -1,9 +1,11 @@
 ---
-- setup:
+- name: load ansible_pkg_mgr
+  setup:
     filter: "*"
   when: ansible_pkg_mgr is not defined
 
-- set_fact:
+- name: determine if we are to use proxy or not
+  set_fact:
     use_proxy: "{{ http_proxy is defined or https_proxy is defined }}"
 
 - name: configure system proxy variables
@@ -19,7 +21,8 @@
       ftp_proxy={{ http_proxy }}
       export http_proxy https_proxy ftp_proxy HTTP_PROXY HTTPS_PROXY
 
-- when: not use_proxy
+- name: create proxy env file
+  when: not use_proxy
   become: true
   file:
     path: /etc/profile.d/proxy.sh
@@ -56,7 +59,7 @@
 - name: activate custom CA
   when: result is changed
   become: true
-  shell: update-ca-trust
+  command: update-ca-trust
 
 - name: configure pip to use system ca certificates
   when: custom_ca is defined

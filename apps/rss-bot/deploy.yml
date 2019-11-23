@@ -89,7 +89,11 @@
           delay: 5
 
       rescue:
-        - debug: var=result
-        - shell: docker logs rss-bot
+        - name: display rss-bot logs
+          command: docker logs rss-bot
+          args:
+            warn: false
           register: result
-        - fail: msg="{{ result }}"
+
+        - name: fail the playbook
+          fail: msg="{{ result }}"

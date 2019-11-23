@@ -17,7 +17,8 @@
       - ekultails  # luke short
   tasks:
 
-    - user:
+    - name: create users
+      user:
         name: "{{ item }}"
         state: present
         groups:

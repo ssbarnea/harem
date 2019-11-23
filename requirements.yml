@@ -3,3 +3,5 @@
 
 # from galaxy
 # - src: avinetworks.docker
+
+# - src: https://opendev.org/zuul/zuul-jobs.git

@@ -1,8 +1,9 @@
 ---
 - name: check if pip is present
-  shell: command -v pip
+  command: command -v pip
   failed_when: false
   register: command_pip
+  changed_when: false
 
 - name: install pip
   when: command_pip.rc != 0
@@ -15,7 +16,9 @@
         dest: /root/get-pip.py
 
     - name: install pip
-      shell: python /root/get-pip.py
+      command: python /root/get-pip.py
+      args:
+        warn: false
 
 - name: install pip packages
   become: true
@@ -27,25 +30,26 @@
     # extra_args: --user
 
 
-- name: additional pythons for tox
-  package:
-    - centos-release-scl
+# - name: additional pythons for tox
+#   package:
+#     name:
+#       - centos-release-scl
 
-- name:
-  package:
-    - rh-python34-python-devel
-    - rh-python35
-    - rh-python35-python-devel
-    - rh-python35-psycopg2
-    - rh-python35-sqlalchemy
-    - rh-python36
-    - rh-python36-psycopg2
-    - rh-python36-sqlalchemy
-    - rh-python36-python-devel
-    - gcc
-    - patch
-    - sqlite-devel
-    - readline-devel
-    - openssl-devel
-    - python-devel
-    - sclo-python35-python-tox
+# - name:
+#   package:
+#     - rh-python34-python-devel
+#     - rh-python35
+#     - rh-python35-python-devel
+#     - rh-python35-psycopg2
+#     - rh-python35-sqlalchemy
+#     - rh-python36
+#     - rh-python36-psycopg2
+#     - rh-python36-sqlalchemy
+#     - rh-python36-python-devel
+#     - gcc
+#     - patch
+#     - sqlite-devel
+#     - readline-devel
+#     - openssl-devel
+#     - python-devel
+#     - sclo-python35-python-tox

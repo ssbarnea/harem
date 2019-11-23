@@ -36,7 +36,8 @@
         ks_os_repo: "{{ distros_mirror }}/rhel/8/os/x86_64/"
   tasks:
 
-    - set_fact:
+    - name: configure ks facts
+      set_fact:
         ks_host_id: "{{ mac_addresses[0] | regex_replace(':', '-') | lower }}"
         ks_os_name: "{{ boot_options[os_flavour].name }}"
         ks_os_version: "{{ boot_options[os_flavour].version }}"
@@ -57,12 +58,14 @@
           - vim-enhanced
         ks_repo_updates: ''
 
-    - when: snmp is defined and snmp
+    - name: set ks snmpp vars
+      when: snmp is defined and snmp
       set_fact:
         ks_services: "{{ ks_services }} + [ 'snmpd' ]"
         ks_packages: "{{ ks_packages }} + [ 'net-snmp' ]"
 
-    - when: ks_os_name != 'fedora'
+    - name: set ks vars
+      when: ks_os_name != 'fedora'
       set_fact:
         ks_services: "{{ ks_services }} + [ 'network' ]"
         ks_packages: "{{ ks_packages }} + [ 'screen' ]"

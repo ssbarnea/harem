@@ -1,5 +1,6 @@
 ---
-- set_fact:
+- name: load root password
+  set_fact:
     root_password: "{{ lookup('file', '{{ item }}') }}"
   with_first_found:
     - files:
@@ -62,7 +63,7 @@
 
     - name: create directories for boot files
       file:
-        path: "{{ pxe_root }}/{{ dir}}"
+        path: "{{ pxe_root }}/{{ dir }}"
         state: directory
       with_items:
         - fedora28

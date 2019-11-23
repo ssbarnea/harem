@@ -1,12 +1,15 @@
 ---
 - become: true
   block:
-  - file:
+  - name: configure volumes
+    file:
       path: "{{ docker_volumes_root }}/{{ item }}"
       state: directory
     with_items:
       - "{{ role_name }}"
-  - copy:
+
+  - name: create compose file
+    copy:
       src: docker-compose.yml
       dest: /{{ docker_volumes_root }}/{{ role_name }}/docker-compose.yml
   # - copy:

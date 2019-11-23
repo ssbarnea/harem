@@ -65,7 +65,8 @@
                       max_attempts: 3
           register: result
 
-        - docker_container_info:
+        - name: get info about container
+          docker_container_info:
             name: "{{ app.name }}"
           register: result2
           failed_when: not result.container.State.Running
@@ -73,11 +74,16 @@
           delay: 5
 
       rescue:
-        - debug: var=result
-        - shell: |
+        - name: print debug info
+          debug: var=result
+
+        - name: display docker logs
+          shell: |
             docker logs {{ app.name }}
           register: result
-        - fail:
+
+        - name: assure we fail the playbook
+          fail:
             msg: |
               "{{ result.stderr_lines | join('\\n') }}"
               "{{ result.stdout_lines | join('\\n') }}"

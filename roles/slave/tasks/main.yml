@@ -16,11 +16,21 @@
 
 - debug: var=result
 
+- name: install sys deps
+  package:
+    name:
+      # - the_silver_searcher  # missing from centos8
+      - rsync
+      - python36  # centos8
+      - make
+  become: true
+
 - name: install seashells for easy sharing console
   pip:
     name:
       - seashells
       - tox
+    extra_args: --user
 
 - name: create sea utility function
   copy:
@@ -29,8 +39,4 @@
         $* 2>&1 | seashells
       }
     dest: /etc/profile.d/seashells.sh
-
-- package:
-    name:
-      - the_silver_searcher
-      - rsync
+  become: true

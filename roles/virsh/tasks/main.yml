@@ -3,11 +3,12 @@
   package:
     name: '*'
     state: latest
+  become: true
 
 - name: install virsh packages
   package:
     name:
-      - bridge-utils
+      # - bridge-utils  # missingin c8
       - ebtables
       - libguestfs-tools
       - libvirt
@@ -16,13 +17,15 @@
       - virt-install
       - virt-top
     state: present
+  become: true
 
 - name: enable libvirtd
   service:
     name: libvirtd
+    enabled: true
     state: started
 
 - name: validate virsh
-  shell:
+  command: |
     virsh list
   changed_when: false

@@ -1,6 +1,7 @@
 ---
 
-- setup:
+- name: set facts
+  setup:
     gather_subset: min
     # min includes ansible_python_version
 # cert.pem\nchain.pem\nfullchain.pem\nprivkey.pem

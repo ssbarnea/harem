@@ -47,7 +47,8 @@
     # - name: activate custom CA
     #   when: result is changed
     #   shell: update-ca-trust
-    - set_fact:
+    - name: determine env vars to export
+      set_fact:
         env_dict:
           http_proxy: "{{ http_proxy }}"
           https_proxy: "{{ http_proxy }}"
@@ -71,6 +72,9 @@
       shell: |
         security find-certificate -a -p /Library/Keychains/System.keychain > {{ ca_cert }}
         security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> {{ ca_cert }}
+      args:
+        warn: false
+      changed_when: true
 
     - name: configure pip to use system ca certificates
       ini_file:
@@ -80,7 +84,8 @@
         value: "{{ ca_cert }}"
 
     - name: validate pip
-      shell: pip search pip
+      command: pip search pip
+      changed_when: false
 
 # TODOs:
 

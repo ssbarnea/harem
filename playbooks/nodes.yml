@@ -1,34 +1,50 @@
 #!/usr/bin/env ansible-playbook
 ---
-- hosts: baremetals
+- hosts: n0  # baremetals
   gather_facts: false
   tasks:
+
+    - name: Install baremetail utils
+      package:
+        name:
+          - usbutils  # lsusb
+          - autofs
+
+    - name: config autofs service
+      service:
+        name: autofs
+        enabled: true
+        status: started
+    # mount /dev/sdb /media/wd10
 
     - include_role:
         name: ensure-mail
 
-#     - include_role:
-#         name: ensure-proxy
+    - include_role:
+        name: ensure-proxy
 
-#     - include_role:
-#         name: virsh
+    - include_role:
+        name: virsh
 
-#     - include_role:
-#         name: slave
+    - include_role:
+        name: slave
 
-#     - shell: |
-#         npm config set proxy ${http_proxy}
-#         npm config set https-proxy ${http_proxy}
-# # NFS multipath https://vspherecentral.vmware.com/t/esxi-host-and-virtual-machine/storage-and-networking/nfs-4-1-multipathing-configuration-and-best-practices/
-# # iSCSI multipath https://opentodo.net/2015/06/high-available-nfs-server-setup-iscsi-multipath/
+    # - shell: |
+    #     npm config set proxy ${http_proxy}
+    #     npm config set https-proxy ${http_proxy}
+    #   # NFS multipath https://vspherecentral.vmware.com/t/esxi-host-and-virtual-machine/storage-and-networking/nfs-4-1-multipathing-configuration-and-best-practices/
+    #   # iSCSI multipath https://opentodo.net/2015/06/high-available-nfs-server-setup-iscsi-multipath/
 
-#     - package:
-#         name:
-#         - docker
-#         - docker-common
-#         state: absent
-#     - include_role:
-#         name: ensure-docker
+    - name: remove system docker if needed
+      package:
+        name:
+          - docker
+          - docker-common
+        state: absent
+      become: true
+
+    - include_role:
+        name: ensure-docker
 
 #     - package:
 #         name:

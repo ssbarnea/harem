@@ -1,6 +1,7 @@
 ---
 # tasks file for ensure-docker
-- setup:
+- name: load required facts
+  setup:
     gather_subset: min
     # min includes ansible_python_version
 # cert.pem\nchain.pem\nfullchain.pem\nprivkey.pem
@@ -13,11 +14,13 @@
 #     state: present
 # - import_role:
 #     name: avinetworks.docker
-- package:
+- name: install docker dependencies
+  package:
     name:
       - yum-utils
       - device-mapper-persistent-data
       - lvm2
+  become: true
 
 # - package:
 #     name: rsync
@@ -32,3 +35,8 @@
 #   become: true
 
 - debug: var=result
+
+
+- name: run install-docker role from zuul-jobs
+  include_role:
+    name: install-docker

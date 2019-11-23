@@ -1,7 +1,7 @@
 ---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
+    rev: v2.4.0
     hooks:
       - id: check-byte-order-marker
       - id: check-executables-have-shebangs
@@ -15,7 +15,7 @@ repos:
         files: .*\.(yaml|yml)$
         args: [--unsafe]
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.17.0
+    rev: v1.18.0
     hooks:
       - id: yamllint
         files: \.(yaml|yml)$
@@ -34,3 +34,16 @@ repos:
         # E040: Syntax error determined using `bash -n` (as many scripts
         #       use jinja templating, this will often fail and the syntax
         #       error will be discovered in execution anyway)
+  - repo: https://github.com/ansible/ansible-lint.git
+    # replace master with 4.1.1 once is released because this does not work
+    # as expected. See: https://github.com/psf/black/issues/420
+    rev: master
+    hooks:
+      - id: ansible-lint
+        always_run: true
+        pass_filenames: false
+        # do not add file filters here as ansible-lint does not give reliable
+        # results when called with individual files.
+        # https://github.com/ansible/ansible-lint/issues/611
+        verbose: true
+        entry: env ANSIBLE_LIBRARY=./library ansible-lint --force-color -p -v

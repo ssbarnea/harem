@@ -11,7 +11,8 @@
       when: ipmi_address is defined
       block:
 
-        - pip:
+        - name: install ipmi_boot module requirements
+          pip:
             name: pyghmi
           delegate_to: localhost
           connection: local
@@ -69,7 +70,8 @@
           delegate_to: localhost
           with_sequence: count=3
 
-        - wait_for:
+        - name: wait for provisioned machine to respond
+          wait_for:
             host: "{{ ansible_host }}"
             port: 22
             timeout: 10

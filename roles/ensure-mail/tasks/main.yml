@@ -18,6 +18,7 @@
           - '!all'
 
     - name: install mail related packages
+      become: true
       package:
         name:
           - postfix

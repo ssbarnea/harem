@@ -1,0 +1,8 @@
+parseable: true
+quiet: false
+skip_list:
+  - 403  # Package installs should not use latest
+verbosity: 1
+exclude_paths:
+  - jenkins
+  - zuul.d
