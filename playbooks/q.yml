@@ -30,25 +30,36 @@
           ) &
 
     - name: configure openvpn otpd service
+      become: true
       copy:
         dest: /usr/local/opnsense/service/conf/actions.d/actions_otpd.conf
         content: |
-          [restart]
-          command:/root/otpd
+          [start]
+          command:pkill -f otpd; /root/otpd
           parameters:
           type:script
           message:starting otpd
+          description: Start OTPD
+
+          [restart]
+          command:pkill -f otpd; /root/otpd
+          parameters:
+          type:script
+          message:starting otpd
+          description: Restart OTPD
 
           [stop]
           command:pkill -f otpd; exit 0
           parameters:
           type:script
           message:stop otpd
+          description: Stop OTPD
 
       register: result
 
     - name: reload config
       when: result is changed
+      become: true
       command: service configd restart
       args:
         warn: false
@@ -63,3 +74,4 @@
       file:
         path: /tmp/.ovpn-tmp
         mode: 0700
+      become: true
