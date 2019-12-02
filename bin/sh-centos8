@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 set -euxo pipefail
-docker run -it centos:8 /bin/bash
+docker pull pycontribs/centos:8
+docker run -it pycontribs/centos:8 /bin/bash

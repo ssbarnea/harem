@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 set -euxo pipefail
-docker run -it centos:latest /bin/bash
+docker pull pycontribs/centos:7
+docker run --network=host -it pycontribs/centos:7 /bin/bash
