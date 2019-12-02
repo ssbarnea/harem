@@ -5,3 +5,5 @@
 # - src: avinetworks.docker
 
 # - src: https://opendev.org/zuul/zuul-jobs.git
+
+- src: https://github.com/DataDog/ansible-datadog.git

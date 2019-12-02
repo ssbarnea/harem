@@ -104,3 +104,4 @@ venv.bak/
 .mypy_cache/
 kube_user.creds
 grafana.db
+roles/ansible-datadog

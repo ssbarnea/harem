@@ -1,0 +1,10 @@
+#!/usr/bin/env ansible-playbook
+# %YAML 1.2
+# ---
+- hosts: n0,leno
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Deploy DataDog
+      include_role:
+        name: ansible-datadog

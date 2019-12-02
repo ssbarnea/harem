@@ -6,3 +6,4 @@ verbosity: 1
 exclude_paths:
   - jenkins
   - zuul.d
+  - roles/ansible-datadog
