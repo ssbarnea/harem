@@ -29,6 +29,10 @@
         owner: "{{ app.name }}"
       register: cfg
 
+    - name: install docker-compose
+      pip:
+        name: docker-compose
+
     - block:
         - name: compose up
           docker_compose:
