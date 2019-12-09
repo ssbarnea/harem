@@ -38,6 +38,9 @@ galaxy_info:
         - all
         - 7
         - 8
+    - name: Ubuntu
+      versions:
+        - all
 
   galaxy_tags: []
 

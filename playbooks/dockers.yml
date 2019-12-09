@@ -1,0 +1,75 @@
+#!/usr/bin/env ansible-playbook
+%YAML 1.2
+---
+- hosts: n0,buntu #,buntu # baremetals
+  gather_facts: false
+  tasks:
+
+    - name: Remove system docker if needed
+      package:
+        name:
+          - docker
+          - docker-common
+        state: absent
+      become: true
+
+    - include_role:
+        name: ensure-docker
+
+    - name: Detect localhost ssh keys
+      command: ssh-keyscan localhost
+      register: localhost_keys
+
+    - name: Grab root pub key
+      become: true
+      slurp:
+        src: ~/.ssh/id_rsa.pub
+      register: my_key
+
+    - name: Assure we trust outselves
+      become: true
+      authorized_key:
+        user: root  # ansible_user_id woun't not be root with become!
+        state: present
+        key: "{{ my_key.content | b64decode }}"
+
+   # to avoid docker remoting issues, especially with paramiko
+    - name: assure localhost is in known_hosts
+      become: true
+      known_hosts:
+        key: "{{ item }}"
+        name: localhost
+        state: present
+      with_items: "{{ localhost_keys.stdout_lines }}"
+
+    - name: Perform validations
+      become: true
+      shell:
+        cmd: |
+          {{ item }}
+        executable: /bin/bash  # for pipefail
+      with_items:
+        - ping -4 -c2 google.com
+        - ping -6 -c2 google.com
+        - docker ps
+        - DOCKER_HOST=ssh://root@localhost docker ps
+        - docker run --network=host -it busybox ping -4 -c2 google.com
+        - docker run --network=host -it busybox ping -6 -c2 google.com
+        - docker run -it busybox ping -4 -c2 google.com
+        - docker run -it busybox ping -6 -c2 google.com
+      changed_when: false
+
+    # ipv6 joy https://github.com/moby/moby/issues/20559
+
+    # ip -6 route show
+# ::1 dev lo proto kernel metric 256 pref medium
+# 2a02:8010:61a9:33::201 dev enp1s0 proto kernel metric 100 pref medium
+# 2a02:8010:61a9::/48 dev enp1s0 proto ra metric 100 pref medium
+# fe80::/64 dev enp1s0 proto kernel metric 100 pref medium
+# fe80::/64 dev vethb21ad52 proto kernel metric 256 pref medium
+# fe80::/64 dev docker0 proto kernel metric 256 pref medium
+# fe80::/64 dev br-055f556fc48b proto kernel metric 256 linkdown pref medium
+# fe80::/64 dev vethf116c5d proto kernel metric 256 pref medium
+# fe80::/64 dev veth04ebc7e proto kernel metric 256 pref medium
+# fe80::/64 dev veth2899db8 proto kernel metric 256 pref medium
+# default via fe80::20e:c4ff:fed2:aa5d dev enp1s0 proto ra metric 100 pref medium

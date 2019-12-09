@@ -1,42 +1,34 @@
 ---
 # tasks file for ensure-docker
-- name: load required facts
+- name: Load required facts
   setup:
-    gather_subset: min
-    # min includes ansible_python_version
-# cert.pem\nchain.pem\nfullchain.pem\nprivkey.pem
-# - shell: |
-#     ls /usr/syno/etc/certificate/system/default
-#   register: result
+    gather_subset: min,network
 
-- debug: var=ansible_distribution
-# - docker_swarm:
-#     state: present
-# - import_role:
-#     name: avinetworks.docker
-- name: install docker dependencies
+# https://github.com/docker/compose/issues/6463
+- name: Bump sshd MaxSessions to avoid remoting errors
+  become: true
+  lineinfile:
+    dest=/etc/ssh/sshd_config
+    regexp='^MaxSessions '
+    line='MaxSessions 501'
+  notify: restart-sshd
+
+- name: Install docker dependencies
   package:
     name:
       - yum-utils
       - device-mapper-persistent-data
       - lvm2
   become: true
+  when: ansible_os_family == 'RedHat'
 
-# - package:
-#     name: rsync
-#     use: pkg
-#   delegate_to: pfsense
-#   become: yes
-# - name: configure docked
-#   template:
-#     src: dockerd.json.j2
-#     dest: /var/packages/Docker/etc/dockerd.json
-#   register: result
-#   become: true
+- name: Perform docker ipv6 tricks
+  when: docker_ipv6
+  include_tasks: ipv6.yml
 
-- debug: var=result
-
-
-- name: run install-docker role from zuul-jobs
+- name: Run install-docker role from zuul-jobs
+  vars:
+    # bug in role, fails without it
+    ansible_user: root
   include_role:
     name: install-docker

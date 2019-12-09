@@ -1,0 +1,84 @@
+
+# Based on:
+#   https://github.com/moby/moby/issues/36954#issuecomment-512244615
+#   https://docs.docker.com/v17.09/engine/userguide/networking/default_network/ipv6/#how-ipv6-works-on-docker
+- debug: var=ansible_default_ipv6
+
+- name: Assure host ipv6 accepts RA
+  become: true
+  sysctl:
+    name: "net.ipv6.conf.{{ ansible_default_ipv6.interface }}.accept_ra"
+    value: "2"
+
+- name: sysctl ipv6 settings
+  become: true
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+  with_dict:
+    "net.ipv6.conf.default.forwarding": "1"
+    "net.ipv6.conf.all.forwarding": "1"
+
+- name: route docker subnet
+  become: true
+  command: |
+    ip6tables -t nat -A POSTROUTING -s {{ docker_ipv6_subnet }} -j MASQUERADE
+  changed_when: true
+
+- name: assure ipv6 forwarding
+  become: true
+  command: ip -6 route add {{ docker_ipv6_subnet }} dev docker0
+  register: result
+  failed_when: false
+  changed_when: true
+
+- debug: var=result
+# enable MASQUERADE for outgoing packets:
+# sudo ip6tables -t nat -A POSTROUTING -s 2001:db8:1::/64 -j MASQUERADE
+
+# Probably not needed since we alter daemon.json directly with extra options
+# - name: enable docker ipv6 support
+#   become: true
+#   lineinfile:
+#     path: /etc/sysconfig/docker-network
+#     regexp: '^DOCKER_NETWORK_OPTIONS='
+#     line: DOCKER_NETWORK_OPTIONS=--ipv6
+#     create: true
+#   register: result
+
+    # docker_network cannot be used to edit implicit networks like 'hosts':
+    # docker.errors.APIError: 403 Client Error: Forbidden ("host is a pre-defined network and cannot be removed")
+
+- name: load docker server config
+  slurp:
+    src: /etc/docker/daemon.json
+  register: docker_config_base64
+  failed_when: false
+
+- debug: var=docker_config_base64
+
+- name: Display docker config patching
+  set_fact:
+    docker_config: >-
+      {% if 'content' in docker_config_base64 -%}
+      {{- docker_config_base64.content|b64decode|from_json|default({}) -}}
+      {%- else -%}
+      {}
+      {%- endif -%}
+
+- name: Reconfigure docker json
+  vars:
+    overrides:
+      ipv6: true
+      # mandatory due to: https://github.com/moby/moby/issues/36954
+      fixed-cidr-v6: 2001:db8:1::/64
+  set_fact:
+    docker_config: "{{ docker_config | combine(overrides, recursive=True) }}"
+
+- name: Save new docker config
+  become: true
+  copy:
+    dest: /etc/docker/daemon.json
+    content: "{{ docker_config | to_json }}"
+  register: result
+  notify: restart-docker

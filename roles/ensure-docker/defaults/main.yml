@@ -1,2 +1,6 @@
 ---
 # defaults file for ensure-docker
+docker_ipv6: true
+docker_ipv6_subnet: 2001:db8:1::/64
+docker_config_base64:
+    content: ""
