@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Summary: Display yaml file with anchors expanded and with colors, if bat is installed.
+# Author: Sorin Sbarnea
+set -euo pipefail
+
+command -v yaml >/dev/null || {
+    python -m pip install --user ruamel.yaml.cmd
+}
+
+if command -v bat >/dev/null; then
+  CAT="bat -p -l yaml"
+fi
+
+# if bat is present we use it to diplayed it colored
+yaml merge-expand "$1" - | ${CAT:-cat}
