@@ -1,20 +1,38 @@
 #!/usr/bin/env ansible-playbook
+%YAML 1.2
 ---
-- hosts: n0  # baremetals
+- hosts: n0,buntu  # baremetals
   gather_facts: false
   tasks:
 
+    # TODO:
+    # systemctl enable --now cockpit.socket
+
+    - name: Disable password login
+      become: true
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "^(#\\s*)?{{ item.key }} "
+        line: "{{ item.key }} {{ item.value }}"
+      notify: restart sshd
+      with_dict:
+        ChallengeResponseAuthentication: "no"
+        PasswordAuthentication: "no"
+        Protocol: 2
+
     - name: Install baremetail utils
+      become: true
       package:
         name:
           - usbutils  # lsusb
           - autofs
 
     - name: config autofs service
+      become: true
       service:
         name: autofs
         enabled: true
-        status: started
+        state: started
     # mount /dev/sdb /media/wd10
 
     - include_role:

@@ -11,6 +11,12 @@ feeds:
       period: 3
       shorten: false
       new: none
+  "#ansible-lint":
+    so:
+      url: https://stackoverflow.com/feeds/tag/ansible-lint
+      period: 3
+      shorten: false
+      new: none
   "#ansible-molecule":
     so-molecule:
       url: https://stackoverflow.com/feeds/tag/molecule

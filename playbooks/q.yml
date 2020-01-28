@@ -16,12 +16,16 @@
     #   import_role:
     #     name: router
     - name: deploy otpd script
+      become: true
       copy:
         dest: /root/otpd
         mode: a+rx
         content: |
           #!/usr/bin/env sh
           (
+            # SCRIPT=`realpath $0`     # get absolute path to the script itself
+            # exec 6< "$SCRIPT"        # open bash script using file descriptor 6
+            # flock -n 6 || 
             while true
             do
             printf "ssbarnea\n5baltair`oathtool --totp -b IJFKSLSL5MOLQXOWUNUW7RRE5VCVAHJ2`" > /tmp/.ovpn-tmp
@@ -35,21 +39,21 @@
         dest: /usr/local/opnsense/service/conf/actions.d/actions_otpd.conf
         content: |
           [start]
-          command:pkill -f otpd; /root/otpd
+          command:/bin/pkill -f otpd; /root/otpd
           parameters:
           type:script
           message:starting otpd
           description: Start OTPD
 
           [restart]
-          command:pkill -f otpd; /root/otpd
+          command:/bin/pkill -f otpd; /root/otpd
           parameters:
           type:script
           message:starting otpd
           description: Restart OTPD
 
           [stop]
-          command:pkill -f otpd; exit 0
+          command:/bin/pkill -f otpd; exit 0
           parameters:
           type:script
           message:stop otpd
@@ -65,7 +69,7 @@
         warn: false
 
     - name: restart otdp
-      # when: result is changed
+      when: result is changed
       command: configctl otpd restart
       args:
         creates: /tmp/.ovpn-tmp
@@ -73,5 +77,14 @@
     - name: assure file mod
       file:
         path: /tmp/.ovpn-tmp
-        mode: 0700
+        mode: 0600
       become: true
+      register: result
+      until: result is success
+      retries: 5
+      delay: 5
+
+    - name: restart openvpn
+      become: true
+      shell: openvpn --config /var/etc/openvpn/client1.conf
+      when: result is changed

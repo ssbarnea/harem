@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+git add .
+git pull --rebase
+git commit --amend -a

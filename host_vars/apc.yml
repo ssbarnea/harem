@@ -7,8 +7,13 @@ password: !vault |
   33343665396138383836656630316136373164346635383964666134376234326639316530366665
   6638363963636564370a663135616332353035386535663033303532643566633638336133383264
   3537
-url: http://192.168.33.10
-mac_address: 00 C0 B7 B6 F2 A6
+
+#  snmp-ups privProtocol=AES
+# Model Number: 		AP9631
+# Serial Number: 		ZA1134005284
+
+# url: http://192.168.33.10
+# mac_address: 00 C0 B7 B6 F2 A6
 # RackPDU 1.8A
 # RADIUS
 # SNMPv1
@@ -22,7 +27,7 @@ hw_rev: B2
 
 
 # ~22 = 2 nodes, macmini, dsm
-snmp_pdu_load: .1.3.6.1.4.1.318.1.1.12.2.3.1.1.2
+# snmp_pdu_load: .1.3.6.1.4.1.318.1.1.12.2.3.1.1.2
 
 # rpdu
 # v3.9.2

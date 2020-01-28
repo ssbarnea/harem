@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 unset http_proxy
+
+ssh n0 firewall-cmd --zone=trusted --permanent --add-source=192.168.0.0/16
+
 docker pull linuxserver/unifi-controller
 docker stop unifi || true
 docker rm unifi || true

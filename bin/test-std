@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+>&2 echo "some error"
+echo "some output"
+

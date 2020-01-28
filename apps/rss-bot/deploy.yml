@@ -30,6 +30,7 @@
         owner: "{{ owner }}"
         group: "{{ group }}"
         state: directory
+        recurse: true
         mode: "0700"
 
     - name: deploy config
@@ -46,6 +47,10 @@
         dest: /opt/data/rss-bot/secrets.env
       register: secrets
 
+    - name: install docker-compose
+      pip:
+        name: docker-compose
+
     - block:
         - name: compose up
           docker_compose:
@@ -61,7 +66,8 @@
                 rss-bot:
                   tty: true
                   # nobody:nobody on centos7, does not support names
-                  user: "{{ uid }}:{{ gid }}"
+                  user: nobody
+                  #"{{ uid }}:{{ gid }}"
                   container_name: rss-bot
                   image: ascensive/irc-rss-feed-bot:latest
                   volumes:

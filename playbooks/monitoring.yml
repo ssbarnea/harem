@@ -1,10 +1,56 @@
-#!/usr/bin/env ansible-playbook
+#!/usr/bin/env ansible-playbook -v
 # %YAML 1.2
 # ---
-- hosts: n0,leno
+- hosts: n0,leno,buntu
   gather_facts: true
-  become: true
   tasks:
-    - name: Deploy DataDog
-      include_role:
-        name: ansible-datadog
+
+    # - name: repair permisssions
+    #   become: true
+    #   command: chown -R dd-agent:dd-agent /etc/datadog-agent
+    #   # notify: Restart agent
+
+    - name: Deploy default DataDog configs
+      become: true
+      become_user: dd-agent
+      synchronize:
+        src: "files/_all_/etc/datadog-agent/"
+        dest: /etc/datadog-agent/
+        recursive: true
+        archive: false
+        delete: false
+        owner: false
+        group: false
+        times: true  # makes it idempotent
+      register: result1
+      notify: Restart agent
+
+    - name: Check for configs to deploy
+      local_action: stat path=files/{{ inventory_hostname_short }}
+      register: configs_dir
+
+    # - name: Deploy DataDog
+    #   include_role:
+    #     name: ansible-datadog
+
+    - name: Deploy custom DataDog configs
+      when:
+        - "'isdir' in configs_dir.stat"
+        - configs_dir.stat['isdir']
+      become: true
+      become_user: dd-agent
+      synchronize:
+        src: "files/{{ inventory_hostname_short }}/etc/datadog-agent/"
+        dest: /etc/datadog-agent
+        recursive: true
+        archive: false
+        delete: false
+      register: resul2
+      notify: Restart agent
+
+  handlers:
+    - name: Restart agent
+      become: true
+      service:
+        name: datadog-agent
+        state: restarted
