@@ -1,0 +1,115 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: n0
+  become: true
+  vars:
+    app:
+      name: traefik
+      docker_image: traefik:v2.2
+  tasks:
+
+    - name: create app user
+      user:
+        name: "{{ app.name }}"
+        home: "/opt/data/{{ app.name }}/"
+      register: user
+
+    - name: service folder
+      file:
+        path: /opt/data/{{ app.name }}/
+        owner: "{{ app.name }}"
+        group: "{{ app.name }}"
+        state: directory
+        mode: "0700"
+
+    - name: deploy config
+      copy:
+        src: "{{ item }}"
+        dest: /opt/data/{{ app.name }}/{{ item }}
+        group: "{{ app.name }}"
+        owner: "{{ app.name }}"
+      register: cfg
+      loop:
+         - traefik.yml
+         - traefik-dynamic.yml
+
+    - name: install docker-compose
+      pip:
+        name: docker-compose
+
+    - block:
+        - name: compose up
+          docker_compose:
+            build: true
+            debug: true
+            pull: true
+            # recreate: always
+            restarted: true
+            project_name: "{{ app.name }}"
+            remove_orphans: true
+            definition: &compose
+              version: '3.7'
+              services:
+                traefik:
+                  image: "{{ app.docker_image }}"
+                  container_name: "traefik"
+                  command:
+                    #- "--log.level=DEBUG"
+                    - "--api.insecure=true"
+                    - "--providers.docker=true"
+                    - "--providers.docker.exposedbydefault=true"
+                    - "--entrypoints.web.address=:80"
+                  ports:
+                    - "80:80"
+                    - "8080:8080"
+                    - "443:443"
+                  volumes:
+                    - "/var/run/docker.sock:/var/run/docker.sock:ro"
+                    - "/opt/data/{{ app.name }}/traefik.yml:/traefik.yml"
+                    - "/opt/data/{{ app.name }}/traefik-dynamic.yml:/traefik-dynamic.yml"
+                  labels:
+                  # - "traefik.docker.network=frontend"
+                  - "traefik.enable=true"
+                  - "traefik.frontend.rule=Host:n0.sbarnea.com; PathPrefixStrip:/traefik"
+                  - "traefik.port=8080"
+                  - "traefik.protocol=http"
+
+                # whoami:
+                #   image: "containous/whoami"
+                #   container_name: "simple-service"
+                #   labels:
+                #     - "traefik.enable=true"
+                #     - "traefik.http.routers.whoami.rule=Host(`n0.sbarnea.com`)"
+                #     - "traefik.http.routers.whoami.entrypoints=web"
+          register: result
+
+        # - name: get info about container
+        #   docker_container_info:
+        #     name: "{{ app.name }}"
+        #   register: result2
+        #   failed_when: not result.container.State.Running
+        #   retries: 3
+        #   delay: 5
+
+      rescue:
+        - name: print debug info
+          debug: var=result
+
+        - name: display docker logs
+          shell: |
+            docker logs {{ app.name }}
+          register: result
+
+        - name: compose down
+          docker_compose:
+            project_name: "{{ app.name }}"
+            definition: *compose
+            state: absent
+
+        - name: assure we fail the playbook
+          fail:
+            msg: |
+              "{{ result.stderr_lines | join('\\n') }}"
+              "{{ result.stdout_lines | join('\\n') }}"
+
+    # - debug: var=result
