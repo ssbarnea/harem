@@ -1,7 +1,7 @@
 ---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.4.0
+    rev: v3.1.0
     hooks:
       - id: check-byte-order-marker
       - id: check-executables-have-shebangs
@@ -10,20 +10,19 @@ repos:
       - id: end-of-file-fixer
       - id: mixed-line-ending
       - id: trailing-whitespace
-      - id: flake8
       - id: check-yaml
         files: .*\.(yaml|yml)$
         args: [--unsafe]
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.18.0
+    rev: v1.23.0
     hooks:
       - id: yamllint
         files: \.(yaml|yml)$
         types: [file, yaml]
         # uncomment once a new yamllint release is made:
-        # entry: yamllint --strict
+        entry: yamllint --strict -f parsable
   - repo: https://github.com/openstack-dev/bashate.git
-    rev: 0.6.0
+    rev: 2.0.0
     hooks:
       - id: bashate
         entry: bashate --error . --ignore=E006,E040
@@ -34,10 +33,19 @@ repos:
         # E040: Syntax error determined using `bash -n` (as many scripts
         #       use jinja templating, this will often fail and the syntax
         #       error will be discovered in execution anyway)
+  - repo: https://gitlab.com/pycqa/flake8.git
+    rev: 3.8.1
+    hooks:
+      - id: flake8
+        language_version: python3
+        additional_dependencies:
+          - flake8-2020>=1.6.0
+          - flake8-docstrings
+          - flake8-pytest-style>=1.0.0
   - repo: https://github.com/ansible/ansible-lint.git
     # replace master with 4.1.1 once is released because this does not work
     # as expected. See: https://github.com/psf/black/issues/420
-    rev: master
+    rev: v4.3.0a1
     hooks:
       - id: ansible-lint
         always_run: true
@@ -46,4 +54,4 @@ repos:
         # results when called with individual files.
         # https://github.com/ansible/ansible-lint/issues/611
         verbose: true
-        entry: env ANSIBLE_LIBRARY=./library ansible-lint --force-color -p -v
+        entry: env ANSIBLE_LIBRARY=./library ansible-lint --force-color -p

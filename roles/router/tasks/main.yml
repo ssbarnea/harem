@@ -1,5 +1,6 @@
 ---
-- setup:
+- name: gather facts
+  setup:
     filter: "*"
   when: ansible_pkg_mgr is not defined
 
@@ -63,4 +64,7 @@
       nohup sh /root/ovpn-get-auth >>/var/log/ovpn-pipe.log 2>&1 </dev/null &
 
 - name: start ovpn-pipe
-  shell: sh /usr/local/etc/rc.d/ovpn-pipe.sh
+  shell:
+    cmd: sh /usr/local/etc/rc.d/ovpn-pipe.sh
+    warn: false
+  changed_when: false

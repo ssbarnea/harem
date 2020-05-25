@@ -8,7 +8,7 @@ command -v yaml >/dev/null || {
 }
 
 if command -v bat >/dev/null; then
-  CAT="bat -p -l yaml"
+    CAT="bat -p -l yaml"
 fi
 
 # if bat is present we use it to diplayed it colored

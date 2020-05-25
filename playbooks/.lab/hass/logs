@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+DOCKER_HOST=root@buntu docker logs -f hassio

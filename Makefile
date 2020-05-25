@@ -1,4 +1,4 @@
-.PHONY: list dsm n2
+.PHONY: list dsm n2 prep
 
 .EXPORT_ALL_VARIABLES:
 
@@ -33,6 +33,7 @@ n2:
 	./bin/reprov n2
 
 n0:
+	pause
 	./bin/reprov n0
 
 kube: env
@@ -42,3 +43,6 @@ kube: env
 kube-reset: env
 	ansible-playbook contribs/kubespray/reset.yml
 #--become --become-user=root
+
+prep:
+	ansible-galaxy install -r requirements.yml

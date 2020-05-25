@@ -1,0 +1,107 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: buntu
+  become: true
+  vars:
+    gid: 99
+    uid: 99
+    # owner: nobody
+    # group: nobody
+    project_name: hass
+  tasks:
+
+    - name: service folder
+      file:
+        path: /opt/data/{{ project_name }}/
+        owner: "{{ owner | default(omit) }}"
+        group: "{{ group | default(omit) }}"
+        state: directory
+        recurse: true
+        mode: "0700"
+
+    # - name: deploy config
+    #   copy:
+    #     src: config.yaml
+    #     dest: /opt/data/{{ project_name }}/config.yaml
+    #   register: cfg
+
+    # - name: deploy secrets
+    #   copy:
+    #     content: |
+    #       IRC_PASSWORD={{ IRC_PASSWORD }}
+    #       BITLY_TOKENS={{ BITLY_TOKENS }}
+    #     dest: /opt/data/{{ project_name }}/secrets.env
+    #   register: secrets
+
+    - name: install docker-compose
+      pip:
+        name: docker-compose
+
+    - block:
+        - name: compose up
+          docker_compose:
+            build: true
+            debug: true
+            pull: true
+            recreate: always
+            restarted: true
+            project_name: "{{ project_name }}"
+            definition:
+              version: '3.7'
+              services:
+                hass:
+                  tty: true
+                  # nobody:nobody on centos7, does not support names
+                  user: "{{ owner | default(omit) }}"
+                  # "{{ uid }}:{{ gid }}"
+                  container_name: "{{ project_name }}-hass"
+                  image: homeassistant/home-assistant:stable
+                  volumes:
+                    - "/opt/data/{{ project_name }}:/config"
+                  # env_file:
+                  #   - "/opt/data/{{ project_name }}/secrets.env"
+                  restart: always
+                  logging:
+                    options:
+                      max-size: 10m
+                      max-file: "3"
+                  deploy:
+                    restart_policy:
+                      condition: on-failure
+                      delay: 10s
+                      max_attempts: 3
+                  ports:
+                    - "8123:8123"
+                  devices:
+                    - "/dev/ttyACM0:/dev/ttyACM0"
+                mqtt:
+                  container_name: "{{ project_name }}-mqtt"
+                  image: toke/mosquitto:latest
+                  restart: unless-stopped
+                  ports:
+                    - 1883:1883
+                    - 9001:9001
+                  volumes:
+                    - "/opt/data/{{ project_name }}/mosquitto/:/mqtt/config/:ro"
+          register: result
+
+        - name: gather container info
+          docker_container_info:
+            name: "{{ project_name }}-{{ item }}"
+          register: result
+          failed_when: not result.container.State.Running
+          retries: 3
+          delay: 5
+          with_item:
+            - mqtt
+            - hass
+
+      rescue:
+        - name: "display {{ project_name }} logs"
+          command: "docker logs {{ project_name }}"
+          args:
+            warn: false
+          register: result
+
+        - name: fail the playbook
+          fail: msg="{{ result }}"

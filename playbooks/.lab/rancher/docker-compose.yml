@@ -1,0 +1,21 @@
+# based on https://www.portainer.io/documentation/quick-start/
+
+version: '3.7'
+services:
+  rancher:
+    image: rancher/rancher:latest
+    container_name: rancher
+    # network_mode: bridge
+    restart: always
+    ports:
+      - 80
+      - 443
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      # - "/opt/data/rancher/:/data"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.r.rule=Host(`r.sbarnea.com`)
+      - traefik.http.routers.r.tls.certResolver=myresolver
+      - traefik.http.routers.r.entrypoints=http,https
+      - traefik.http.services.rancher.loadbalancer.server.port=80

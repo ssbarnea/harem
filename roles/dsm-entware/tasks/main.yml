@@ -31,8 +31,10 @@
   shell: which opkg
   failed_when: false
   register: result
+  changed_when: false
 
-- when: result.rc != 0
+- name: Add /opt/bin to path
+  when: result.rc != 0
   lineinfile:
     dest: /etc/profile
     state: present

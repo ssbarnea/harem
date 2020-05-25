@@ -1,0 +1,36 @@
+#!/usr/bin/env ansible-playbook
+
+- name: netdata
+  hosts: localhost
+  environment:
+    DOCKER_HOST: "{{ lookup('env', 'DOCKER_HOST') }}"
+  tasks:
+    - name: netdata script
+      script: ../apps/run-netdata
+
+- name: unifi
+  hosts: localhost
+  environment:
+    DOCKER_HOST: "{{ lookup('env', 'DOCKER_HOST') }}"
+  tasks:
+    - name: inifi script
+      script: ../apps/run-unifi
+
+- name: iot
+  environment:
+    DOCKER_HOST: "{{ lookup('env', 'DOCKER_HOST') }}"
+  hosts: localhost
+  tasks:
+    - name: iot script
+      script: ../apps/run-iot
+
+- name: nvr
+  hosts: localhost
+  environment:
+    DOCKER_HOST: "{{ lookup('env', 'DOCKER_HOST') }}"
+  tasks:
+    - name: nvr script
+      script: ../apps/run-nvr
+
+- name: rss-bot
+  import_playbook: ../apps/rss-bot/deploy.yml

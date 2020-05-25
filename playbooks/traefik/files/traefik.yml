@@ -1,0 +1,76 @@
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: true
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: sorin.sbarnea@gmail.com
+      storage: /data/acme.json
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+      # entryPoint: https
+      # tlsChallenge:
+      #   entryPoint: https
+      httpChallenge:
+        entryPoint: http
+      # domains:
+      #   main: sbarnea.com
+      #   sans:
+      #     - t.sbarnea.com
+
+log:
+  filePath: "/data/traefik.log"
+  # level: DEBUG
+  format: common
+accessLog:
+  filePath: "/data/access.log"
+  filters:
+    statusCodes:
+      - "100-199"
+      - "400-499"
+      - "500-599"
+  # level: DEBUG
+
+# Enable API and dashboard
+api:
+  insecure: true
+  dashboard: true
+
+ping: {}
+  # Name of the related entry point
+  #
+  # Optional
+  # Default: "traefik"
+  #
+  # entryPoint = "traefik"
+
+providers:
+  docker:
+    # Docker server endpoint. Can be a tcp or a unix socket endpoint.
+    #
+    # Required
+    # Default: "unix:///var/run/docker.sock"
+    #
+    # endpoint = "tcp://10.10.10.10:2375"
+
+    # Default host rule.
+    #
+    # Optional
+    # Default: "Host(`{{ normalize .Name }}`)"
+    #
+    # defaultRule = "Host(`{{ normalize .Name }}.docker.localhost`)"
+    exposedByDefault: true
+
+file:
+  filename: "/data/traefik-dynamic.yml"
+  watch: true
+
+serversTransport:
+  insecureSkipVerify: false
+

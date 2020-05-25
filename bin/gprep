@@ -2,4 +2,5 @@
 set -euxo pipefail
 git add .
 git pull --rebase
+[[ -f .pre-commit-config.yaml ]] && pre-commit run -a
 git commit --amend -a

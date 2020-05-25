@@ -2,3 +2,4 @@
 pkg_mgr_map:
   dnf: /etc/dnf/dnf.conf
   yum: /etc/yum.conf
+  apt: ''

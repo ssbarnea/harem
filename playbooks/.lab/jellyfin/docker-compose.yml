@@ -1,0 +1,30 @@
+---
+version: "3.2"
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    network_mode: "host"
+    # port 8096
+    volumes:
+      # - /media/wd10/.config/jellyfin:/config
+      # - /media/wd10/.cache/jellyfin:/cache
+      # - /media/wd10/media:/media
+      - type: volume
+        source: download
+        target: /download
+        volume:
+          nocopy: true
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.j.rule=Host(`j.sbarnea.com`)
+      - traefik.http.routers.j.tls.certResolver=myresolver
+      - traefik.http.routers.j.entrypoints=http,https
+      - traefik.http.services.j.loadbalancer.server.port=8096
+      # - traefik.http.services.j.loadbalancer.server.scheme=http
+      # 8920 for https
+volumes:
+  download:
+    driver_opts:
+      type: "nfs"
+      o: "nfsvers=4,addr=syno,nolock,soft,rw"
+      device: ":/volume2/download"

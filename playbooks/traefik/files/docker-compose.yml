@@ -1,0 +1,56 @@
+version: '3.7'
+services:
+  traefik:
+    image: traefik:v2.2.1
+    container_name: "traefik"
+    command:
+      - "--configFile=/data/traefik.yml"
+      # - "--api.insecure=true"
+      # - "--providers.docker=true"
+      # - "--providers.docker.exposedbydefault=true"
+      # - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      # - "/opt/data/traefik/traefik.yml:/traefik.yml"
+      # - "/opt/data/traefik/traefik-dynamic.yml:/traefik-dynamic.yml"
+      - "/opt/data/traefik/:/data/"
+    labels:
+      # - "traefik.docker.network=frontend"
+      - traefik.enable=true
+      - "traefik.frontend.rule=Host:t.sbarnea.com"  # || Host:n0 # ; PathPrefixStrip:/traefik"
+      - traefik.port=8080
+      - traefik.protocol=http
+      - traefik.http.routers.t.rule=Host(`t.sbarnea.com`)
+      - traefik.http.routers.t.tls.certResolver=myresolver
+      - traefik.http.routers.t.entrypoints=web,websecure
+      - traefik.http.routers.t.service=api@internal
+      # global redirect to https
+      - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.redirs.entrypoints=web"
+      - "traefik.http.routers.redirs.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    # deploy:
+    #   restart_policy:
+    #     condition: on-failure
+    #     max_attempts: 3
+    # networks:
+    #   - bridge6
+  whoami:
+    image: containous/whoami
+    labels:
+      - "traefik.enable=true"
+      - traefik.http.routers.whoami.rule=Host(`whoami.sbarnea.com`)
+      - traefik.http.routers.whoami.tls.certResolver=myresolver
+      - traefik.http.routers.whoami.entrypoints=websecure
+      # - traefik.http.routers.whoami.service=whoami-traefik@docker
+      # - traefik.http.services.whoami.loadBalancer.server.port=80
+    # networks:
+    #   - bridge6
+# networks:
+#   bridge6:
+#     name: bridge6
+#     driver: bridge

@@ -23,7 +23,7 @@
         name:
           - postfix
           - mailx
-        state: installed
+        state: present
 
     - name: call newaliases
       become: true

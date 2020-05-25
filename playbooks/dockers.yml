@@ -1,7 +1,7 @@
 #!/usr/bin/env ansible-playbook
-%YAML 1.2
+# %YAML 1.2
 ---
-- hosts: n0,buntu #,buntu # baremetals
+- hosts: n0,buntu  # baremetals
   gather_facts: false
   tasks:
 
@@ -14,11 +14,12 @@
       become: true
 
     - include_role:
-        name: ensure-docker
+        name: ensure-docker-plus
 
     - name: Detect localhost ssh keys
       command: ssh-keyscan localhost
       register: localhost_keys
+      changed_when: false
 
     - name: Grab root pub key
       become: true
@@ -42,22 +43,54 @@
         state: present
       with_items: "{{ localhost_keys.stdout_lines }}"
 
-    - name: Perform validations
+    - name: Perform ipv4 validations
       become: true
       shell:
         cmd: |
           {{ item }}
         executable: /bin/bash  # for pipefail
+        warn: false
       with_items:
         - ping -4 -c2 google.com
+        - docker ps
+        - DOCKER_HOST=ssh://root@localhost docker ps
+        - docker run --network=host -t busybox ping -4 -c2 google.com
+        - docker run -t busybox ping -4 -c2 google.com
+        - docker run -t busybox wget -q -O /dev/null http://v4.ipv6-test.com/api/myip.php\?json
+      changed_when: false
+
+    - name: Perform ipv6 validations
+      become: true
+      vars:
+        network: bridge6
+      shell:
+        cmd: |
+          {{ item }}
+        executable: /bin/bash  # for pipefail
+        warn: false
+      with_items:
         - ping -6 -c2 google.com
         - docker ps
         - DOCKER_HOST=ssh://root@localhost docker ps
-        - docker run --network=host -it busybox ping -4 -c2 google.com
-        - docker run --network=host -it busybox ping -6 -c2 google.com
-        - docker run -it busybox ping -4 -c2 google.com
-        - docker run -it busybox ping -6 -c2 google.com
+        - docker run --network={{ network }} -t busybox ping -6 -c2 google.com
+        - docker run --network={{ network }} -t busybox ping -6 -c2 google.com
+        - docker run --network={{ network }} -t busybox wget -q -O /dev/null http://v6.ipv6-test.com/api/myip.php\?json
+        - docker run --network={{ network }} -t busybox wget -q -O /dev/null http://v4v6.ipv6-test.com/api/myip.php\?json
       changed_when: false
+
+# while DNS and ICMP(ping) can pass in a container, on centos-8 web access may
+# not. WE MUST TEST 80/443
+
+# # Masquerading allows for docker ingress and egress (this is the juicy bit)
+# firewall-cmd --zone=public --add-masquerade --permanent
+
+# # Specifically allow incoming traffic on port 80/443 (nothing new here)
+# firewall-cmd --zone=public --add-port=80/tcp
+# firewall-cmd --zone=public --add-port=443/tcp
+
+# # Reload firewall to apply permanent rules
+# firewall-cmd --reload
+# https://serverfault.com/questions/987686/no-network-connectivity-to-from-docker-ce-container-on-centos-8
 
     # ipv6 joy https://github.com/moby/moby/issues/20559
 

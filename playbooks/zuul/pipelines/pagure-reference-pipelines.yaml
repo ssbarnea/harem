@@ -1,0 +1,102 @@
+- pipeline:
+    name: check
+    manager: independent
+    require:
+      pagure.io:
+        merged: False
+        open: True
+    trigger:
+      pagure.io:
+        - event: pg_pull_request
+          action: comment
+          comment: (?i)^\s*recheck\s*$
+        - event: pg_pull_request
+          action:
+            - opened
+            - changed
+    start:
+      pagure.io:
+        status: 'pending'
+        comment: false
+      sqlreporter:
+    success:
+      pagure.io:
+        status: 'success'
+      sqlreporter:
+    failure:
+      pagure.io:
+        status: 'failure'
+      sqlreporter:
+
+- pipeline:
+    name: gate
+    manager: dependent
+    precedence: high
+    require:
+      pagure.io:
+        score: 1
+        merged: False
+        open: True
+        tags: gateit
+        status: success
+      sqlreporter:
+    trigger:
+       pagure.io:
+         - event: pg_pull_request
+           action: status
+           status: success
+         - event: pg_pull_request_review
+           action: thumbsup
+         - event: pg_pull_request
+           action: tagged
+           tag: gateit
+    start:
+      pagure.io:
+        status: 'pending'
+        comment: false
+      sqlreporter:
+    success:
+      pagure.io:
+        status: 'success'
+        merge: true
+        comment: true
+      sqlreporter:
+    failure:
+      pagure.io:
+        status: 'failure'
+        comment: true
+      sqlreporter:
+
+- pipeline:
+    name: promote
+    post-review: true
+    manager: supercedent
+    precedence: high
+    require:
+      pagure.io:
+        merged: True
+        open: False
+    trigger:
+       pagure.io:
+         - event: pg_pull_request
+           action: closed
+    success:
+      pagure.io:
+        comment: true
+      sqlreporter:
+    failure:
+      pagure.io:
+        comment: true
+      sqlreporter:
+
+- pipeline:
+    name: post
+    post-review: true
+    manager: independent
+    precedence: low
+    trigger:
+      pagure.io:
+        - event: pg_push
+          ref: ^refs/heads/.*$
+    success:
+      sqlreporter:

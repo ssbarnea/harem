@@ -1,3 +1,4 @@
+# noqa D100
 import os
 
 import testinfra.utils.ansible_runner
@@ -7,6 +8,7 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 
 def test_hosts_file(host):
+    """My test sucks."""
     f = host.file('/etc/hosts')
 
     assert f.exists

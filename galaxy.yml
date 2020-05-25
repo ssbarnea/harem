@@ -1,0 +1,10 @@
+namespace: ssbarnea
+name: harem
+authors:
+  - Sorin Sbarnea
+license: MIT
+tags:
+  - personal
+  - infrastructure
+  - homelab
+repository: https://github.com/ssbarnea/harem

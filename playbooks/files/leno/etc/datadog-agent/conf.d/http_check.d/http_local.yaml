@@ -1,0 +1,22 @@
+init_config:
+instances:
+  - name: https_q
+    url: https://q.sbarnea.com
+    timeout: 5
+    tags: infra
+    min_collection_interval: 120
+
+  - name: https_unifi
+    url: https://unifi.sbarnea.com
+    tags: home
+    min_collection_interval: 120
+
+  - name: https_nvr
+    url: https://nvr.sbarnea.com
+    tags: home
+    min_collection_interval: 120
+
+  - name: https_syno
+    url: https://syno.sbarnea.com
+    tags: home
+    min_collection_interval: 120

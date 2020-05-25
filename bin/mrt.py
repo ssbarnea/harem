@@ -1,3 +1,4 @@
+# noqa D100
 from __future__ import print_function
 import pytest
 import subprocess
@@ -13,7 +14,7 @@ from pathlib import Path
 #     if ext == '.yaml':
 #         return GitRepo(path, parent)
 
-def test_ansible_lint(repo):
+def test_ansible_lint(repo):  # noqa D103
     cmd = ["ansible-lint", "-v", "--force-color", "-p"]
     print("running: %s (from %s)" % (" ".join(quote(arg) for arg in cmd), repo))
     try:
@@ -40,7 +41,7 @@ def test_ansible_lint(repo):
         )
 
 
-def pytest_generate_tests(metafunc):
+def pytest_generate_tests(metafunc):  # noqa D103
     if "repo" in metafunc.fixturenames:
         results = [x.parent for x in Path(".").rglob("*.git")]
         metafunc.parametrize("repo", results)

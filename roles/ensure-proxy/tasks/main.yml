@@ -41,6 +41,7 @@
 
 - name: "configure packager proxy: {{ pkg_mgr_map[ansible_pkg_mgr] }}"
   become: true
+  when: pkg_mgr_map[ansible_pkg_mgr] | default(false)
   ini_file:
     path: "{{ pkg_mgr_map[ansible_pkg_mgr] }}"
     section: main

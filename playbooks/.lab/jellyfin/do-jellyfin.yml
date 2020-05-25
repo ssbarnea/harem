@@ -1,0 +1,41 @@
+#!/usr/bin/env ansible-playbook -vv
+---
+- hosts: localhost
+  become: false
+  vars:
+    app:
+      name: jellyfin
+
+  tasks:
+
+    - block:
+
+        - name: compose down
+          docker_compose:
+            project_name: "{{ app.name }}"
+            project_src: "{{ playbook_dir }}"
+            state: absent
+          register: result
+
+        - name: compose up
+          docker_compose:
+            build: true
+            debug: true
+            pull: true
+            recreate: always
+            restarted: true
+            project_name: "{{ app.name }}"
+            remove_orphans: true
+            project_src: "{{ playbook_dir }}"
+          register: result
+
+      rescue:
+        - name: print debug info
+          debug:
+            var: result
+
+        - name: compose down
+          docker_compose:
+            project_name: "{{ app.name }}"
+            project_src: "{{ playbook_dir }}"
+            state: absent

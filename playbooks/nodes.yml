@@ -1,12 +1,17 @@
 #!/usr/bin/env ansible-playbook
-%YAML 1.2
+# %YAML 1.2
 ---
-- hosts: n0,buntu  # baremetals
+- hosts: n0  # baremetals
   gather_facts: false
   tasks:
 
     # TODO:
     # systemctl enable --now cockpit.socket
+
+    - name: Configure nfs mounts
+      when: nfs_exports | length > 0
+      include_role:
+        name: geerlingguy.nfs
 
     - name: Disable password login
       become: true

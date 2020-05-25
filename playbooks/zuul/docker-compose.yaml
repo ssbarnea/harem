@@ -1,0 +1,128 @@
+# Version 2 is the latest that is supported by docker-compose in
+# Ubuntu Xenial.
+version: '3.7'
+
+services:
+  gerrit:
+    image: gerritcodereview/gerrit
+    ports:
+      - "8080:8080"
+      - "29418:29418"
+    command: |
+      /bin/sh -c '\
+        git config -f /var/gerrit/etc/gerrit.config gerrit.canonicalWebUrl http://localhost:8080/ && \
+        git config -f /var/gerrit/etc/gerrit.config gerrit.ui POLYGERRIT && \
+        git config -f /var/gerrit/etc/gerrit.config sendemail.enable false && \
+        git config -f /var/gerrit/etc/gerrit.config noteDb.changes.autoMigrate true && \
+        /var/gerrit/bin/gerrit.sh run'
+  gerritconfig:
+    image: zuul/zuul-executor
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=${no_proxy},gerrit
+    depends_on:
+      - gerrit
+    volumes:
+      - "sshkey:/var/ssh:z"
+      - "nodessh:/var/node:z"
+      - "./playbooks/:/var/playbooks/:z"
+    # NOTE(pabelanger): Be sure to update this line each time we change the
+    # default version of ansible for Zuul.
+    command: "/usr/local/lib/zuul/ansible/2.8/bin/ansible-playbook /var/playbooks/setup.yaml"
+  zk:
+    image: zookeeper
+  mysql:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: zuul
+      MYSQL_USER: zuul
+      MYSQL_PASSWORD: secret
+      # Work around slow db startup when writing TZINFO data.
+      MYSQL_INITDB_SKIP_TZINFO: 1
+  scheduler:
+    depends_on:
+      - gerritconfig
+      - zk
+      - mysql
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=${no_proxy},gerrit
+      - ZUUL_MYSQL_PASSWORD=secret
+    command: "sh -c '/var/playbooks/wait-to-start.sh && zuul-scheduler -d'"
+    # FIXME: The scheduler has no ansible anymore so use the executor image.
+    #        This needs to be changes such that ansible is not required for startup.
+    image: zuul/zuul-scheduler
+    volumes:
+      - "./etc_zuul/:/etc/zuul/:z"
+      - "./playbooks/:/var/playbooks/:z"
+      - "sshkey:/var/ssh:z"
+  web:
+    command: "sh -c '/var/playbooks/wait-to-start-gearman.sh && zuul-web -d'"
+    depends_on:
+      - scheduler
+      - mysql
+    ports:
+      - "9000:9000"
+    image: zuul/zuul-web
+    environment:
+      ZUUL_MYSQL_PASSWORD: secret
+    volumes:
+      - "./etc_zuul/:/etc/zuul/:z"
+      - "./playbooks/:/var/playbooks/:z"
+  executor:
+    privileged: true
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=${no_proxy},gerrit,scheduler
+      - ZUUL_MYSQL_PASSWORD=secret
+    command: "zuul-executor -d"
+    depends_on:
+      - scheduler
+    image: zuul/zuul-executor
+    volumes:
+      - "./etc_zuul/:/etc/zuul/:z"
+      - "./playbooks/:/var/playbooks/:z"
+      - "sshkey:/var/ssh:z"
+      - "logs:/srv/static/logs:z"
+  node:
+    build:
+      dockerfile: node-Dockerfile
+      context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gerrit"
+    volumes:
+      - "nodessh:/root/.ssh:z"
+  launcher:
+    command: "nodepool-launcher -d"
+    depends_on:
+      - zk
+    image: zuul/nodepool-launcher
+    volumes:
+      - "./etc_nodepool/:/etc/nodepool/:z"
+    ports:
+      - "8022:8022"
+  logs:
+    build:
+      dockerfile: logs-Dockerfile
+      context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy}"
+    ports:
+      - "8000:80"
+    volumes:
+      - "logs:/usr/local/apache2/htdocs:z"
+
+volumes:
+  sshkey:
+  nodessh:
+  logs:
+    driver_opts:
+      device: /var/log/zuul

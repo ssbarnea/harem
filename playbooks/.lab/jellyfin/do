@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+docker-compose down --volumes
+docker-compose build
+docker-compose run jellyfin

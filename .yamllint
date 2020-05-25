@@ -1,7 +1,12 @@
 ---
 extends: default
 
+ignore: |
+  playbooks/zuul/
+  roles/ansible-datadog
+
 rules:
   line-length:
     max: 999
   document-start: disable
+  comments-indentation: disable

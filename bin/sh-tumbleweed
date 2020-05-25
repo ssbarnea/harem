@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+docker run -it opensuse/tumbleweed:latest /bin/bash

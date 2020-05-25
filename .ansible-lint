@@ -1,9 +1,11 @@
 parseable: true
 quiet: false
 skip_list:
+  - 305  # Use shell only when shell functionality is required
   - 403  # Package installs should not use latest
 verbosity: 1
 exclude_paths:
   - jenkins
   - zuul.d
   - roles/ansible-datadog
+  - playbooks/zuul/

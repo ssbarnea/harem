@@ -1,0 +1,54 @@
+#!/usr/bin/env ansible-playbook
+
+- name: aws route53 dns config
+  hosts: localhost
+  vars:
+    lb_domains:
+      - awx
+      - ha
+      - er  # elastic-recheck.dn  /
+      - j
+      - nvr
+      - p  # portainer
+      - r  # rancher
+      - rp  # report portal
+      - syno
+      - t  # traefik
+      - unifi
+      - whoami
+      - z  # zuul
+  tasks:
+
+    - name: read dns entry from route53
+      route53:
+        state: get
+        zone: sbarnea.com
+        record: "{{ item }}.sbarnea.com."
+        type: CNAME
+      register: rec
+      with_items: "{{ lb_domains }}"
+
+    - debug: msg="{{ item.set }}"
+      with_items: "{{ rec.results }}"
+
+    - name: remove cnames on route53
+      route53:
+        zone: sbarnea.com
+        record: "{{ item.set.record }}"
+        type: CNAME
+        state: absent
+        value: "{{ item.set.value }}"
+      when: "'record' in item.set"
+      with_items: "{{ rec.results }}"
+
+    - name: configure aliases on route53
+      route53:
+        zone: sbarnea.com
+        record: "{{ item }}.sbarnea.com"
+        type: A
+        value: h.sbarnea.com.
+        state: present
+        overwrite: true
+        alias: true
+        alias_hosted_zone_id: "Z1HZE7JX39SXW5"
+      with_items: "{{ lb_domains }}"

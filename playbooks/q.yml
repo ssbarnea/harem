@@ -1,4 +1,4 @@
-#!/usr/bin/env ansible-playbook
+#!/usr/bin/env ansible-playbook -v
 ---
 # playbook to configure the pfsense router, 'q'
 - hosts: q
@@ -25,7 +25,7 @@
           (
             # SCRIPT=`realpath $0`     # get absolute path to the script itself
             # exec 6< "$SCRIPT"        # open bash script using file descriptor 6
-            # flock -n 6 || 
+            # flock -n 6 ||
             while true
             do
             printf "ssbarnea\n5baltair`oathtool --totp -b IJFKSLSL5MOLQXOWUNUW7RRE5VCVAHJ2`" > /tmp/.ovpn-tmp
@@ -39,21 +39,21 @@
         dest: /usr/local/opnsense/service/conf/actions.d/actions_otpd.conf
         content: |
           [start]
-          command:/bin/pkill -f otpd; /root/otpd
+          command:/bin/pkill -TERM otpd; /root/otpd
           parameters:
           type:script
           message:starting otpd
           description: Start OTPD
 
           [restart]
-          command:/bin/pkill -f otpd; /root/otpd
+          command:/bin/pkill -TERM otpd; /root/otpd
           parameters:
           type:script
           message:starting otpd
           description: Restart OTPD
 
           [stop]
-          command:/bin/pkill -f otpd; exit 0
+          command:/bin/pkill -TERM otpd; rm -f /tmp/.ovpn-tmp; exit 0
           parameters:
           type:script
           message:stop otpd
@@ -64,13 +64,21 @@
     - name: reload config
       when: result is changed
       become: true
-      command: service configd restart
-      args:
+      shell:
+        cmd: |
+          set -eux pipefail
+          service configd restart
+          # we assure we fail if the new actions are not found
+          configctl configd actions | grep otpd
         warn: false
 
-    - name: restart otdp
-      when: result is changed
-      command: configctl otpd restart
+    - name: restart otdp and haproxy
+      # when: result is changed
+      shell: |
+        set +e
+        configctl otpd restart
+        sleep 2
+        configctl haproxy restart
       args:
         creates: /tmp/.ovpn-tmp
 
@@ -84,7 +92,9 @@
       retries: 5
       delay: 5
 
-    - name: restart openvpn
+    - name: restart openvpn  # noqa 305
       become: true
-      shell: openvpn --config /var/etc/openvpn/client1.conf
+      shell:
+        cmd: openvpn --config /var/etc/openvpn/client1.conf
+        warn: false
       when: result is changed

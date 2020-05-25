@@ -105,3 +105,4 @@ venv.bak/
 kube_user.creds
 grafana.db
 roles/ansible-datadog
+roles/geerlingguy.nfs

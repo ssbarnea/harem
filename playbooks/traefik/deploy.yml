@@ -1,0 +1,109 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: n0
+  become: true
+  gather_facts: false
+  vars:
+    app:
+      name: traefik
+  tasks:
+
+    - name: create app user
+      user:
+        name: "{{ app.name }}"
+        home: "/opt/data/{{ app.name }}/"
+      register: user
+
+    - name: service folder
+      file:
+        path: /opt/data/{{ app.name }}/
+        owner: "{{ app.name }}"
+        group: "{{ app.name }}"
+        state: directory
+        mode: "0700"
+
+    - name: deploy config
+      copy:
+        src: "{{ item }}"
+        dest: /opt/data/{{ app.name }}/{{ item }}
+        group: "{{ app.name }}"
+        owner: "{{ app.name }}"
+      register: cfg
+      loop:
+        - traefik.yml
+        - traefik-dynamic.yml
+        - docker-compose.yml
+
+    - name: install docker-compose
+      pip:
+        name: docker-compose>=1.25.5
+        state: present
+
+    - block:
+
+        - name: compose up
+          shell:
+            cmd: docker-compose --no-ansi --compatibility up --detach
+            # --abort-on-container-exit
+            warn: false
+            chdir: /opt/data/{{ app.name }}
+          register: result
+
+        # - name: compose down
+        #   delegate_to: localhost
+        #   become: false
+        #   docker_compose:
+        #     project_name: "{{ app.name }}"
+        #     project_src: .
+        #     state: absent
+
+        # - name: compose up
+        #   delegate_to: localhost
+        #   become: false
+        #   docker_compose:
+        #     build: true
+        #     debug: true
+        #     pull: true
+        #     # recreate: always
+        #     restarted: true
+        #     project_name: "{{ app.name }}"
+        #     remove_orphans: true
+        #     project_src: .
+        #   register: result
+
+        - name: get info about container
+          docker_container_info:
+            name: "{{ app.name }}"
+          register: result
+          failed_when: not result.container.State.Running
+          retries: 3
+          delay: 5
+
+      rescue:
+        - name: print debug info
+          debug: var=result
+
+        # - name: display docker logs
+        #   shell: |
+        #     docker logs {{ app.name }}
+        #   register: result
+
+        # - name: compose down
+        #   delegate_to: localhost
+        #   become: false
+        #   docker_compose:
+        #     project_name: "{{ app.name }}"
+        #     project_src: .
+        #     state: absent
+
+        - name: assure we fail the playbook
+          fail:
+            msg: "Fatal error, look above"
+
+    # - debug: var=result
+    - name: logs
+      shell:
+        cmd: docker logs traefik
+      args:
+        warn: false
+      changed_when: false

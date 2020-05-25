@@ -26,7 +26,9 @@
       notify: Restart agent
 
     - name: Check for configs to deploy
-      local_action: stat path=files/{{ inventory_hostname_short }}
+      delegate_to: localhost
+      stat:
+        path: files/{{ inventory_hostname_short }}
       register: configs_dir
 
     # - name: Deploy DataDog

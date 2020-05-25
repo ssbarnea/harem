@@ -1,0 +1,39 @@
+#!/usr/bin/env ansible-playbook
+%YAML 1.2
+---
+- hosts: n0  # ,buntu # baremetals
+  gather_facts: min
+  become: true
+  tasks:
+
+    - name: install apcupsd
+      package:
+        name:
+          - nut
+          - net-snmp-utils  # redhat
+          # snmp # ubuntu
+        state: present
+
+    - name: configure ups.conf
+      ini_file:
+        path: /etc/ups/ups.conf
+        section: apc
+        option: "{{ item.key }}"
+        value: "{{ item.value }}"
+      with_dict:
+        driver: snmp-ups
+        port: "{{ apc_ups_ip }}"
+
+    # - name: configure apcupsd
+    #   copy:
+    #     dest: /etc/apcupsd/apcupsd.conf
+    #     content: |
+    #       UPSNAME {{ apc_ups_name }}
+    #       UPSCABLE ether
+    #       UPSTYPE pcnet
+    #       DEVICE {{ apc_ups_ip }}:{{ apc_ups_user }}:{{ apc_ups_password }}
+
+    # - name: start service
+    #   service:
+    #     name: apcuipsd
+    #     state: started

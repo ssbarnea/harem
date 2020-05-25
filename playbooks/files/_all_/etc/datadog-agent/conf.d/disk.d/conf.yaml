@@ -1,0 +1,22 @@
+init_config:
+
+instances:
+
+  - use_mount: false
+    mount_point_blacklist:
+      - /run/docker/netns/
+      - /sys/kernel/debug/
+      - /var/lib/containers/storage/overlay
+      - /var/lib/docker/containers
+      - /var/lib/docker/overlay2/
+      - devfs
+      - drivefs
+      - com.apple.TimeMachine
+      - /dev/loop
+      - /Volumes/
+      - /System/Volumes/Data/home
+      - /snap/
+    device_blacklist:
+      - devfs
+      - drivefs
+      - /dev/

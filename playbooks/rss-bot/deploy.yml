@@ -1,0 +1,105 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: n0
+  become: true
+  vars:
+    gid: 99
+    uid: 99
+    owner: nobody
+    group: nobody
+    IRC_PASSWORD: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      66636330373936373835626630346330303838393463363337313935356332303839663633633166
+      6135363133396533333163643036396331643839313861360a333330323638323733656133393062
+      62656637396130633730616163626134343832373538333431333864633231313063316535623963
+      6632346436316562650a376163616337383032336634653266333333656336356364623466666164
+      6266
+    BITLY_TOKENS: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      35633033656337613261323333306633306432393063613733306436636266356132366563663566
+      3665356133353263613738326330363466646232333533370a386239656431653565613432613338
+      35626237306233343064623732313430663763623736646331366465613664303938313137313962
+      6364633366393166630a633630333265343630616565376666623037616539373261303531396466
+      65623063356336356131303737323937663664356336333732656465353838366361353264396137
+      6433376363366564376264646563623331356264323637373263
+  tasks:
+
+    - name: service folder
+      file:
+        path: /opt/data/rss-bot/
+        owner: "{{ owner }}"
+        group: "{{ group }}"
+        state: directory
+        recurse: true
+        mode: "0700"
+
+    - name: deploy config
+      copy:
+        src: config.yaml
+        dest: /opt/data/rss-bot/config.yaml
+      register: cfg
+
+    - name: deploy secrets
+      copy:
+        content: |
+          IRC_PASSWORD={{ IRC_PASSWORD }}
+          BITLY_TOKENS={{ BITLY_TOKENS }}
+        dest: /opt/data/rss-bot/secrets.env
+      register: secrets
+
+    - name: install docker-compose
+      pip:
+        name: docker-compose
+
+    - block:
+        - name: compose up
+          docker_compose:
+            build: true
+            debug: true
+            pull: true
+            recreate: always
+            restarted: true
+            project_name: rss-bot
+            definition:
+              version: '3.7'
+              services:
+                rss-bot:
+                  tty: true
+                  # nobody:nobody on centos7, does not support names
+                  user: nobody
+                  # "{{ uid }}:{{ gid }}"
+                  container_name: rss-bot
+                  image: ascensive/irc-rss-feed-bot:latest
+                  volumes:
+                    - /opt/data/rss-bot:/config
+                  env_file:
+                    - /opt/data/rss-bot/secrets.env
+                  restart: always
+                  logging:
+                    options:
+                      max-size: 10m
+                      max-file: "3"
+                  deploy:
+                    restart_policy:
+                      condition: on-failure
+                      delay: 10s
+                      max_attempts: 3
+          register: result
+
+        - name: gather container info
+          docker_container_info:
+            name: rss-bot
+          register: result
+          failed_when: not result.container.State.Running
+          retries: 3
+          delay: 5
+
+      rescue:
+        - name: display rss-bot logs
+          command: docker logs rss-bot
+          args:
+            warn: false
+          register: result
+
+        - name: fail the playbook
+          fail: msg="{{ result }}"
