@@ -1,0 +1,18 @@
+version: '2'
+services:
+  thelounge:
+    container_name: thelounge
+    image: thelounge/thelounge:latest
+    network_mode: bridge
+    ports:
+      - "9001:9001"
+    restart: always
+    volumes:
+      - /opt/data/thelounge:/var/opt/thelounge
+    labels:
+      - traefik.enable=true
+      - traefik.port=9001
+      - traefik.http.routers.irc.rule=Host(`irc.sbarnea.com`)
+      - traefik.http.routers.irc.tls.certResolver=myresolver
+      - traefik.http.routers.irc.entrypoints=websecure
+      - traefik.http.services.irc.loadbalancer.server.port=9001
