@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Put this in user PATH, likely ~/.local/bin and define it as preffered
+# editor by adding exports below to you shell config:
+# export EDITOR="edit"
+# export VISUAL="$EDITOR"
+
+# To make it even easier to edit a file:
+# alias e="$EDITOR"
+
+# If file argument starts with /tmp we run in foreground mode so
+# commands like "crontab -e" do not fail.
+OPTS=""
+if [[ "$1" == /tmp/* ]]; then
+    OPTS="-w"
+fi
+
+if [ -d "$1" ]; then
+  # we want to open folder with append to current workspace
+  /usr/local/bin/code ${OPTS:-} -a "$@"
+else
+  # we want to reuse current window for files
+  /usr/local/bin/code ${OPTS:-} -r "$@"
+fi
