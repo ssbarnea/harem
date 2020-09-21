@@ -1,0 +1,65 @@
+#!/usr/bin/env ansible-playbook
+- hosts: leno
+  gather_facts: true
+  become_user: ssbarnea
+  tasks:
+
+    - name: clone gri from git
+      git:
+        repo: https://github.com/pycontribs/gri.git
+        dest: ~/svc/gri
+
+    - name: install awscli # using homebrew works too
+      become: true
+      become_user: root
+      package:
+        name: awscli
+
+    - name: install gri
+      pip:
+        name: .
+        chdir: ~/svc/gri
+        virtualenv: ~/svc/gri/venv
+        editable: true
+        virtualenv_command: python3 -m venv
+
+    - name: create report script
+      copy:
+        content: |
+          #!/bin/bash
+          set -euxo pipefail
+          ~/svc/gri/venv/bin/gri -o ~/gri-report.html owned incoming merged draft abandon
+          aws s3 cp ~/gri-report.html s3://sbarnea.com/gri/ssbarnea.html --acl public-read
+        mode: 0700
+        dest: ~/svc/gri/venv/bin/gri-report
+
+    - name: make folders
+      file:
+        path: "{{ item }}"
+        recurse: true
+        mode: 0750
+      with_items:
+        - ~/.config/gri/
+        - ~/.aws/
+
+    - name: copy gri config
+      copy:
+        src: ~/.config/gri/gri.yaml
+        dest: ~/.config/gri/gri.yaml
+        mode: 0750
+
+    - name: deploy credentials (that is crazy stupid)
+      copy:
+        src: "{{ item }}"
+        dest: "{{ item }}"
+        mode: 0600
+      with_items:
+        - ~/.netrc
+        - ~/.aws/credentials
+
+    - name: configure cron
+      cron:
+        name: gri-report
+        job: ~/svc/gri/venv/bin/gri-report
+        special_time: hourly
+        user: ssbarnea
