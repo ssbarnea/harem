@@ -11,7 +11,7 @@
 # If file argument starts with /tmp we run in foreground mode so
 # commands like "crontab -e" do not fail.
 OPTS=""
-if [[ "$1" == /tmp/* ]]; then
+if [[ "$1" == /tmp/* ]] || [[ "$1" == */.git/* ]]; then
     OPTS="-w"
 fi
 
