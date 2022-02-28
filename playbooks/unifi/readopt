@@ -2,8 +2,6 @@
 set -euxo pipefail
 unset http_proxy
 
-for AP in ap ap2
-do
-
-ssh $AP mca-cli-op set-inform http://unifi.sbarnea.com:18080/inform
+for AP in ap ap2; do
+    ssh $AP mca-cli-op set-inform http://unifi.sbarnea.com:18080/inform
 done
