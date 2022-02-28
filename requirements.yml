@@ -5,6 +5,14 @@
 # - src: avinetworks.docker
 
 # - src: https://opendev.org/zuul/zuul-jobs.git
-
-- src: https://github.com/DataDog/ansible-datadog.git
-- src: geerlingguy.nfs
+roles:
+  - src: https://github.com/DataDog/ansible-datadog.git
+  - src: geerlingguy.nfs
+  - src: geerlingguy.samba
+collections:
+  - name: ansible.posix
+    # type: git
+    # version: devel
+  - name: community.aws
+  - name: community.docker
+  - name: community.general  # ipmi_boot
