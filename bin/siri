@@ -1,19 +1,22 @@
 #!/usr/bin/env python
+"""Script to invoke Siri."""
 import sys
 import time
 import keyboard
 
 
 def trigger_siri():
+    """Trigger Siri."""
     print("...")
-    keyboard.press('command+space')
+    keyboard.press("command+space")
     time.sleep(0.5)
-    keyboard.release('command+space')
+    keyboard.release("command+space")
     time.sleep(0.2)  # Wait for Siri to load
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    """Main entry point."""
     trigger_siri()
     print("sending command")
     keyboard.write(sys.argv[1])
-    keyboard.send('enter')
+    keyboard.send("enter")
