@@ -1,0 +1,42 @@
+# based on https://www.portainer.io/documentation/quick-start/
+
+version: '3.7'
+services:
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    # command: -H unix:///var/run/docker.sock
+    # network_mode: bridge
+    networks:
+      - traefik_default
+    restart: always
+    ports:
+      - "9000:9000"
+      # - "8000:8000"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/opt/data/portainer/:/data"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.p.rule=Host(`p.sbarnea.com`)
+      - traefik.http.routers.p.tls.certResolver=myresolver
+      - traefik.http.routers.p.entrypoints=websecure
+      # do not use 8080 because controller will redirect to 8443 anyway
+      - traefik.http.services.p.loadbalancer.server.port=9000
+      # - traefik.docker.network=public
+      - traefik.port=9000
+#     networks:
+#       - private
+#       - public
+
+# networks:
+#   private:
+#     driver: overlay
+#     name: private
+#   public:
+#     external: true
+
+networks:
+  traefik_default:
+    driver: bridge
+    external: true

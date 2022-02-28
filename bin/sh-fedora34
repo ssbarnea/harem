@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+docker pull fedora:34
+docker run --network host -it fedora:34 /bin/bash

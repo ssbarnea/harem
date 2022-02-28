@@ -1,4 +1,1 @@
 pre-commit
-# Added here to expose them to github dependabot
-ansible-lint
-molecule

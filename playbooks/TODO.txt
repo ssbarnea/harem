@@ -1,0 +1,7 @@
+install dnf-automatic
+https://www.tecmint.com/setup-automatic-updates-for-centos-8/
+
+[commands]
+apply_updates = yes
+
+systemctl enable --now dnf-automatic.timer

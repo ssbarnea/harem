@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+unset http_proxy
+unset ALL_PROXY
+docker pull ubuntu:bionic
+docker run -it ubuntu:bionic /bin/bash

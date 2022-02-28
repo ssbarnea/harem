@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+podman pull quay.io/centos/centos:stream8
+podman run -it quay.io/centos/centos:stream8 /bin/bash

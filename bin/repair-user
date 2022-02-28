@@ -1,0 +1,11 @@
+#!/bin/bash
+set -ex
+
+# macos do file associations
+duti -s com.microsoft.VSCode cfg all
+duti -s com.microsoft.VSCode toml all
+duti -s com.microsoft.VSCode json all
+duti -s com.microsoft.VSCode md all
+duti -s com.microsoft.VSCode ini all
+duti -s com.microsoft.VSCode in all
+duti -s com.microsoft.VSCode public.plain-text all

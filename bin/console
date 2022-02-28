@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
-set -eou pipefail
+set -eoux pipefail
+export IPMI_USER=ADMIN
 ipmitool -I lanplus -H $1 -U $IPMI_USER -E sol deactivate || true
 ipmitool -I lanplus -H $1 -U $IPMI_USER -E sol activate

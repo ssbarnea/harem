@@ -1,0 +1,6 @@
+#!/usr/bin/env ansible-playbook -v
+---
+- hosts: n0
+  gather_facts: false
+  roles:
+    - geerlingguy.samba

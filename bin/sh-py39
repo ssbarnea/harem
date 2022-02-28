@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+docker pull docker.io/python:3.9-bullseye
+docker run -it docker.io/python:3.9-bullseye /bin/bash

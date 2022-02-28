@@ -1,8 +1,12 @@
 namespace: ssbarnea
 name: harem
+description: Don't use me
+version: 1.0.0
 authors:
   - Sorin Sbarnea
-license: MIT
+license:
+  - MIT
+readme: README.md
 tags:
   - personal
   - infrastructure

@@ -33,4 +33,4 @@
       script: ../apps/run-nvr
 
 - name: rss-bot
-  import_playbook: ../apps/rss-bot/deploy.yml
+  import_playbook: rss-bot/run.yml

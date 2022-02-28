@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  web:
+    container_name: "nginx"
+    image: nginx
+    network_mode: bridge
+    # ports:
+    #   - "80"
+    volumes:
+      - /opt/data/n:/usr/share/nginx/html
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.n.rule=Host(`n.sbarnea.com`)
+      - traefik.http.routers.n.tls.certResolver=myresolver
+      - traefik.http.routers.n.entrypoints=websecure
+      - traefik.http.routers.n.service=n
+      - traefik.http.services.n.loadbalancer.server.port=80
+      - traefik.http.services.n.loadbalancer.healthCheck.path=/
+      - traefik.http.services.n.loadbalancer.healthCheck.interval=60s

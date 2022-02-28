@@ -1,0 +1,32 @@
+---
+version: "2.1"
+services:
+  plex:
+    image: ghcr.io/linuxserver/plex
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - VERSION=docker
+      - UMASK_SET=022 #optional
+      - PLEX_CLAIM= #optional
+    volumes:
+      - /opt/data/plex:/config
+      - /mnt/download/media/series/:/tv
+      - /mnt/download/media/Movies:/movies
+    restart: unless-stopped
+# -e PUID=1000 -e PGID=1000
+# -d
+# podman run --name=plex --net=host -e VERSION=docker -e UMASK_SET=022 -e PLEX_CLAIM=claim-cyNEFU8RJTpQZe7fhNYk -v /opt/data/plex:/config:rw -v /mnt/download/media/series/:/tv:ro -v /mnt/download/media/Movies:/movies:ro \
+# -p 32400:32400 \
+# -p 1900:1900/udp \
+# -p 3005:3005 \
+# -p 5353:5353/udp \
+# -p 8324:8324 \
+# -p 32410:32410/udp \
+# -p 32412:32412/udp \
+# -p 32413:32413/udp \
+# -p 32414:32414/udp \
+# -p 32469:32469 \
+# -it ghcr.io/linuxserver/plex
