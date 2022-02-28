@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 services:
   unifi:
     image: linuxserver/unifi-controller:latest
@@ -55,8 +55,8 @@ services:
 #   unifi_default:
 #     name: unifi_default
 #     driver: bridge
-    # driver_opts:
-    #   com.docker.network.bridge.enable_icc: "true"
+# driver_opts:
+#   com.docker.network.bridge.enable_icc: "true"
 #   bridge6:
 #     name: bridge6
 #     # not supported i v3+

@@ -35,7 +35,6 @@
         template: redhat
         ks_os_repo: "{{ distros_mirror }}/rhel/8/os/x86_64/"
   tasks:
-
     - name: configure ks facts
       set_fact:
         ks_host_id: "{{ mac_addresses[0] | regex_replace(':', '-') | lower }}"
@@ -56,7 +55,7 @@
           - net-tools
           - ntp
           - vim-enhanced
-        ks_repo_updates: ''
+        ks_repo_updates: ""
 
     - name: set ks snmpp vars
       when: snmp is defined and snmp
@@ -75,12 +74,12 @@
       set_fact:
         ks_packages: "{{ ks_packages }} + [ '@base', '@hardware-monitoring', '@system-admin-tools' ]"
         ks_repo_updates: |
-            repo --name=updates --baseurl={{ distros_mirror }}/{{ ks_os_name }}/{{ ks_os_version }}/updates/x86_64
+          repo --name=updates --baseurl={{ distros_mirror }}/{{ ks_os_name }}/{{ ks_os_version }}/updates/x86_64
 
     - name: set fedora specific facts
       set_fact:
         ks_repo_updates: |
-            repo --name=updates --baseurl={{ distros_mirror }}/fedora/linux/updates/{{ ks_os_version }}/Everything/x86_64/
+          repo --name=updates --baseurl={{ distros_mirror }}/fedora/linux/updates/{{ ks_os_version }}/Everything/x86_64/
       when: ks_os_name == "fedora"
 
 - hosts: syno

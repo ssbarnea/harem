@@ -8,7 +8,6 @@ pxe_root: /volume2/PXE
 # [WARNING]: sftp transfer mechanism failed on [...]. Use ANSIBLE_DEBUG=1 to see detailed information
 ansible_ssh_transfer_method: scp
 
-
 docker_volumes_root: /volume1/docker/
 
 # first one is used for wol wake

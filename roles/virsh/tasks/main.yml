@@ -1,7 +1,7 @@
 ---
 - name: update system
   package:
-    name: '*'
+    name: "*"
     state: latest
   become: true
 

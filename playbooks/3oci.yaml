@@ -13,10 +13,9 @@
       - rlandy
       - sshnaidm
       - weshayutin
-      - cloudnull  # not real ci but trusted
-      - ekultails  # luke short
+      - cloudnull # not real ci but trusted
+      - ekultails # luke short
   tasks:
-
     - name: create users
       user:
         name: "{{ item }}"

@@ -1,6 +1,6 @@
 # based on https://www.portainer.io/documentation/quick-start/
 
-version: '3.7'
+version: "3.7"
 services:
   portainer:
     image: portainer/portainer

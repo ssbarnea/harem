@@ -31,8 +31,6 @@ certificatesResolvers:
         provider: route53
         delayBeforeCheck: 10
 
-
-
 log:
   filePath: "/data/traefik.log"
   # level: DEBUG
@@ -51,7 +49,8 @@ api:
   insecure: true
   dashboard: true
 
-ping: {}
+ping:
+  {}
   # Name of the related entry point
   #
   # Optional
@@ -83,4 +82,3 @@ serversTransport:
   # needed for unifi controller
   # https://community.ui.com/questions/Does-anyone-run-UniFi-with-Traefik-reverse-proxy/d41da74d-d82a-4d68-aa4c-64606de45307
   insecureSkipVerify: true
-

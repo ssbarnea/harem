@@ -9,7 +9,6 @@
   when: command_pip.rc != 0
   become: true
   block:
-
     - name: download get-pip.py
       get_url:
         url: https://bootstrap.pypa.io/get-pip.py
@@ -28,8 +27,6 @@
       - docker-compose
     state: present
     # extra_args: --user
-
-
 # - name: additional pythons for tox
 #   package:
 #     name:

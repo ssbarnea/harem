@@ -6,11 +6,9 @@
   vars:
     state: "setup"
   tasks:
-
     - name: if host has ipmi_address
       when: ipmi_address is defined
       block:
-
         - name: install ipmi_boot module requirements
           pip:
             name: pyghmi
@@ -61,7 +59,6 @@
         - wol.mac
         - state != 'off'
       block:
-
         - name: send wol magic packet
           wakeonlan:
             mac: "{{ wol.mac }}"

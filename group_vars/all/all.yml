@@ -22,11 +22,9 @@ no_proxy: "localhost,zuul.openstack.org,192.168.0.0/16,10.0.0.0/8,172.30.0.0/16"
 
 matrix_fqdn: "m.{{ domain }}"
 
-
 distros_mirror: http://mirror.bytemark.co.uk
 
-rhel8_pxeboot_url:
-  http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os/isolinux
+rhel8_pxeboot_url: http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os/isolinux
 # http://download-node-02.eng.bos.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8/work/x86_64/buildinstall/BaseOS/images/pxeboot
 
 vpn_username: !vault |
@@ -176,7 +174,6 @@ custom_ca: !vault |
   37636164393534326166666365613537663839356636323736303766356434306361626631633164
   373330306539373136333261303937356261
 
-
 ## Directory where etcd data stored
 etcd_data_dir: /var/lib/etcd
 
@@ -189,7 +186,6 @@ bin_dir: /usr/local/bin
 ## environments where the nodes are accessed remotely by the "public" ip,
 ## but don't know about that address themselves.
 # access_ip: 1.1.1.1
-
 
 ## External LB example config
 ## apiserver_loadbalancer_domain_name: "elb.some.domain"
@@ -239,7 +235,6 @@ upstream_dns_servers:
 
 ## If you need exclude all cluster nodes from proxy and other resources, add other resources here.
 additional_no_proxy: "localhost,192.168.0.0/16,10.0.0.0/8,172.30.0.0/16"
-
 ## Certificate Management
 ## This setting determines whether certs are generated via scripts.
 ## Chose 'none' if you provide your own certificates.

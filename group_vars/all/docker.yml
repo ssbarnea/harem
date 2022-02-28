@@ -72,6 +72,7 @@ docker_options: >-
   --default-runtime=docker-runc --exec-opt native.cgroupdriver=systemd
   --userland-proxy-path=/usr/libexec/docker/docker-proxy-current --signature-verification=false
   {%- endif -%}
+
 ##   -H unix:///var/run/docker.sock --tlsverify --tlscacert=/etc/ssl/etcd/ssl/ca.pem --tlscert=/etc/ssl/etcd/ssl/member-n0.pem --tlskey=/etc/ssl/etcd/ssl/member-n0-key.pem -H tcp://0.0.0.0:2376
 
 # --tlsverify

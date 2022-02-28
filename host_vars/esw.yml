@@ -9,7 +9,5 @@ name: esw
 
 vendor_url: ftp://ftp.zyxel.com/GS1910-24HP/
 max_frame: 10240
-
-
 # firmware: V2.00(AAAY.0)C0
 # Dec 16, 2014

@@ -1,16 +1,15 @@
 #!/usr/bin/env ansible-playbook
 %YAML 1.2
 ---
-- hosts: n0  # ubuntu # baremetals
+- hosts: n0 # ubuntu # baremetals
   gather_facts: false
   become: true
   tasks:
-
     - name: install apcupsd
       package:
         name:
           - nut
-          - net-snmp-utils  # redhat
+          - net-snmp-utils # redhat
           # snmp # ubuntu
         state: present
 

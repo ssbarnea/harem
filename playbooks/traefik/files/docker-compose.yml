@@ -1,5 +1,5 @@
 # syaml-language-server: $schema=compose
-version: '3.7'
+version: "3.7"
 services:
   traefik:
     image: traefik:v2.4
@@ -23,7 +23,7 @@ services:
     labels:
       # - "traefik.docker.network=frontend"
       - traefik.enable=true
-      - "traefik.frontend.rule=Host:t.sbarnea.com"  # || Host:n0 # ; PathPrefixStrip:/traefik"
+      - "traefik.frontend.rule=Host:t.sbarnea.com" # || Host:n0 # ; PathPrefixStrip:/traefik"
       - traefik.port=8080
       - traefik.protocol=http
       - traefik.http.routers.t.rule=Host(`t.sbarnea.com`)

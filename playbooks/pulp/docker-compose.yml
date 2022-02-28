@@ -1,5 +1,5 @@
 # based on https://pulpproject.org/2020/03/15/pulp-fedora31-single-container/
-version: '3.7'
+version: "3.7"
 services:
   pulp:
     image: pulp/pulp-fedora31

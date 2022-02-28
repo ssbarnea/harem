@@ -62,7 +62,7 @@
       lineinfile:
         path: ~/.profile
         regexp: '^#?\s?export {{ item.key }}\s?='
-        line: 'export {{ set_line }}  # managed by ansible'
+        line: "export {{ set_line }}  # managed by ansible"
         validate: 'bash -c "source %s && set || grep \"{{ set_line }}\""'
       vars:
         set_line: "{{ item.key }}={{ item.value }}"
@@ -86,7 +86,6 @@
     - name: validate pip
       command: pip search pip
       changed_when: false
-
 # TODOs:
 
 # sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain <certificate>

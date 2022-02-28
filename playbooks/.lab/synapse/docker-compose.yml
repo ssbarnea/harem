@@ -2,10 +2,9 @@
 # This compose file is compatible with Compose itself, it might need some
 # adjustments to run properly with stack.
 
-version: '3'
+version: "3"
 
 services:
-
   synapse:
     build:
       context: .

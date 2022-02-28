@@ -18,15 +18,14 @@ authorized_keys: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 ipv6: true
 snmp: false
 
-custom_networking: false  # if false we will fully trust DHCP
-nameserver: ~  # define it if you want to configure a default nameserver
+custom_networking: false # if false we will fully trust DHCP
+nameserver: ~ # define it if you want to configure a default nameserver
 domain: lan
 search_domains: "{{ domain }}"
 # ^ above options are used only when custom_networking is true
 
 bond_slaves: eth0,eth1
 bond_options: mode=802.3ad,lacp_rate=fast,miimon=100,xmit_hash_policy=layer2+3
-
 
 # TODO(ssbarnea): enable bonding based on number of interfaces on host
 network_options: >

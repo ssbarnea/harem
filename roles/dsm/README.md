@@ -1,5 +1,4 @@
-DSM Role
-========
+# DSM Role
 
 Configures Synology DSM to act as:
 
@@ -11,37 +10,29 @@ References:
 
 - https://www.syslinux.org/wiki/index.php?title=PXELINUX
 
-
-Requirements
-------------
+## Requirements
 
 A DSM 6.2 or newer machine named "syno" or inside "syno" group,
 
-Role Variables
---------------
+## Role Variables
 
 http_proxy
 cert_name
 
-
-Dependencies
-------------
+## Dependencies
 
 N/A
 
-Example Playbook
-----------------
+## Example Playbook
 
     - hosts: servers
       roles:
          - { role: dsm, x: 42 }
 
-License
--------
+## License
 
 BSD
 
-Author Information
-------------------
+## Author Information
 
 Sorin Sbarnea

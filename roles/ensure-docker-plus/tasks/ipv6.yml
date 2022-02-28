@@ -45,8 +45,8 @@
 #     create: true
 #   register: result
 
-    # docker_network cannot be used to edit implicit networks like 'hosts':
-    # docker.errors.APIError: 403 Client Error: Forbidden ("host is a pre-defined network and cannot be removed")
+# docker_network cannot be used to edit implicit networks like 'hosts':
+# docker.errors.APIError: 403 Client Error: Forbidden ("host is a pre-defined network and cannot be removed")
 
 - name: load docker server config
   slurp:

@@ -3,7 +3,6 @@
   gather_facts: false
   strategy: free
   tasks:
-
     # - pip:
     #     name: pyghmi
     #     state: present

@@ -7,9 +7,7 @@
       name: jellyfin
 
   tasks:
-
     - block:
-
         - name: compose down
           docker_compose:
             project_name: "{{ app.name }}"

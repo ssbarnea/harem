@@ -6,19 +6,18 @@
     lb_domains:
       - awx
       - ha
-      - er  # elastic-recheck.dn  /
+      - er # elastic-recheck.dn  /
       - j
       - nvr
-      - p  # portainer
-      - r  # rancher
-      - rp  # report portal
+      - p # portainer
+      - r # rancher
+      - rp # report portal
       - syno
-      - t  # traefik
+      - t # traefik
       - unifi
       - whoami
-      - z  # zuul
+      - z # zuul
   tasks:
-
     - name: read dns entry from route53
       community.aws.route53_info:
         state: get

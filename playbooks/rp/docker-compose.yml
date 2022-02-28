@@ -11,9 +11,8 @@
 ##      '-d' -- enables daemon mode
 ##      '--force-recreate' -- forces re-recreating of all containers
 
-version: '2.4'
+version: "2.4"
 services:
-
   # gateway:
   #   image: traefik:v2.0.5
   #   ports:
@@ -48,7 +47,7 @@ services:
       # ports:
       # - "9200:9200"
     healthcheck:
-      test: ["CMD", "curl","-s" ,"-f", "http://localhost:9200/_cat/health"]
+      test: ["CMD", "curl", "-s", "-f", "http://localhost:9200/_cat/health"]
     restart: always
 
   analyzer:
@@ -76,7 +75,7 @@ services:
 
   postgres:
     image: postgres:12-alpine
-    shm_size: '512m'
+    shm_size: "512m"
     environment:
       POSTGRES_USER: rpuser
       POSTGRES_PASSWORD: rppass
@@ -89,8 +88,7 @@ services:
     # If you need to access the DB locally. Could be a security risk to expose DB.
     #    ports:
     #      - "5432:5432"
-    command:
-      -c checkpoint_completion_target=0.9
+    command: -c checkpoint_completion_target=0.9
       -c work_mem=96MB
       -c wal_writer_delay=20ms
       -c synchronous_commit=off
@@ -118,8 +116,8 @@ services:
   rabbitmq:
     image: rabbitmq:3.7.16-management
     #ports:
-      # - "5672:5672"
-      #- "15672:15672"
+    # - "5672:5672"
+    #- "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: "rabbitmq"
       RABBITMQ_DEFAULT_PASS: "rabbitmq"
@@ -161,15 +159,15 @@ services:
       - LB_URL=https://rp.sbarnea.com
       - TRAEFIK_V2_MODE=true
     labels:
-        - "traefik.http.routers.index.rule=Host(`rp.sbarnea.com`)"
-        - "traefik.http.routers.index.tls.certResolver=myresolver"
-        - "traefik.http.routers.index.entrypoints=websecure"
-        # - "traefik.http.routers.index.rule=PathPrefix(`/`)"
-        - "traefik.http.routers.index.service=index"
-        - "traefik.http.services.index.loadbalancer.server.port=8080"
-        - "traefik.http.services.index.loadbalancer.server.scheme=http"
-        - "traefik.enable=true"
-        - traefik.port=8080
+      - "traefik.http.routers.index.rule=Host(`rp.sbarnea.com`)"
+      - "traefik.http.routers.index.tls.certResolver=myresolver"
+      - "traefik.http.routers.index.entrypoints=websecure"
+      # - "traefik.http.routers.index.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.index.service=index"
+      - "traefik.http.services.index.loadbalancer.server.port=8080"
+      - "traefik.http.services.index.loadbalancer.server.scheme=http"
+      - "traefik.enable=true"
+      - traefik.port=8080
     restart: always
 
   api:

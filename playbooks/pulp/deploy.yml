@@ -6,7 +6,6 @@
     app:
       name: pulp
   tasks:
-
     - name: create app user
       user:
         name: "{{ app.name }}"

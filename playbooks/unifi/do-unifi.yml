@@ -6,13 +6,11 @@
     app:
       name: unifi
   tasks:
-
     - name: install reqs
       pip:
         name: docker-compose
 
     - block:
-
         - name: compose down
           community.docker.docker_compose:
             project_name: "{{ app.name }}"

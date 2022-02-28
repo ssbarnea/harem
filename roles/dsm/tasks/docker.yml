@@ -1,5 +1,4 @@
 ---
-
 - name: set facts
   setup:
     gather_subset: min

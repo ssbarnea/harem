@@ -77,7 +77,7 @@ askPassword()
             ROOT_PASSWORD=1
         ;;
     esac
-    
+
 }
 
 # Shows continue message.
@@ -163,7 +163,7 @@ showInvalid()
 # Main function of the script.
 startScript()
 {
-    while : 
+    while :
     do
         clear
         showMenu
@@ -186,7 +186,7 @@ startScript()
                 disableGateKeeper
             ;;
 
-            4)  
+            4)
                 clear
                 removeAppFromGateKeeper
             ;;

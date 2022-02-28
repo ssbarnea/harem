@@ -21,7 +21,7 @@
     name:
       # - the_silver_searcher  # missing from centos8
       - rsync
-      - python36  # centos8
+      - python36 # centos8
       - make
   become: true
 

@@ -26,7 +26,6 @@
       65623063356336356131303737323937663664356336333732656465353838366361353264396137
       6433376363366564376264646563623331356264323637373263
   tasks:
-
     - name: service folder
       file:
         path: "{{ item }}"
@@ -67,7 +66,7 @@
             restarted: true
             project_name: rss-bot
             definition:
-              version: '3.7'
+              version: "3.7"
               services:
                 rss-bot:
                   tty: true

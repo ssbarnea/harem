@@ -1,5 +1,4 @@
 ---
-
 - name: generate pxeboot menu
   # qnap does not have python ast module, so template is broken, we run it
   # on the controller instead.

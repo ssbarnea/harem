@@ -39,7 +39,6 @@
 
 - debug: var=result
 
-
 - name: deploy ovpn-get-auth
   copy:
     dest: /root/ovpn-get-auth

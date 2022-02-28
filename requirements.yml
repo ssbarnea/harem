@@ -15,4 +15,4 @@ collections:
     # version: devel
   - name: community.aws
   - name: community.docker
-  - name: community.general  # ipmi_boot
+  - name: community.general # ipmi_boot

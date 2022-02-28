@@ -9,7 +9,6 @@
     # group: nobody
     project_name: hass
   tasks:
-
     - name: service folder
       file:
         path: /opt/data/{{ project_name }}/
@@ -47,7 +46,7 @@
             restarted: true
             project_name: "{{ project_name }}"
             definition:
-              version: '3.7'
+              version: "3.7"
               services:
                 hass:
                   tty: true

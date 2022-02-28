@@ -4,7 +4,6 @@
 - hosts: n0,leno,buntu
   gather_facts: true
   tasks:
-
     # - name: repair permisssions
     #   become: true
     #   command: chown -R dd-agent:dd-agent /etc/datadog-agent
@@ -21,7 +20,7 @@
         delete: false
         owner: false
         group: false
-        times: true  # makes it idempotent
+        times: true # makes it idempotent
       register: result1
       notify: Restart agent
 

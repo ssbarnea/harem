@@ -8,7 +8,6 @@
     app:
       name: traefik
   tasks:
-
     - name: create app user
       user:
         name: "{{ app.name }}"
@@ -41,7 +40,6 @@
         state: present
 
     - block:
-
         - name: compose up
           shell:
             cmd: >
@@ -52,7 +50,6 @@
             warn: false
             chdir: /opt/data/{{ app.name }}
           register: result
-
 
         # - name: compose up
         #   delegate_to: localhost

@@ -9,8 +9,8 @@
   become: true
   lineinfile:
     dest: /etc/ssh/sshd_config
-    regexp: '^MaxSessions '
-    line: 'MaxSessions 501'
+    regexp: "^MaxSessions "
+    line: "MaxSessions 501"
   notify: restart-sshd
 
 - name: Install docker dependencies
@@ -32,4 +32,4 @@
     # bug in role, fails without it
     ansible_user: root
   include_role:
-    name: ensure-docker  # from zuul-jobs
+    name: ensure-docker # from zuul-jobs

@@ -92,7 +92,7 @@
       retries: 5
       delay: 5
 
-    - name: restart openvpn  # noqa 305
+    - name: restart openvpn # noqa 305
       become: true
       shell:
         cmd: openvpn --config /var/etc/openvpn/client1.conf

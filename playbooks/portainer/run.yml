@@ -6,7 +6,6 @@
     app:
       name: portainer
   tasks:
-
     - name: create app user
       user:
         name: "{{ app.name }}"
@@ -37,7 +36,6 @@
         state: present
 
     - block:
-
         - name: compose down
           docker_compose:
             project_name: "{{ app.name }}"

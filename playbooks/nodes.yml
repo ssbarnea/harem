@@ -1,10 +1,9 @@
 #!/usr/bin/env ansible-playbook
 # %YAML 1.2
 ---
-- hosts: n0  # baremetals
+- hosts: n0 # baremetals
   gather_facts: false
   tasks:
-
     # TODO:
     # systemctl enable --now cockpit.socket
 
@@ -29,7 +28,7 @@
       become: true
       package:
         name:
-          - usbutils  # lsusb
+          - usbutils # lsusb
           - autofs
 
     - name: config autofs service
@@ -68,7 +67,6 @@
 
     - include_role:
         name: ensure-docker
-
 #     - package:
 #         name:
 #           - wget

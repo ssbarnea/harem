@@ -3,7 +3,6 @@
   gather_facts: true
   become_user: ssbarnea
   tasks:
-
     - name: clone gri from git # noqa: git-latest
       git:
         repo: https://github.com/pycontribs/gri.git

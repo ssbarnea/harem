@@ -6,7 +6,6 @@
     app:
       name: prom
   tasks:
-
     - name: create app user
       user:
         name: "{{ app.name }}"
@@ -43,7 +42,7 @@
             restarted: true
             project_name: "{{ app.name }}"
             definition:
-              version: '3.7'
+              version: "3.7"
               services:
                 rss-bot:
                   tty: true

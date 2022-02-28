@@ -20,16 +20,16 @@ Reprovisioning a baremetal node:
 
     reprov <host> [os)_flavour]
 
-Supported os flavors: ``centos7``, ``fedora28``,
-``ubuntu-[bionic|trusty|xenial]``
+Supported os flavors: `centos7`, `fedora28`,
+`ubuntu-[bionic|trusty|xenial]`
 
 ## Hardware Components
 
-- ``syno`` : Synology DSM
-    - TFTP server
-    - storage server (NFS/SMB/HTTP/...)
-- ``router``: PfSense
-    - DHCP server (tftp)
-    - http proxy (squid)
-    - reverse proxy (haproxy) doing SSL
-- ``baremetals`` : Set of nodes that can be controlled over IPMI
+- `syno` : Synology DSM
+  - TFTP server
+  - storage server (NFS/SMB/HTTP/...)
+- `router`: PfSense
+  - DHCP server (tftp)
+  - http proxy (squid)
+  - reverse proxy (haproxy) doing SSL
+- `baremetals` : Set of nodes that can be controlled over IPMI

@@ -2,7 +2,6 @@
 # based on a true story fund at:
 # https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
 
-
 - name: check if opkg exists
   stat:
     path: /opt/bin/opkg
@@ -11,7 +10,6 @@
 - when: not st.stat.exists
   become: true
   block:
-
     - name: create folder
       file:
         path: /volume1/@entware-ng/opt
@@ -38,5 +36,5 @@
   lineinfile:
     dest: /etc/profile
     state: present
-    line: 'PATH=$PATH:/opt/bin'
+    line: "PATH=$PATH:/opt/bin"
   become: true

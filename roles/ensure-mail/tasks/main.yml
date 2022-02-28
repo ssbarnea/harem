@@ -11,11 +11,10 @@
 
 - when: result is changed
   block:
-
     - name: gather ansible_hostname
       setup:
         gather_subset:
-          - '!all'
+          - "!all"
 
     - name: install mail related packages
       become: true
