@@ -1,0 +1,76 @@
+---
+# vars file for dsm
+distros_mirror: http://mirror.bytemark.co.uk
+# ks_url is where the kickstart files are served from
+ks_url: http://192.168.33.40/~ssbarnea/ks
+ks_root: /volume1/homes/ssbarnea/www/ks
+pxe_root: /share/pxe
+# /volume2/PXE
+serial_console: ttyS1,115200
+
+# Use `openssl passwd -1 "password"` to generate a new password
+auth_encryption: sha512
+
+default_username: cloud-user
+default_password: "{{ root_password }}"
+
+authorized_keys: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+ipv6: true
+snmp: false
+
+custom_networking: false  # if false we will fully trust DHCP
+nameserver: ~  # define it if you want to configure a default nameserver
+domain: lan
+search_domains: "{{ domain }}"
+# ^ above options are used only when custom_networking is true
+
+bond_slaves: eth0,eth1
+bond_options: mode=802.3ad,lacp_rate=fast,miimon=100,xmit_hash_policy=layer2+3
+
+
+# TODO(ssbarnea): enable bonding based on number of interfaces on host
+network_options: >
+  --device=bond0 --bondslaves={{ bond_slaves }} --bondopts={{ bond_options }}
+
+# https://access.redhat.com/solutions/666853 - about bonding options
+
+kernel_options: >
+  nomodeset
+  i915.modeset=0
+  nouveau.modeset=0
+  logo.nologo
+  inst.cmdline
+  inst.proxy={{ http_proxy }}
+  proxy={{ http_proxy }}
+  modprobe.blacklist=floppy
+  console=tty0
+  console={{ serial_console }}
+  inst.ks.sendmac
+  bond=bond0:{{ bond_slaves }}:{{ bond_options}}
+  {# save wasted minutes waiting for: "random: crng init done" #}
+  random.trust_cpu=on
+  {% if syslog_server is defined -%}inst.syslog={{ syslog_server }}{%- endif -%}
+
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/sect-parameter-configuration-files-other-s390
+# https://media.readthedocs.org/pdf/anaconda-installer/latest/anaconda-installer.pdf
+#  bond=bond0:em1,em2,p1p1,p1p2:mode=802.3ad,lacp_rate=fast,miimon=100,xmit_hash_policy=layer2+3
+# vlan=bond0.123:bond0
+
+# see https://serverfault.com/questions/708447/probing-edd-boot-message-stays-for-ten-minutes-on-centos-6-6
+
+extra_packages:
+  - crudini
+  - htop
+  - iotop
+  - mc
+  - ncdu
+  - lldpd
+  - python2-pip
+  - iperf3
+# -- not implemented yet --
+
+dhcp_boot_default_bios_filename: pxelinux.0
+# undionly.kpxe  # ipxe file (causes recursive loop w/o config on dhcp server)
+dhcp_boot_uefi_32bit_filename: centos7/efi/grubia32.efi
+dhcp_boot_uefi_64bit_filename: centos7/efi/grubx64.efi
+dhcp_boot_next_server: 192.168.33.40

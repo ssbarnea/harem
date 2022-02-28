@@ -1,0 +1,200 @@
+lang en_US.UTF-8
+keyboard --vckeymap=us --xlayouts=''
+{% if ks_services is defined and ks_services %}
+services --enabled={{ ks_services | default([]) | join(',') }}
+{% endif %}
+eula --agreed
+
+network {{ network_options | replace('\n', '') }} --onboot=yes {% if ks_hostname is defined %}--hostname={{ ks_hostname }}{% endif %} --bootproto=dhcp{% if not ipv6 %} --noipv6{% endif %} --activate
+
+{% if root_password is defined and root_password %}
+rootpw --iscrypted {{ root_password | string | password_hash(auth_encryption) }}
+auth --useshadow --passalgo={{ auth_encryption }}
+{% endif %}
+{% if default_username is defined %}
+user --name={{ default_username }}{% if default_password is defined and default_password %} --iscrypted --password={{ default_password | string | password_hash(auth_encryption)  }}{% endif %}
+{% endif %}
+
+{% if ks_repo_updates is defined %}
+{{ ks_repo_updates }}
+{% endif %}
+
+firewall --disabled
+selinux --disabled
+timezone UTC
+firstboot --disabled
+skipx
+text
+
+ignoredisk --only-use=sda
+bootloader --location=mbr --timeout=0 --append="{% if not ipv6 %}ipv6.disable=1 {% endif %}net.ifnames=0 biosdevname=0"
+zerombr
+clearpart --drives=sda --all
+part swap --asprimary --fstype=swap --ondisk=sda --size=1024
+part /    --asprimary --fstype=xfs  --ondisk=sda --size=1024 --grow
+
+reboot
+
+%packages
+@core
+{% if ks_packages is defined %}
+{{ ks_packages | join('\n') }}
+{% endif %}
+%end
+
+%post
+{# tee post execution based on https://wiki.centos.org/TipsAndTricks/KickStart #}
+exec < /dev/tty3 > /dev/tty3
+chvt 3
+(
+
+set -exuo pipefail
+
+{# configure static MAC address for the bond0 interface to avoid randon assignment at boot#}
+{% if ks_bond_mac is defined %}
+crudini --set /etc/sysconfig/network-scripts/ifcfg-bond0 MACADDR {{ ks_bond_mac }}
+{% endif %}
+
+{# we want to be able to know what happens with our switch #}
+which lldpd && chkconfig lldpd on || true
+
+sed -i -e 's|^# %wheel\tALL=(ALL)\tNOPASSWD: ALL|%wheel\tALL=(ALL)\tNOPASSWD: ALL|; s|^Defaults    requiretty|#&|' /etc/sudoers
+
+{# to avoid rpm install from url failing due to untrusted CA of the proxy #}
+{% if custom_ca is defined %}
+cat << EOF > /etc/pki/ca-trust/source/anchors/custom-ca.crt
+{{ custom_ca }}
+EOF
+update-ca-trust
+{% endif %}
+
+{# assure pip will uses system CA certificates and avoid failing due to proxy #}
+cat << EOF >/etc/pip.conf
+[global]
+cert = /etc/ssl/certs/ca-bundle.crt
+EOF
+
+
+source /etc/os-release
+if $ID == 'fedora'; then
+  PKG_CMD=dnf
+  PKG_CONFIG=/etc/dnf/dnf.conf
+  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-${VERSION_ID}-primary
+  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-${VERSION_ID}-x86_64
+else
+  PKG_CMD=yum
+  PKG_CONFIG=/etc/yum.conf
+  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-${VERSION_ID} || true
+  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial || true
+  rpm --import https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-${VERSION_ID} || true
+  rpm --import https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-${VERSION_ID}Server || true
+  rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-${VERSION_ID}.noarch.rpm || true
+fi
+
+{% if http_proxy is defined %}
+{# https://unix.stackexchange.com/questions/212894/whats-the-right-format-for-the-http-proxy-environment-variable-caps-or-no-ca #}
+### HTTP PROXY
+echo "proxy={{ http_proxy }}" >> $PKG_CONFIG
+cat <<EOF > /etc/profile.d/proxy.sh
+HTTP_PROXY={{ http_proxy }}
+HTTPS_PROXY={{ http_proxy }}
+http_proxy={{ http_proxy }}
+https_proxy={{ http_proxy }}
+ftp_proxy={{ http_proxy }}
+export http_proxy https_proxy ftp_proxy HTTP_PROXY HTTPS_PROXY
+EOF
+cat <<EOF > /etc/wgetrc
+http_proxy = {{ http_proxy_no_schema }}
+https_proxy = {{ https_proxy_no_schema }}
+ftp_proxy = {{ http_proxy_no_schema }}
+EOF
+{% endif %}
+
+$PKG_CMD install -q -y augeas dmidecode {{ extra_packages | join(" ") }}
+
+{% if custom_networking %}
+{% if nameserver is defined and nameserver %}
+### DNS settings
+cat << EOF > /etc/resolv.conf
+domain {{ domain }}
+search {{ search_domains }}
+nameserver {{ nameserver }}
+EOF
+{% endif %}
+
+{### disable /etc/resolv.conf rewritting if NM is installed #}
+[ -f /etc/NetworkManager/NetworkManager.conf ] && sed -i '/\[main\]/a dns=none' /etc/NetworkManager/NetworkManager.conf
+{% endif  %}
+
+{### creating new /etc/hosts #}
+cat << EOF > /etc/hosts
+# Do not remove the following line, or various programs
+# that require network functionality will fail
+127.0.0.1 localhost.localdomain localhost
+::1       localhost6.localdomain6 localhost6
+EOF
+
+{% if snmp is defined and snmp %}
+{### create snmp config #}
+cat << EOF >/etc/snmp/snmpd.conf
+com2sec         notConfigUser  default       public
+group           notConfigGroup v1            notConfigUser
+group           notConfigGroup v2c           notConfigUser
+access          notConfigGroup ""            any  noauth exact systemview none none
+view            systemview     included      .1
+master  agentx
+agentxperms 770 770 daemon daemon
+dontLogTCPWrappersConnects 1
+interface lo 24 1000000000
+EOF
+{% endif %}
+
+install --mode=700 -d /root/.ssh
+{# install --mode=700 /dev/null /root/.ssh/authorized_keys #}
+
+{# ---- Install our SSH key ---- #}
+install -m 0600 /dev/stdin /root/.ssh/authorized_keys <<EOF
+{{ authorized_keys }}
+EOF
+
+{# fix up selinux context #}
+restorecon -R /root/.ssh/
+
+{% if default_username is defined %}
+install --mode=700 -o {{ default_username }} -g {{ default_username }} -d ~{{ default_username }}/.ssh
+install -o {{ default_username }} -g {{ default_username }} /root/.ssh/authorized_keys ~{{ default_username }}/.ssh/authorized_keys
+echo "{{ default_username }} ALL=(ALL)    NOPASSWD: ALL" >> /etc/sudoers
+{% endif %}
+
+{% for f in lookup('fileglob', 'files/etc/ssh/*.key', wantlist=True) %}
+curl -ks {{ ks_url }}/etc/ssh/{{ f | basename }} | \
+    install -m 0640 -o root -g ssh_keys /dev/stdin /etc/ssh/{{ f | basename }}
+{% endfor %}
+{% for f in lookup('fileglob', 'files/etc/ssh/*.pub', wantlist=True) %}
+curl -ks {{ ks_url }}/etc/ssh/{{ f | basename }} | \
+    install -m 0644 -o root -g root /dev/stdin /etc/ssh/{{ f | basename }}
+{% endfor %}
+
+augtool -s <<EOF
+{# root login needs to be enabled during initial setup so the project specific scripts can be executed #}
+set /files/etc/ssh/sshd_config/PermitRootLogin yes
+
+{# This saves time during vm startup #}
+set /files/etc/grub.conf/timeout 0
+
+{# Removed because otherwise user install scripts can't use sudo #}
+rm /files/etc/sudoers/Defaults[requiretty]
+EOF
+
+{# install virtualbox guest tools, if appropiate #}
+dmidecode -t system|grep 'Product Name: VirtualBox' >/dev/null && {
+    $PKG_CMD install -y virtualbox-guest-additions
+}
+
+
+yum makecache
+
+) 2>&1 | /usr/bin/tee /root/ks-post.log
+chvt 1
+
+%end

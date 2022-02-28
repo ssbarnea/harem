@@ -1,0 +1,83 @@
+UI menu.c32
+MENU TITLE Host Menu {{ ks_hostname | default('generic') }}
+PXERetry 5
+PROMPT 0
+{# unit: 0.1s #}
+TIMEOUT 100
+DEFAULT {{ 'custom-' + os_flavour | default('bootlocal') }}
+
+LABEL bootlocal
+  MENU LABEL Local Boot
+  TEXT HELP
+  This will exit from the network boot menu and attempt
+  to boot from local media (hard disk, DVD, etc)
+  ENDTEXT
+  localboot 0
+
+LABEL memtest
+  MENU LABEL memtest
+  kernel memtest
+  append -
+
+LABEL nemo
+MENU LABEL nemo
+ kernel memdisk
+ append initrd=nemo.img floppy raw
+
+{% if ks_hostname is defined %}
+LABEL custom-{{ os_flavour }}
+MENU LABEL custom-{{ os_flavour }}
+  ipappend 2
+  kernel {{ os_flavour }}/vmlinuz
+  append initrd={{ os_flavour }}/initrd.img repo={{ ks_os_repo }} ks={{ ks_url }}/{{ ks_host_id }}.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+{% else %}
+
+LABEL centos7
+MENU LABEL centos7
+  ipappend 2
+  kernel centos7/vmlinuz
+  append initrd=centos7/initrd.img repo={{ distros_mirror }}/centos/7/os/x86_64/ ks={{ ks_url }}/redhat.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+
+LABEL centos8
+MENU LABEL centos8
+  ipappend 2
+  kernel centos8/vmlinuz
+  append initrd=centos8/initrd.img repo={{ distros_mirror }}/centos/8/BaseOS/x86_64/os/ ks={{ ks_url }}/redhat.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+
+LABEL rhel8
+MENU LABEL rhel8
+  ipappend 2
+  kernel rhel8/vmlinuz
+  append initrd=rhel8/initrd.img repo=http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os
+{# ks={{ ks_url }}/redhat.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+#}
+LABEL fedora28
+MENU LABEL fedora28
+  ipappend 2
+  kernel fedora28/vmlinuz
+  append initrd=fedora28/initrd.img repo={{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/ ks={{ ks_url }}/redhat.ks inst.proxy={{ http_proxy }} ipv6.disable=1 net.ifnames=0 biosdevname=0 {{ kernel_options }}
+
+LABEL debian-stretch
+MENU LABEL debian-stretch
+  ipappend 2
+  kernel {{ distros_mirror }}/debian/dists/stretch/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
+  append initrd={{ distros_mirror }}/debian/dists/stretch/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz locale=en_US.UTF-8 keymap=us netcfg/get_hostname=debian-stretch netcfg/get_domain=lan auto url={{ ks_url }}/debian-stretch.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 interface=eth0 {{ kernel_options }}
+
+LABEL ubuntu-bionic
+MENU LABEL ubuntu-bionic
+  ipappend 2
+  kernel {{ distros_mirror }}/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux
+  append initrd={{ distros_mirror }}/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 keymap=us netcfg/get_hostname=ubuntu-bionic netcfg/get_domain=lan auto url={{ ks_url }}/ubuntu-bionic.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 interface=eth0 {{ kernel_options }}
+
+LABEL ubuntu-trusty
+MENU LABEL ubuntu-trusty
+  ipappend 2
+  kernel {{ distros_mirror }}/ubuntu/dists/trusty/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux
+  append initrd={{ distros_mirror }}/ubuntu/dists/trusty/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 keymap=us netcfg/get_hostname=ubuntu-trusty netcfg/get_domain=lan auto url={{ ks_url }}/ubuntu-trusty.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 interface=eth0 {{ kernel_options }}
+
+LABEL ubuntu-xenial
+MENU LABEL ubuntu-xenial
+  ipappend 2
+  kernel {{ distros_mirror }}/ubuntu/dists/xenial/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux
+  append initrd={{ distros_mirror }}/ubuntu/dists/xenial/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 keymap=us netcfg/get_hostname=ubuntu-xenial netcfg/get_domain=lan auto url={{ ks_url }}/ubuntu-xenial.ks ipv6.disable=1 net.ifnames=0 biosdevname=0 interface=eth0 {{ kernel_options }}
+{% endif %}

@@ -1,0 +1,57 @@
+---
+
+- name: generate pxeboot menu
+  # qnap does not have python ast module, so template is broken, we run it
+  # on the controller instead.
+  delegate_to: localhost
+  template:
+    src: "pxelinux.cfg/default.j2"
+    dest: "tmp/pxelinux.cfg/01-{{ hostvars[item]['ks_host_id']"
+    # dest: >-
+    #   {{ pxe_root }}/pxelinux.cfg/01-{{ hostvars[item]['ks_host_id'] }}
+  loop: "{{ groups.baremetals }}"
+  when: mac_addresses is defined
+
+# - name: Deploy generated files
+#   fail:
+#     msg: foo
+- name: Make sure destination dir exists
+  file:
+    path: "tmp/{{ ks_root }}"
+    state: directory
+    recurse: true
+
+- name: generare ks file
+  # same reason, lacking ast
+  delegate_to: localhost
+  vars:
+    ks_services: "{{ hostvars[item]['ks_services'] }}"
+    ks_hostname: "{{ hostvars[item]['ks_hostname'] }}"
+    ks_repo_updates: "{{ hostvars[item]['ks_repo_updates'] }}"
+    ks_packages: "{{ hostvars[item]['ks_packages'] }}"
+    ks_bond_mac: "{{ hostvars[item]['ks_bond_mac'] }}"
+  template:
+    src: "ks/{{ hostvars[item]['ks_template'] }}.ks.j2"
+    dest: "tmp/{{ hostvars[item]['ks_root'] | default(ks_root) }}/{{ hostvars[item]['ks_host_id'] }}.ks"
+  loop: "{{ groups['baremetals'] }}"
+
+- name: tftp tasks
+  include_tasks: tftp.yml
+
+# kudos to: https://nguvu.org/pfsense/pfSense-WPAD-PAC-proxy-configuration-guide/
+- name: configure proxy wpad file
+  delegate_to: localhost
+  template:
+    src: proxy.pac.j2
+    dest: "tmp/{{ ks_root }}/proxy.pac"
+
+- name: proxy wpad symlinks
+  delegate_to: localhost
+  file:
+    dest: "tmp/{{ ks_root }}/{{ item }}"
+    src: "{{ ks_root }}/proxy.pac"
+    state: link
+    # force: true
+  with_items:
+    - wpad.dat
+    - wpad.da
