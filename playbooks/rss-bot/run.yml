@@ -1,19 +1,22 @@
 #!/usr/bin/env ansible-playbook
 ---
-- hosts: n0
+- hosts: buntu
   become: true
   vars:
-    gid: 99
-    uid: 99
-    owner: nobody
-    group: nobody
-    IRC_PASSWORD: !vault |
-      $ANSIBLE_VAULT;1.1;AES256
-      66636330373936373835626630346330303838393463363337313935356332303839663633633166
-      6135363133396533333163643036396331643839313861360a333330323638323733656133393062
-      62656637396130633730616163626134343832373538333431333864633231313063316535623963
-      6632346436316562650a376163616337383032336634653266333333656336356364623466666164
-      6266
+    # gid: 99
+    # uid: 99
+    owner: root
+    group: root
+    # owner: nobody
+    # group: nogroup  # ubuntu does not have nobody group
+    IRC_PASSWORD: not911fy
+    # !vault |
+    #   $ANSIBLE_VAULT;1.1;AES256
+    #   66636330373936373835626630346330303838393463363337313935356332303839663633633166
+    #   6135363133396533333163643036396331643839313861360a333330323638323733656133393062
+    #   62656637396130633730616163626134343832373538333431333864633231313063316535623963
+    #   6632346436316562650a376163616337383032336634653266333333656336356364623466666164
+    #   6266
     BITLY_TOKENS: !vault |
       $ANSIBLE_VAULT;1.1;AES256
       35633033656337613261323333306633306432393063613733306436636266356132366563663566
@@ -26,12 +29,15 @@
 
     - name: service folder
       file:
-        path: /opt/data/rss-bot/
+        path: "{{ item }}"
         owner: "{{ owner }}"
         group: "{{ group }}"
         state: directory
         recurse: true
         mode: "0700"
+      loop:
+        - /opt/data/rss-bot/
+        - /opt/data/rss-bot/.ircrssfeedbot_cache
 
     - name: deploy config
       copy:
@@ -53,7 +59,7 @@
 
     - block:
         - name: compose up
-          docker_compose:
+          community.docker.docker_compose:
             build: true
             debug: true
             pull: true
@@ -66,12 +72,14 @@
                 rss-bot:
                   tty: true
                   # nobody:nobody on centos7, does not support names
-                  user: nobody
+                  # user: nobody
+                  user: root
                   # "{{ uid }}:{{ gid }}"
                   container_name: rss-bot
                   image: ascensive/irc-rss-feed-bot:latest
                   volumes:
                     - /opt/data/rss-bot:/config
+                    # - /opt/data/rss-bot:/app
                   env_file:
                     - /opt/data/rss-bot/secrets.env
                   restart: always

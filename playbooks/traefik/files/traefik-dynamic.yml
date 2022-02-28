@@ -1,32 +1,45 @@
+# yaml-language-server: $schema=https://json.schemastore.org/traefik-v2-file-provider
 http:
   routers:
-    syno-http:
-      rule: Host(`syno.sbarnea.com`)
-      service: syno
-      middlewares:
-        - redirect
-      entrypoints:
-        - http
-    syno-https:
-      rule: Host(`syno.sbarnea.com`)
-      tls:
-        certresolver: myresolver
-      service: syno
-      entrypoints:
-        - https
-    z:
-      rule: Host(`z.sbarnea.com`)
-      service: dashboard@internal
-      tls:
-        certresolver: myresolver
-      entrypoints:
-        - http
-        - https
+    er:
+      rule: "Host(`er.sbarnea.com`)"
+      service: service-er
+      entryPoints:
+        - web
+        - websecure
+
+    # syno-http:
+    #   rule: Host(`syno.sbarnea.com`)
+    #   service: syno
+    #   middlewares:
+    #     - redirect
+    #   entrypoints:
+    #     - http
+    # syno-https:
+    #   rule: Host(`syno.sbarnea.com`)
+    #   tls:
+    #     certresolver: myresolver
+    #   service: syno
+    #   entrypoints:
+    #     - https
+    # z:
+    #   rule: Host(`z.sbarnea.com`)
+    #   service: dashboard@internal
+    #   tls:
+    #     certresolver: myresolver
+    #   entrypoints:
+    #     - http
+    #     - https
   services:
-    syno:
+    service-er:
       loadBalancer:
         servers:
-          url: "http://192.168.33.40"
+          - url: http://192.168.33.20:8001
+
+    # syno:
+    #   loadBalancer:
+    #     servers:
+    #       url: "http://192.168.33.40"
 
   middlewares:
     redirect-to-https:

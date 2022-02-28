@@ -1,0 +1,9 @@
+---
+- hosts: syno
+  gather_facts: false
+  strategy: free
+  tasks:
+  # - include_role:
+  #     name: ensure
+  - include_role:
+      name: matrix

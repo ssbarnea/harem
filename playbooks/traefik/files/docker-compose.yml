@@ -1,7 +1,8 @@
+# syaml-language-server: $schema=compose
 version: '3.7'
 services:
   traefik:
-    image: traefik:v2.2.1
+    image: traefik:v2.4
     container_name: "traefik"
     command:
       - "--configFile=/data/traefik.yml"
@@ -18,6 +19,7 @@ services:
       # - "/opt/data/traefik/traefik.yml:/traefik.yml"
       # - "/opt/data/traefik/traefik-dynamic.yml:/traefik-dynamic.yml"
       - "/opt/data/traefik/:/data/"
+      - "/opt/data/traefik/.aws/:/root/.aws/"
     labels:
       # - "traefik.docker.network=frontend"
       - traefik.enable=true
@@ -33,10 +35,13 @@ services:
       - "traefik.http.routers.redirs.entrypoints=web"
       - "traefik.http.routers.redirs.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    restart: always
+    # apparently the deploy policy does not have any effect
     # deploy:
     #   restart_policy:
-    #     condition: on-failure
+    #     condition: always
     #     max_attempts: 3
+    #     window: 120s
     # networks:
     #   - bridge6
   whoami:
@@ -48,6 +53,7 @@ services:
       - traefik.http.routers.whoami.entrypoints=websecure
       # - traefik.http.routers.whoami.service=whoami-traefik@docker
       # - traefik.http.services.whoami.loadBalancer.server.port=80
+    restart: always
     # networks:
     #   - bridge6
 # networks:

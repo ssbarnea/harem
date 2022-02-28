@@ -1,6 +1,7 @@
 #!/usr/bin/env ansible-playbook
+# syaml-language-server: $schema=foossssf
 ---
-- hosts: n0
+- hosts: buntu
   become: true
   gather_facts: false
   vars:
@@ -43,19 +44,15 @@
 
         - name: compose up
           shell:
-            cmd: docker-compose --no-ansi --compatibility up --detach
+            cmd: >
+              docker-compose --no-ansi up --detach
+              {% if cfg is changed %}--force-recreate{% endif %}
+            # --compatibility -- breaks unless-stopped
             # --abort-on-container-exit
             warn: false
             chdir: /opt/data/{{ app.name }}
           register: result
 
-        # - name: compose down
-        #   delegate_to: localhost
-        #   become: false
-        #   docker_compose:
-        #     project_name: "{{ app.name }}"
-        #     project_src: .
-        #     state: absent
 
         # - name: compose up
         #   delegate_to: localhost

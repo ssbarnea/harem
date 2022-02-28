@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+unset http_proxy
+docker pull mozillaiot/gateway
+# docker stop iot || true
+# docker rm iot || true
+docker create \
+    --name=iot \
+    --net=host \
+    -e PUID=1000 \
+    -e PGID=1000 \
+    -p 8080:8080 \
+    -p 4443:4443 \
+    -v /opt/data/iot:/home/node/.mozilla-iot \
+    --restart unless-stopped \
+    mozillaiot/gateway:latest
+
+#   --network bridge \
+#   --ip 192.168.33.50 \
+docker start iot

@@ -7,46 +7,59 @@ services:
       - PUID=1000
       - PGID=1000
       - MEM_LIMIT=1024M
+      - TZ=Europe/London
     ports:
-      - "3478:3478/udp"
-      - "10001:10001/udp"
-      - "8080"
-      - "8081:8081"
-      - "28443:8443"
-      - "8843:8843"
-      - "8880:8880"
-      - "6789:6789"
+      - 18080:8080
+      - 3478:3478/udp
+      # - "3478:3478/udp"
+      # - "10001:10001/udp"
+      # - "8080:8080"
+      # - "8081:8081"
+      - "8443:8443"
+      # # - "28443:8443"
+      # - "1900:1900"
+      # - "8843:8843"
+      # - "8880:8880"
+      # - "6789:6789"
+      # - "5514:5514"
     volumes:
       - "/opt/data/unifi:/config"
     labels:
       - traefik.enable=true
+      # - traefik.docker.network=unifi_default
       - traefik.http.routers.unifi.rule=Host(`unifi.sbarnea.com`)
+      - traefik.http.routers.unifi.tls=true
       - traefik.http.routers.unifi.tls.certResolver=myresolver
-      - traefik.http.routers.unifi.entrypoints=http,https
+      - traefik.http.routers.unifi.entrypoints=web,websecure
       # do not use 8080 because controller will redirect to 8443 anyway
       - traefik.http.services.unifi-unifi.loadbalancer.server.port=8443
       - traefik.http.services.unifi-unifi.loadbalancer.server.scheme=https
       # header mingling, Ref: https://www.smarthomebeginner.com/install-unifi-controller-on-docker
-      - "traefik.http.middlewares.unifi.headers.sslredirect=true"
-      - "traefik.http.middlewares.unifi.headers.stsSeconds=315360000"
-      - "traefik.http.middlewares.unifi.headers.browserXSSFilter=true"
-      - "traefik.http.middlewares.unifi.headers.contentTypeNosniff=true"
-      - "traefik.http.middlewares.unifi.headers.forceSTSHeader=true"
-      - "traefik.http.middlewares.unifi.headers.STSIncludeSubdomains=true"
-      - "traefik.http.middlewares.unifi.headers.STSPreload=true"
-      - "traefik.http.middlewares.unifi.headers.frameDeny=true"
-      - "traefik.http.middlewares.unifi.headers.accessControlAllowCredentials=true"
-      - "traefik.http.middlewares.unifi.headers.SSLHost=unifi.sbarnea.com"
-    networks:
-      - bridge6
+      # - "traefik.http.middlewares.unifi.headers.sslredirect=true"
+      # - "traefik.http.middlewares.unifi.headers.stsSeconds=315360000"
+      # - "traefik.http.middlewares.unifi.headers.browserXSSFilter=true"
+      # - "traefik.http.middlewares.unifi.headers.contentTypeNosniff=true"
+      # - "traefik.http.middlewares.unifi.headers.forceSTSHeader=true"
+      # - "traefik.http.middlewares.unifi.headers.STSIncludeSubdomains=true"
+      # - "traefik.http.middlewares.unifi.headers.STSPreload=true"
+      # - "traefik.http.middlewares.unifi.headers.frameDeny=true"
+      # - "traefik.http.middlewares.unifi.headers.accessControlAllowCredentials=true"
+      # - "traefik.http.middlewares.unifi.headers.SSLHost=unifi.sbarnea.com"
+    # networks:
+    #   - unifi_default
     deploy:
       restart_policy:
         condition: on-failure
         max_attempts: 3
-networks:
-  bridge6:
-    name: bridge6
-    # not supported i v3+
-    # enable_ipv6: true
-    driver: bridge
-    # enable_ipv6: true
+# networks:
+#   unifi_default:
+#     name: unifi_default
+#     driver: bridge
+    # driver_opts:
+    #   com.docker.network.bridge.enable_icc: "true"
+#   bridge6:
+#     name: bridge6
+#     # not supported i v3+
+#     # enable_ipv6: true
+#     driver: bridge
+#     # enable_ipv6: true

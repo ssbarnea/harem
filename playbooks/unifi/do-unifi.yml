@@ -1,25 +1,34 @@
-#!/usr/bin/env ansible-playbook -vvvv
+#!/usr/bin/env ansible-playbook -vv
 ---
 - hosts: localhost
   become: false
   vars:
     app:
       name: unifi
-
-
   tasks:
+
+    - name: install reqs
+      pip:
+        name: docker-compose
 
     - block:
 
         - name: compose down
-          docker_compose:
+          community.docker.docker_compose:
             project_name: "{{ app.name }}"
             project_src: "{{ playbook_dir }}"
             state: absent
           register: result
 
+        # dompose-up may fail with name conflict if container with same name
+        # already exists, even if is not running, so we need to enforce its removal.
+        - name: Remove container
+          community.docker.docker_container:
+            name: "{{ app.name }}"
+            state: absent
+
         - name: compose up
-          docker_compose:
+          community.docker.docker_compose:
             build: true
             debug: true
             pull: true
@@ -49,7 +58,7 @@
         #   register: result
 
         - name: compose down
-          docker_compose:
+          community.docker.docker_compose:
             project_name: "{{ app.name }}"
             project_src: "{{ playbook_dir }}"
             state: absent
@@ -60,4 +69,5 @@
         #       "{{ result.module_stderr | join('\\n') }}"
         #       "{{ result.module_stdout | join('\\n') }}"
 
-    # - debug: var=result
+        - debug:
+            msg: Controller web interface shoul be visible at http://unifi.sbarnea.com:18080
