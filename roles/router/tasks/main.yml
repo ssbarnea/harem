@@ -64,7 +64,7 @@
       nohup sh /root/ovpn-get-auth >>/var/log/ovpn-pipe.log 2>&1 </dev/null &
 
 - name: start ovpn-pipe
-  shell:
+  command:
     cmd: sh /usr/local/etc/rc.d/ovpn-pipe.sh
     warn: false
   changed_when: false

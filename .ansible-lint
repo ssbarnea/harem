@@ -1,8 +1,16 @@
 parseable: true
 quiet: false
 skip_list:
-  - 305  # Use shell only when shell functionality is required
-  - 403  # Package installs should not use latest
+  # Temporary disabled during adoption:
+  - fqcn-builtins
+  - risky-file-permissions
+  - no-handler
+  - unnamed-task
+  - yaml
+  - no-changed-when
+  - role-name
+  - package-latest
+  - var-naming
 verbosity: 1
 exclude_paths:
   - jenkins

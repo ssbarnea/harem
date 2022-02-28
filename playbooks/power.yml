@@ -16,7 +16,7 @@
             name: pyghmi
           delegate_to: localhost
           connection: local
-          ignore_errors: true
+          failed_when: false
 
         - name: configure next boot device
           community.general.ipmi_boot:
@@ -36,7 +36,7 @@
           shell: "ssh {{ inventory_hostname }} reboot &"
           connection: local
           delegate_to: localhost
-          ignore_errors: true
+          failed_when: false
           async: 10
           poll: 0
 

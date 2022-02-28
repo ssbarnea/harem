@@ -25,10 +25,10 @@
         mode: +x
 
     - name: install
-      shell: /bin/sh /volume1/@entware-ng/opt/entware_install.sh
+      command: /bin/sh /volume1/@entware-ng/opt/entware_install.sh
 
 - name: check PATH status
-  shell: which opkg
+  command: which opkg
   failed_when: false
   register: result
   changed_when: false

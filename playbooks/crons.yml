@@ -4,15 +4,11 @@
   become_user: ssbarnea
   tasks:
 
-    - name: clone gri from git
+    - name: clone gri from git # noqa: git-latest
       git:
         repo: https://github.com/pycontribs/gri.git
         dest: ~/svc/gri
-
-    - name: clone gri from git
-      git:
-        repo: https://github.com/pycontribs/gri.git
-        dest: ~/svc/gri
+        update: yes
 
     - name: install awscli # using homebrew works too
       become: true
