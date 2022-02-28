@@ -1,0 +1,17 @@
+---
+dependency:
+  name: shell
+  # when calling galaxy manually keep in mind that that unless you manually
+  # specify the destination directory, it will install to `~/.ansible/collections`
+  # regardless the value of ANSIBLE_COLLECTIONS_PATH(S).
+  # https://github.com/ansible/ansible/issues/72187
+  command: >
+    ansible-galaxy collection install -p "${MOLECULE_EPHEMERAL_DIRECTORY}/collections" community.molecule
+driver:
+  name: delegated
+platforms:
+  - name: instance
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
