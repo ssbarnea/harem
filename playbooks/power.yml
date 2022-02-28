@@ -19,7 +19,7 @@
           ignore_errors: true
 
         - name: configure next boot device
-          ipmi_boot:
+          community.general.ipmi_boot:
             bootdev: "{% if state == 'on' %}hd0{% else %}{{ state }}{% endif %}"
             # network
             # setup

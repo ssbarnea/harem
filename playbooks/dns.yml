@@ -20,7 +20,7 @@
   tasks:
 
     - name: read dns entry from route53
-      route53:
+      community.aws.route53_info:
         state: get
         zone: sbarnea.com
         record: "{{ item }}.sbarnea.com."

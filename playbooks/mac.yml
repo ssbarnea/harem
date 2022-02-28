@@ -77,7 +77,7 @@
       changed_when: true
 
     - name: configure pip to use system ca certificates
-      ini_file:
+      community.general.ini_file:
         path: "~/.conf/pip/pip.conf"
         section: global
         option: cert

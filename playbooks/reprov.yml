@@ -11,7 +11,7 @@
     #     extra_args: --user
 
     - name: set default boot to disk
-      ipmi_boot:
+      community.general.ipmi_boot:
         bootdev: hd
         name: "{{ ipmi_address }}"
         uefiboot: "no"

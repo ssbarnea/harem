@@ -1,8 +1,8 @@
 #!/usr/bin/env ansible-playbook
 %YAML 1.2
 ---
-- hosts: n0  # ,buntu # baremetals
-  gather_facts: min
+- hosts: n0  # ubuntu # baremetals
+  gather_facts: false
   become: true
   tasks:
 
@@ -15,7 +15,7 @@
         state: present
 
     - name: configure ups.conf
-      ini_file:
+      community.general.ini_file:
         path: /etc/ups/ups.conf
         section: apc
         option: "{{ item.key }}"
