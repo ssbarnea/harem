@@ -9,4 +9,6 @@ rules:
   line-length:
     max: 999
   document-start: disable
+  comments:
+    min-spaces-from-content: 1
   comments-indentation: disable

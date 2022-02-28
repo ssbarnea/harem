@@ -9,8 +9,8 @@ services:
       - PUID=1000
       - PGID=1000
       - VERSION=docker
-      - UMASK_SET=022 #optional
-      - PLEX_CLAIM= #optional
+      - UMASK_SET=022 # optional
+      - PLEX_CLAIM= # optional
     volumes:
       - /opt/data/plex:/config
       - /mnt/download/media/series/:/tv

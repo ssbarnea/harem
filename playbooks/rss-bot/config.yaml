@@ -2,7 +2,7 @@
 host: chat.freenode.net
 ssl_port: 6697
 nick: notify
-#recheck
+# recheck
 alerts_channel: "##recheck-alerts"
 admin: zbr@*
 mode: +igR # https://freenode.net/kb/answer/usermodes

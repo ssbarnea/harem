@@ -7,7 +7,7 @@
       git:
         repo: https://github.com/pycontribs/gri.git
         dest: ~/svc/gri
-        update: yes
+        update: true
 
     - name: install awscli # using homebrew works too
       become: true
