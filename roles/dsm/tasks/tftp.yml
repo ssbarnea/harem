@@ -83,15 +83,15 @@
         nemo.img: http://www.lsc-group.phys.uwm.edu/beowulf/nemo/construction/BIOS/Nemo-node-config.img
         memtest: http://boot.ipxe.org/memtest
         memtest.0: http://boot.ipxe.org/memtest.0
-        "fedora28/vmlinuz": "{{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/vmlinuz"
-        "fedora28/initrd.img": "{{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/initrd.img"
-        "centos7/initrd.img": "{{ distros_mirror }}/centos/7/os/x86_64/images/pxeboot/initrd.img"
-        "centos7/vmlinuz": "{{ distros_mirror }}/centos/7/os/x86_64/images/pxeboot/vmlinuz"
-        "centos8/initrd.img": "{{ distros_mirror }}/centos/8/BaseOS/x86_64/kickstart/images/pxeboot/initrd.img"
-        "centos8/vmlinuz": "{{ distros_mirror }}/centos/8/BaseOS/x86_64/kickstart/images/pxeboot/vmlinuz"
-        "rhel8/vmlinuz": "{{ rhel8_pxeboot_url }}/vmlinuz"
-        "rhel8/initrd.img": "{{ rhel8_pxeboot_url }}/initrd.img"
-        "rhel80/vmlinuz": "http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8.0/compose/BaseOS/x86_64/os/images/pxeboot/vmlinuz"
-        "rhel80/initrd.img": "http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8.0/compose/BaseOS/x86_64/os/images/pxeboot/initrd.img"
+        fedora28/vmlinuz: "{{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/vmlinuz"
+        fedora28/initrd.img: "{{ distros_mirror }}/fedora/linux/releases/28/Server/x86_64/os/images/pxeboot/initrd.img"
+        centos7/initrd.img: "{{ distros_mirror }}/centos/7/os/x86_64/images/pxeboot/initrd.img"
+        centos7/vmlinuz: "{{ distros_mirror }}/centos/7/os/x86_64/images/pxeboot/vmlinuz"
+        centos8/initrd.img: "{{ distros_mirror }}/centos/8/BaseOS/x86_64/kickstart/images/pxeboot/initrd.img"
+        centos8/vmlinuz: "{{ distros_mirror }}/centos/8/BaseOS/x86_64/kickstart/images/pxeboot/vmlinuz"
+        rhel8/vmlinuz: "{{ rhel8_pxeboot_url }}/vmlinuz"
+        rhel8/initrd.img: "{{ rhel8_pxeboot_url }}/initrd.img"
+        rhel80/vmlinuz: http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8.0/compose/BaseOS/x86_64/os/images/pxeboot/vmlinuz
+        rhel80/initrd.img: http://download.eng.brq.redhat.com/rhel-8/rel-eng/RHEL-8/latest-RHEL-8.0/compose/BaseOS/x86_64/os/images/pxeboot/initrd.img
       loop_control:
         loop_var: file

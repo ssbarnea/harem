@@ -1,8 +1,9 @@
+---
 # yaml-language-server: $schema=https://json.schemastore.org/traefik-v2-file-provider
 http:
   routers:
     er:
-      rule: "Host(`er.sbarnea.com`)"
+      rule: Host(`er.sbarnea.com`)
       service: service-er
       entryPoints:
         - web

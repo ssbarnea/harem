@@ -1,3 +1,4 @@
+---
 #!/usr/bin/env ansible-playbook -v
 # %YAML 1.2
 # ---
@@ -13,7 +14,7 @@
       become: true
       become_user: dd-agent
       synchronize:
-        src: "files/_all_/etc/datadog-agent/"
+        src: files/_all_/etc/datadog-agent/
         dest: /etc/datadog-agent/
         recursive: true
         archive: false
@@ -41,7 +42,7 @@
       become: true
       become_user: dd-agent
       synchronize:
-        src: "files/{{ inventory_hostname_short }}/etc/datadog-agent/"
+        src: files/{{ inventory_hostname_short }}/etc/datadog-agent/
         dest: /etc/datadog-agent
         recursive: true
         archive: false

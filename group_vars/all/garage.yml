@@ -1,3 +1,4 @@
+---
 apc_ups_ip: 192.168.33.9
 apc_ups_user: apc
 apc_ups_password: !vault |

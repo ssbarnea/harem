@@ -25,23 +25,23 @@
     #     services: metrics
     #   register: result
     - debug: var=domain
-    - name: "deploy {{ role_name }} container"
+    - name: deploy {{ role_name }} container
       docker_container:
         name: "{{ role_name }}"
         image: matrixdotorg/synapse:latest
         state: started
         # recreate: yes
         published_ports:
-          - "8008:8008"
-          - "8448:8448"
+          - 8008:8008
+          - 8448:8448
         volumes:
-          - "/{{ docker_volumes_root }}/{{ role_name }}:/data"
+          - /{{ docker_volumes_root }}/{{ role_name }}:/data
         output_logs: true
         env:
-          SYNAPSE_REPORT_STATS: "yes"
+          SYNAPSE_REPORT_STATS: yes
           SYNAPSE_SERVER_NAME: "{{ matrix_fqdn }}"
-          SYNAPSE_NO_TLS: "yes"
-          SYNAPSE_ENABLE_REGISTRATION: "yes"
+          SYNAPSE_NO_TLS: yes
+          SYNAPSE_ENABLE_REGISTRATION: yes
           SYNAPSE_SMTP_HOST: "{{ smtp_host }}"
           SYNAPSE_SMTP_PORT: 465
           SYNAPSE_SMTP_USER: "{{ smtp_user }}"

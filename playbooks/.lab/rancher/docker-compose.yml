@@ -1,3 +1,4 @@
+---
 # based on https://www.portainer.io/documentation/quick-start/
 
 version: "3.7"
@@ -11,7 +12,7 @@ services:
       - 80
       - 443
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - /var/run/docker.sock:/var/run/docker.sock
       # - "/opt/data/rancher/:/data"
     labels:
       - traefik.enable=true

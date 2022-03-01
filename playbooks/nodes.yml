@@ -20,8 +20,8 @@
         line: "{{ item.key }} {{ item.value }}"
       notify: restart sshd
       with_dict:
-        ChallengeResponseAuthentication: "no"
-        PasswordAuthentication: "no"
+        ChallengeResponseAuthentication: no
+        PasswordAuthentication: no
         Protocol: 2
 
     - name: Install baremetail utils

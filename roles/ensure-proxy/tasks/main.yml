@@ -66,7 +66,7 @@
   when: custom_ca is defined
   become: true
   ini_file:
-    path: "/etc/pip.conf"
+    path: /etc/pip.conf
     section: global
     option: cert
-    value: "/etc/ssl/certs/ca-bundle.crt"
+    value: /etc/ssl/certs/ca-bundle.crt

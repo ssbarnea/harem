@@ -1,3 +1,4 @@
+---
 # based on https://www.portainer.io/documentation/quick-start/
 
 version: "3.7"
@@ -11,11 +12,11 @@ services:
       - traefik_default
     restart: always
     ports:
-      - "9000:9000"
+      - 9000:9000
       # - "8000:8000"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "/opt/data/portainer/:/data"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/data/portainer/:/data
     labels:
       - traefik.enable=true
       - traefik.http.routers.p.rule=Host(`p.sbarnea.com`)

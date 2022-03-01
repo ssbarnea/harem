@@ -1,3 +1,4 @@
+---
 version: "3.2"
 
 services:
@@ -17,7 +18,6 @@ services:
       mode: global
       placement:
         constraints: [node.platform.os == linux]
-
 networks:
   portainer_agent:
     driver: overlay

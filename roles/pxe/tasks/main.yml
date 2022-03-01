@@ -4,8 +4,8 @@
   # on the controller instead.
   delegate_to: localhost
   template:
-    src: "pxelinux.cfg/default.j2"
-    dest: "tmp/pxelinux.cfg/01-{{ hostvars[item]['ks_host_id']"
+    src: pxelinux.cfg/default.j2
+    dest: tmp/pxelinux.cfg/01-{{ hostvars[item]['ks_host_id']
     # dest: >-
     #   {{ pxe_root }}/pxelinux.cfg/01-{{ hostvars[item]['ks_host_id'] }}
   loop: "{{ groups.baremetals }}"
@@ -16,7 +16,7 @@
 #     msg: foo
 - name: Make sure destination dir exists
   file:
-    path: "tmp/{{ ks_root }}"
+    path: tmp/{{ ks_root }}
     state: directory
     recurse: true
 
@@ -30,8 +30,8 @@
     ks_packages: "{{ hostvars[item]['ks_packages'] }}"
     ks_bond_mac: "{{ hostvars[item]['ks_bond_mac'] }}"
   template:
-    src: "ks/{{ hostvars[item]['ks_template'] }}.ks.j2"
-    dest: "tmp/{{ hostvars[item]['ks_root'] | default(ks_root) }}/{{ hostvars[item]['ks_host_id'] }}.ks"
+    src: ks/{{ hostvars[item]['ks_template'] }}.ks.j2
+    dest: tmp/{{ hostvars[item]['ks_root'] | default(ks_root) }}/{{ hostvars[item]['ks_host_id'] }}.ks
   loop: "{{ groups['baremetals'] }}"
 
 - name: tftp tasks
@@ -42,12 +42,12 @@
   delegate_to: localhost
   template:
     src: proxy.pac.j2
-    dest: "tmp/{{ ks_root }}/proxy.pac"
+    dest: tmp/{{ ks_root }}/proxy.pac
 
 - name: proxy wpad symlinks
   delegate_to: localhost
   file:
-    dest: "tmp/{{ ks_root }}/{{ item }}"
+    dest: tmp/{{ ks_root }}/{{ item }}
     src: "{{ ks_root }}/proxy.pac"
     state: link
     # force: true

@@ -4,7 +4,7 @@
   gather_facts: false
   strategy: linear
   vars:
-    state: "setup"
+    state: setup
   tasks:
     - name: if host has ipmi_address
       when: ipmi_address is defined
@@ -31,7 +31,7 @@
           register: ipmi_boot
 
         - name: trigger reboot if host is already up
-          shell: "ssh {{ inventory_hostname }} reboot &"
+          shell: ssh {{ inventory_hostname }} reboot &
           connection: local
           delegate_to: localhost
           failed_when: false

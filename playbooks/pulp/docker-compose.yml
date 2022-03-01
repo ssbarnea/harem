@@ -1,3 +1,4 @@
+---
 # based on https://pulpproject.org/2020/03/15/pulp-fedora31-single-container/
 version: "3.7"
 services:
@@ -6,12 +7,12 @@ services:
     container_name: pulp
     network_mode: bridge
     ports:
-      - "24816:24816"
+      - 24816:24816
     volumes:
-      - "/opt/data/pulp/settings:/etc/pulp"
-      - "/opt/data/pulp/storage:/var/lib/pulp"
-      - "/opt/data/pulp/db:/var/lib/pgsql"
-      - "/opt/data/pulp/containers:/var/lib/containers"
+      - /opt/data/pulp/settings:/etc/pulp
+      - /opt/data/pulp/storage:/var/lib/pulp
+      - /opt/data/pulp/db:/var/lib/pgsql
+      - /opt/data/pulp/containers:/var/lib/containers
     labels:
       - traefik.enable=true
       - traefik.http.routers.pulp.rule=Host(`pulp.sbarnea.com`)

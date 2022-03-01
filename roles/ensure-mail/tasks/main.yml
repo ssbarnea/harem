@@ -5,7 +5,7 @@
   become: true
   lineinfile:
     dest: /etc/aliases
-    regexp: "^(.*)root:(.*)"
+    regexp: ^(.*)root:(.*)
     line: "root:  {{ sysadmin_email }}"
   register: result
 

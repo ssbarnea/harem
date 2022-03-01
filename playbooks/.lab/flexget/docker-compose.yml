@@ -4,7 +4,7 @@ services:
   flexget:
     build: .
     ports:
-      - "5555:5050"
+      - 5555:5050
     networks:
       hostnet: {}
 networks:

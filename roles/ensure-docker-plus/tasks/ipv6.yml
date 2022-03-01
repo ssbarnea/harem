@@ -1,3 +1,4 @@
+---
 # Based on:
 #   https://github.com/moby/moby/issues/36954#issuecomment-512244615
 #   https://docs.docker.com/v17.09/engine/userguide/networking/default_network/ipv6/#how-ipv6-works-on-docker
@@ -6,7 +7,7 @@
 - name: Assure host ipv6 accepts RA
   become: true
   sysctl:
-    name: "net.ipv6.conf.{{ ansible_default_ipv6.interface }}.accept_ra"
+    name: net.ipv6.conf.{{ ansible_default_ipv6.interface }}.accept_ra
     value: "2"
 
 - name: sysctl ipv6 settings
@@ -15,8 +16,8 @@
     name: "{{ item.key }}"
     value: "{{ item.value }}"
   with_dict:
-    "net.ipv6.conf.default.forwarding": "1"
-    "net.ipv6.conf.all.forwarding": "1"
+    net.ipv6.conf.default.forwarding: "1"
+    net.ipv6.conf.all.forwarding: "1"
 
 - name: route docker subnet
   become: true

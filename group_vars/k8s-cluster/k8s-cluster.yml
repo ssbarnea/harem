@@ -23,11 +23,11 @@ kube_api_anonymous_auth: true
 kube_version: v1.13.3
 
 # kubernetes image repo define
-kube_image_repo: "gcr.io/google-containers"
+kube_image_repo: gcr.io/google-containers
 
 # Where the binaries will be downloaded.
 # Note: ensure that you've enough disk space (about 1G)
-local_release_dir: "/tmp/releases"
+local_release_dir: /tmp/releases
 # Random shifts for retrying failed ops like pushing/downloading
 retry_stagger: 5
 

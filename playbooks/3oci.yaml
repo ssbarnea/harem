@@ -28,14 +28,14 @@
       authorized_key:
         user: "{{ item }}"
         state: present
-        key: "https://github.com/{{ item }}.keys"
+        key: https://github.com/{{ item }}.keys
       with_items: "{{ accounts }}"
 
     - name: disable password login on ssh
       lineinfile:
         path: /etc/ssh/sshd_config
-        regexp: "^PasswordAuthentication .+"
-        line: "PasswordAuthentication no"
+        regexp: ^PasswordAuthentication .+
+        line: PasswordAuthentication no
       register: result
 
     - name: restart sshd

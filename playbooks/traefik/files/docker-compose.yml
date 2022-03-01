@@ -1,29 +1,30 @@
+---
 # syaml-language-server: $schema=compose
 version: "3.7"
 services:
   traefik:
     image: traefik:v2.4
-    container_name: "traefik"
+    container_name: traefik
     command:
-      - "--configFile=/data/traefik.yml"
+      - --configFile=/data/traefik.yml
       # - "--api.insecure=true"
       # - "--providers.docker=true"
       # - "--providers.docker.exposedbydefault=true"
       # - "--entrypoints.web.address=:80"
     ports:
-      - "80:80"
-      - "8080:8080"
-      - "443:443"
+      - 80:80
+      - 8080:8080
+      - 443:443
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       # - "/opt/data/traefik/traefik.yml:/traefik.yml"
       # - "/opt/data/traefik/traefik-dynamic.yml:/traefik-dynamic.yml"
-      - "/opt/data/traefik/:/data/"
-      - "/opt/data/traefik/.aws/:/root/.aws/"
+      - /opt/data/traefik/:/data/
+      - /opt/data/traefik/.aws/:/root/.aws/
     labels:
       # - "traefik.docker.network=frontend"
       - traefik.enable=true
-      - "traefik.frontend.rule=Host:t.sbarnea.com" # || Host:n0 # ; PathPrefixStrip:/traefik"
+      - traefik.frontend.rule=Host:t.sbarnea.com # || Host:n0 # ; PathPrefixStrip:/traefik"
       - traefik.port=8080
       - traefik.protocol=http
       - traefik.http.routers.t.rule=Host(`t.sbarnea.com`)
@@ -31,10 +32,10 @@ services:
       - traefik.http.routers.t.entrypoints=web,websecure
       - traefik.http.routers.t.service=api@internal
       # global redirect to https
-      - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
-      - "traefik.http.routers.redirs.entrypoints=web"
-      - "traefik.http.routers.redirs.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)
+      - traefik.http.routers.redirs.entrypoints=web
+      - traefik.http.routers.redirs.middlewares=redirect-to-https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
     restart: always
     # apparently the deploy policy does not have any effect
     # deploy:
@@ -47,7 +48,7 @@ services:
   whoami:
     image: containous/whoami
     labels:
-      - "traefik.enable=true"
+      - traefik.enable=true
       - traefik.http.routers.whoami.rule=Host(`whoami.sbarnea.com`)
       - traefik.http.routers.whoami.tls.certResolver=myresolver
       - traefik.http.routers.whoami.entrypoints=websecure

@@ -9,7 +9,7 @@
     - name: create app user
       user:
         name: "{{ app.name }}"
-        home: "/opt/data/{{ app.name }}/"
+        home: /opt/data/{{ app.name }}/
       register: user
 
     - name: service folder
@@ -41,7 +41,7 @@
         - name: compose down
           docker_compose:
             project_name: "{{ app.name }}"
-            project_src: "/opt/data/{{ app.name }}"
+            project_src: /opt/data/{{ app.name }}
             state: absent
 
         - name: compose up
@@ -53,7 +53,7 @@
             restarted: true
             project_name: "{{ app.name }}"
             remove_orphans: true
-            project_src: "/opt/data/{{ app.name }}"
+            project_src: /opt/data/{{ app.name }}
           register: result
 
         # - name: get info about container
@@ -76,7 +76,7 @@
         - name: compose down
           docker_compose:
             project_name: "{{ app.name }}"
-            project_src: "/opt/data/{{ app.name }}"
+            project_src: /opt/data/{{ app.name }}
             state: absent
 
         - name: assure we fail the playbook

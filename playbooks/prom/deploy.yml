@@ -9,7 +9,7 @@
     - name: create app user
       user:
         name: "{{ app.name }}"
-        home: "/opt/data/{{ app.name }}/"
+        home: /opt/data/{{ app.name }}/
       register: user
 
     - name: service folder
@@ -51,7 +51,7 @@
                   container_name: "{{ app.name }}"
                   image: prom/prometheus:latest
                   ports:
-                    - "9090:9090"
+                    - 9090:9090
                   volumes:
                     - /opt/data/{{ app.name }}:/prometheus-data
                   # env_file:

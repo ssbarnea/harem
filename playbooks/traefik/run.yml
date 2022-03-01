@@ -11,7 +11,7 @@
     - name: create app user
       user:
         name: "{{ app.name }}"
-        home: "/opt/data/{{ app.name }}/"
+        home: /opt/data/{{ app.name }}/
       register: user
 
     - name: service folder
@@ -92,7 +92,7 @@
 
         - name: assure we fail the playbook
           fail:
-            msg: "Fatal error, look above"
+            msg: Fatal error, look above
 
     # - debug: var=result
     - name: logs

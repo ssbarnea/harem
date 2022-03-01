@@ -1,3 +1,4 @@
+---
 version: "3.7"
 services:
   unifi:
@@ -15,7 +16,7 @@ services:
       # - "10001:10001/udp"
       # - "8080:8080"
       # - "8081:8081"
-      - "8443:8443"
+      - 8443:8443
       # # - "28443:8443"
       # - "1900:1900"
       # - "8843:8843"
@@ -23,7 +24,7 @@ services:
       # - "6789:6789"
       # - "5514:5514"
     volumes:
-      - "/opt/data/unifi:/config"
+      - /opt/data/unifi:/config
     labels:
       - traefik.enable=true
       # - traefik.docker.network=unifi_default

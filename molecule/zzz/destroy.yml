@@ -12,7 +12,6 @@
     - name: Populate instance config
       set_fact:
         instance_conf: {}
-
     - name: Dump instance config
       copy:
         content: |

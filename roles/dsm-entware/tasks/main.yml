@@ -36,5 +36,5 @@
   lineinfile:
     dest: /etc/profile
     state: present
-    line: "PATH=$PATH:/opt/bin"
+    line: PATH=$PATH:/opt/bin
   become: true

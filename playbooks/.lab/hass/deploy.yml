@@ -56,7 +56,7 @@
                   container_name: "{{ project_name }}-hass"
                   image: homeassistant/home-assistant:stable
                   volumes:
-                    - "/opt/data/{{ project_name }}:/config"
+                    - /opt/data/{{ project_name }}:/config
                   # env_file:
                   #   - "/opt/data/{{ project_name }}/secrets.env"
                   restart: always
@@ -70,9 +70,9 @@
                       delay: 10s
                       max_attempts: 3
                   ports:
-                    - "8123:8123"
+                    - 8123:8123
                   devices:
-                    - "/dev/ttyACM0:/dev/ttyACM0"
+                    - /dev/ttyACM0:/dev/ttyACM0
                 mqtt:
                   container_name: "{{ project_name }}-mqtt"
                   image: toke/mosquitto:latest
@@ -81,7 +81,7 @@
                     - 1883:1883
                     - 9001:9001
                   volumes:
-                    - "/opt/data/{{ project_name }}/mosquitto/:/mqtt/config/:ro"
+                    - /opt/data/{{ project_name }}/mosquitto/:/mqtt/config/:ro
           register: result
 
         - name: gather container info
@@ -96,8 +96,8 @@
             - hass
 
       rescue:
-        - name: "display {{ project_name }} logs"
-          command: "docker logs {{ project_name }}"
+        - name: display {{ project_name }} logs
+          command: docker logs {{ project_name }}
           args:
             warn: false
           register: result

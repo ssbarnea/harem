@@ -12,7 +12,6 @@
     - name: Populate instance config
       set_fact:
         instance_conf: {}
-
     - name: Dump instance config
       copy:
         content: "{{ instance_conf | to_json | from_json | molecule_to_yaml | molecule_header }}"

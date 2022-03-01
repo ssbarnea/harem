@@ -19,7 +19,7 @@
     ks_packages: "{{ hostvars[item]['ks_packages'] }}"
     ks_bond_mac: "{{ hostvars[item]['ks_bond_mac'] }}"
   template:
-    src: "ks/{{ hostvars[item]['ks_template'] }}.ks.j2"
+    src: ks/{{ hostvars[item]['ks_template'] }}.ks.j2
     dest: "{{ hostvars[item]['ks_root'] | default(ks_root) }}/{{ hostvars[item]['ks_host_id'] }}.ks"
   loop: "{{ groups['baremetals'] }}"
 

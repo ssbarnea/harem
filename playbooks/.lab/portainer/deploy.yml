@@ -9,7 +9,7 @@
     - name: create app user
       user:
         name: "{{ app.name }}"
-        home: "/opt/data/{{ app.name }}/"
+        home: /opt/data/{{ app.name }}/
       register: user
 
     - name: service folder

@@ -1,5 +1,5 @@
+---
 init_config:
-
 instances:
   - use_mount: false
     mount_point_blacklist:

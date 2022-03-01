@@ -16,11 +16,11 @@ syslog_server: syslog.lan
 
 http_proxy_no_schema: 192.168.33.1:3128
 https_proxy_no_schema: 192.168.33.1:3129
-http_proxy: "http://{{ http_proxy_no_schema }}"
-https_proxy: "http://{{ https_proxy_no_schema }}"
-no_proxy: "localhost,zuul.openstack.org,192.168.0.0/16,10.0.0.0/8,172.30.0.0/16"
+http_proxy: http://{{ http_proxy_no_schema }}
+https_proxy: http://{{ https_proxy_no_schema }}
+no_proxy: localhost,zuul.openstack.org,192.168.0.0/16,10.0.0.0/8,172.30.0.0/16
 
-matrix_fqdn: "m.{{ domain }}"
+matrix_fqdn: m.{{ domain }}
 
 distros_mirror: http://mirror.bytemark.co.uk
 
@@ -234,7 +234,7 @@ upstream_dns_servers:
 # download_validate_certs: False
 
 ## If you need exclude all cluster nodes from proxy and other resources, add other resources here.
-additional_no_proxy: "localhost,192.168.0.0/16,10.0.0.0/8,172.30.0.0/16"
+additional_no_proxy: localhost,192.168.0.0/16,10.0.0.0/8,172.30.0.0/16
 ## Certificate Management
 ## This setting determines whether certs are generated via scripts.
 ## Chose 'none' if you provide your own certificates.

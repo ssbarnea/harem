@@ -1,12 +1,13 @@
+---
 global:
   checkNewVersion: true
   sendAnonymousUsage: true
 
 entryPoints:
   web:
-    address: ":80"
+    address: :80
   websecure:
-    address: ":443"
+    address: :443
     http:
       tls:
         certResolver: myresolver
@@ -32,16 +33,16 @@ certificatesResolvers:
         delayBeforeCheck: 10
 
 log:
-  filePath: "/data/traefik.log"
+  filePath: /data/traefik.log
   # level: DEBUG
   format: common
 accessLog:
-  filePath: "/data/access.log"
+  filePath: /data/access.log
   filters:
     statusCodes:
-      - "100-199"
-      - "400-499"
-      - "500-599"
+      - 100-199
+      - 400-499
+      - 500-599
   # level: DEBUG
 
 # Enable API and dashboard
@@ -75,7 +76,7 @@ providers:
     # defaultRule = "Host(`{{ normalize .Name }}.docker.localhost`)"
     exposedByDefault: true
   file:
-    filename: "/data/traefik-dynamic.yml"
+    filename: /data/traefik-dynamic.yml
     watch: true
 
 serversTransport:

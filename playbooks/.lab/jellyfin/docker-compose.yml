@@ -3,7 +3,7 @@ version: "3.2"
 services:
   jellyfin:
     image: jellyfin/jellyfin
-    network_mode: "host"
+    network_mode: host
     # port 8096
     volumes:
       # - /media/wd10/.config/jellyfin:/config
@@ -25,6 +25,6 @@ services:
 volumes:
   download:
     driver_opts:
-      type: "nfs"
-      o: "nfsvers=4,addr=syno,nolock,soft,rw"
-      device: ":/volume2/download"
+      type: nfs
+      o: nfsvers=4,addr=syno,nolock,soft,rw
+      device: :/volume2/download

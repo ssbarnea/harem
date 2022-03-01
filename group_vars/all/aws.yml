@@ -1,3 +1,4 @@
+---
 aws_buckets:
   sbarnea.com:
     accesss_key: !vault |

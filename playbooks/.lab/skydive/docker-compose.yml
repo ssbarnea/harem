@@ -1,20 +1,21 @@
+---
 version: "2"
 services:
   elasticsearch:
     image: elasticsearch:5
     ports:
-      - "19200:9200"
-      - "19300:9300"
+      - 19200:9200
+      - 19300:9300
     environment:
-      - "discovery.type=single-node"
+      - discovery.type=single-node
     networks:
       - skynet
 
   skydive-analyzer:
     image: skydive/skydive
     ports:
-      - "8082:8082"
-      - "8082:8082/udp"
+      - 8082:8082
+      - 8082:8082/udp
     links:
       - elasticsearch
     command: analyzer --listen=0.0.0.0:8082
@@ -31,9 +32,9 @@ services:
     depends_on:
       - skydive-analyzer
     ports:
-      - "8081:8081"
-    network_mode: "host"
-    pid: "host"
+      - 8081:8081
+    network_mode: host
+    pid: host
     command: agent --listen=0.0.0.0:8081
     privileged: true
     volumes:
